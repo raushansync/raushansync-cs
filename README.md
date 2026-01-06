@@ -1,51 +1,72 @@
 # RaushanSYNC CS & DS
 
-RaushanSYNC CS & DS is a focused learning hub for Computer Science and Data Science — covering foundational topics from Class 11 & 12, college-level syllabi, and practical skills for careers in software and data.
+RaushanSYNC CS & DS is the Computer Science and Data Science branch of the
+RaushanSYNC Learning Network — a first-principles–driven educational ecosystem
+focused on deep understanding, clarity, and long-term thinking.
 
-![RaushanSYNC CS & DS](https://cs.raushansync.com/assets/images/og-image.jpg)
-
-## 🎯 Project Goals
-
-- Provide high-quality, accessible Computer Science and Data Science resources
-- Structure content from basics (Class 11/12) through college-level courses and practical projects
-- Offer lectures, notes, practice questions and project-based learning
-
-## 🎓 What You'll Find
-
-- Programming tutorials and problem-solving
-- Data structures & algorithms
-- Databases, networking and operating systems
-- Data cleaning, visualization, and machine learning
-- Project ideas and real-world case studies
-
-## 🛠️ Technologies Used
-
-- HTML5, CSS3, Vanilla JavaScript
-- Responsive layouts with CSS Grid & Flexbox
-- PWA-ready assets and simple client-side scripts
-
-## 🚀 Local Development
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/raushansync/raushansync-cs.git
-   cd raushansync-cs
-   ```
-
-2. Open `index.html` in a browser or use a local server (e.g., VS Code Live Server).
-
-## 🤝 Contributing
-
-Contributions welcome: content, fixes, translations, and accessibility improvements. Open a PR with your changes.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📞 Contact
-
-Raushan Kumar - [@raushansync](https://x.com/raushansync)
+This website powers **https://cs.raushansync.com**, delivering structured
+Computer Science and Data Science learning from **Class 11 & 12 foundations**
+to **college-level concepts and practical skills**.
 
 ---
 
-Built with curiosity by Raushan Kumar
+## 🎯 Purpose & Philosophy
+
+RaushanSYNC CS & DS is built on a simple belief:
+
+> Real learning comes from understanding *why* things work, not memorizing tools.
+
+This platform emphasizes:
+- First-principles explanations
+- Conceptual clarity over shortcuts
+- Logical thinking and problem-solving
+- Strong foundations before frameworks
+- Learning as a lifelong process, not exam preparation
+
+---
+
+## 📚 What This Website Contains
+
+- Core Computer Science topics (Class 11, Class 12, and beyond)
+- Programming fundamentals and problem-solving
+- Data Structures & Algorithms (concept-first)
+- Databases, Operating Systems, and Computer Networks
+- Data Science foundations: data handling, visualization, and ML concepts
+- Carefully designed examples, exercises, and explanations
+
+All content is original and written specifically for structured learning.
+
+---
+
+## 🛠️ Technology Stack
+
+This website is intentionally kept **simple, transparent, and dependency-light**:
+
+- HTML5 for structure
+- CSS3 (Grid & Flexbox) for responsive layout
+- Vanilla JavaScript for essential interactivity
+- PWA-ready assets for performance and accessibility
+- Static-site architecture for longevity and reliability
+
+No heavy frameworks. No unnecessary abstractions.
+
+---
+
+## 🌐 Website Structure
+
+- `/class11` – Class 11 Computer Science foundations
+- `/class12` – Class 12 Computer Science foundations
+- `/computer-science` – Core CS concepts
+- `/data-science` – Data Science fundamentals
+- `/about.html` – Philosophy and intent
+- `/assets` – Styles, scripts, and static resources
+
+---
+
+## 🚀 Local Preview (Optional)
+
+You may preview the website locally for personal study:
+
+```bash
+git clone https://github.com/raushansync/raushansync-cs.git
+cd raushansync-cs
