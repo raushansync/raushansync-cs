@@ -1,5 +1,3 @@
 User-agent: *
 Allow: /
-Disallow: /.github/
-
 Sitemap: https://cs.raushansync.com/sitemap.xml
