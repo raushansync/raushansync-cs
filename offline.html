@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3b82f6" id="theme-color-meta">
+
+    <title>Offline | RaushanSYNC CS & DS</title>
+
+    <meta name="description"
+        content="You're offline, but RaushanSYNC CS & DS can still help you continue learning from first principles.">
+    <meta name="author" content="Raushan Kumar">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+
+<body class="offline-page">
+
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo">RaushanSYNC CS & DS</a>
+            <div id="nav" aria-label="Primary navigation"></div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode">
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                    </svg>
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                    </svg>
+                </button>
+                <button class="hamburger" id="hamburger" aria-label="Open menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="welcome-section">
+            <div class="container">
+                <h1>You're Offline — But Learning Can Continue</h1>
+
+                <div class="palette important hero-palette offline-intro">
+                    <p>
+                        It looks like your internet connection is unavailable right now. You can still open pages
+                        you've visited recently, along with saved notes and practice sets, directly from your device.
+                    </p>
+                    <p class="offline-indicator">Offline mode — Some features may be unavailable.</p>
+                </div>
+
+                <div class="navigation-buttons" aria-label="Quick navigation">
+                    <a class="btn" href="/">Home</a>
+                    <a class="btn" href="/class11/">Class 11</a>
+                    <a class="btn" href="/class12/">Class 12</a>
+                    <a class="btn" href="/computer-science/">Computer Science</a>
+                    <a class="btn" href="/data-science/">Data Science</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="container">
+                <h2>Keep Learning From First Principles</h2>
+
+                <div class="palette optional">
+                    <strong>Continue with what you already have</strong>
+                    <ul>
+                        <li>Revisit core concepts and mental models from the last lesson.</li>
+                        <li>Trace algorithms or logic step-by-step on paper.</li>
+                        <li>Write pseudocode or flow diagrams for problems you remember.</li>
+                        <li>Analyze edge cases and think about how the logic might fail.</li>
+                        <li>Sketch data structures or system flow from memory.</li>
+                    </ul>
+                </div>
+
+                <!-- <div id="support-cta"></div> -->
+            </div>
+        </section>
+    </main>
+
+    <div id="footer"></div>
+
+    <script src="/assets/js/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,27 @@
+{
+  "id": "/",
+  "name": "RaushanSYNC CS & DS",
+  "short_name": "RS CS",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "lang": "en",
+  "background_color": "#111827",
+  "theme_color": "#3b82f6",
+  "description": "RaushanSYNC CS & DS teaches computing from first principles through structured lessons, concept notes, and practice—covering programming, algorithms, data structures, and data science to build real understanding and computational thinking.",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
