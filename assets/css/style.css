@@ -348,10 +348,21 @@ main {
 }
 
 
-.btn.disabled {
-  background-color: #9ca3af;
-  cursor: not-allowed;
-}
+.btn.btn-disabled,
+.btn[aria-disabled="true"] {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+  }
+
+.btn.btn-disabled:hover,
+.btn[aria-disabled="true"]:hover {
+    background-color: #9ca3af;
+  }
+
+.btn.btn-disabled:active,
+.btn[aria-disabled="true"]:active {
+    transform: none;
+  }
 
 /* --- Footer --- */
 .footer {
