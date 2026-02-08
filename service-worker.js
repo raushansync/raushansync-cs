@@ -1,6 +1,6 @@
 /* RaushanSYNC Computer Science & Data Science PWA Service Worker */
 
-const CACHE_VERSION = 'csds-v1.0.1';
+const CACHE_VERSION = 'csds-v1.0.2';
 const CORE_CACHE = 'rs-core-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'rs-runtime-' + CACHE_VERSION;
 
@@ -25,7 +25,7 @@ const CORE_ASSETS = [
   '/icons/icon-192.png',
   '/icons/icon-512.png',
 
-  '/about.html',
+  '/about/',
 
   '/computer-science/index.html',
   '/data-science/index.html',
