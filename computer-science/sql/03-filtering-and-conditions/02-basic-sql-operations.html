@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3b82f6" id="theme-color-meta">
+
+    <title>PostgreSQL Basic SQL Operations & Multiset Semantics | RaushanSYNC CS & DS</title>
+
+    <meta name="description"
+        content="Master additional basic SQL operations in PostgreSQL. Learn about Cartesian Products, Self Joins, String Matching (LIKE), ORDER BY, Output Limiting, Advanced Predicates, and Multiset Semantics.">
+
+    <meta name="keywords"
+        content="sql basics, postgresql operations, cartesian product sql, self join sql, sql string matching like, order by sql, fetch first rows, sql multiset semantics, RaushanSYNC, computer science">
+
+    <meta name="author" content="Raushan Kumar">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+
+    <link rel="canonical"
+        href="https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/02-basic-sql-operations.html">
+
+    <meta property="og:site_name" content="RaushanSYNC CS & DS">
+    <meta property="og:title" content="PostgreSQL Basic Operations & Multiset Semantics — RaushanSYNC">
+    <meta property="og:description"
+        content="Complete your understanding of basic SQL query structures by mastering joins, string operations, sorting, limiting, and the core philosophy of multiset semantics.">
+    <meta property="og:type" content="article">
+    <meta property="og:url"
+        content="https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/02-basic-sql-operations.html">
+    <meta property="og:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@raushansync">
+    <meta name="twitter:title" content="PostgreSQL Basic Operations & Multiset Semantics">
+    <meta name="twitter:description"
+        content="Master fundamental SQL query mechanics, including joins, pattern matching, and output formatting.">
+    <meta name="twitter:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Article",
+                "headline": "PostgreSQL Basic SQL Operations & Multiset Semantics",
+                "description": "Complete your basic SQL knowledge by learning Cartesian Products, string matching, limiting outputs, advanced WHERE predicates, and the fundamental concept of Multiset Semantics.",
+                "url": "https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/02-basic-sql-operations.html",
+                "author": {
+                    "@type": "Person",
+                    "name": "Raushan Kumar"
+                },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "RaushanSYNC CS & DS",
+                    "url": "https://cs.raushansync.com/"
+                },
+                "isPartOf": {
+                    "@type": "WebSite",
+                    "name": "RaushanSYNC CS & DS",
+                    "url": "https://cs.raushansync.com/"
+                }
+            },
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "Home",
+                        "item": "https://cs.raushansync.com/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": "Computer Science",
+                        "item": "https://cs.raushansync.com/computer-science/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 3,
+                        "name": "SQL",
+                        "item": "https://cs.raushansync.com/computer-science/sql/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 4,
+                        "name": "03 Filtering and Conditions",
+                        "item": "https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 5,
+                        "name": "3.2 Basic SQL Operations",
+                        "item": "https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/02-basic-sql-operations.html"
+                    }
+                ]
+            }
+        ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+        integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo">RaushanSYNC CS & DS</a>
+            <div id="nav"></div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode">
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                    </svg>
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                    </svg>
+                </button>
+                <button class="hamburger" id="hamburger" aria-label="Open menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="notes-page practice-page">
+        <div class="notes-container">
+
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <ol>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/computer-science/">Computer Science</a></li>
+                    <li><a href="/computer-science/sql/">SQL</a></li>
+                    <li><a href="/computer-science/sql/03-filtering-and-conditions/">03 Filtering and Conditions</a>
+                    </li>
+                    <li aria-current="page">3.2 Basic SQL Operations</li>
+                </ol>
+            </nav>
+
+            <div class="notes-header">
+                <h1>Additional Basic SQL Operations & Multiset Semantics</h1>
+                <p>
+                    Having learned the basics of schema manipulation and the standard <code>SELECT-FROM-WHERE</code>
+                    block,
+                    it is time to complete your fundamental query toolkit. This module bridges the gap between basic
+                    data retrieval
+                    and complex, expressive relational queries.
+                </p>
+            </div>
+
+            <div class="lesson-progress">
+                <span class="lesson-badge">Part 2</span>
+                <span class="lesson-title-small">Basic SQL Operations</span>
+            </div>
+
+            <h2 id="module-context">1. Module Context & Objectives</h2>
+            <p>
+                In earlier lessons, we introduced the basic structure of SQL (<code>CREATE TABLE</code>, schema
+                manipulation, and standard querying).
+                If you feel slightly uncomfortable at this stage, it is perfectly normal—it is the standard stage of
+                language acquisition!
+            </p>
+            <p>
+                <strong>Objective:</strong> To finalize our understanding of the basic query structure by learning
+                operations that make queries
+                expressive and practical for real-world scenarios.
+            </p>
+
+            <h2 id="cartesian-product">2. The Cartesian Product & Joins</h2>
+
+            <p>
+                The <strong>Cartesian Product</strong> is the primitive foundational operation in SQL for combining
+                data. By definition,
+                it generates <em>all combinations</em> of tuples (rows) from two relations (tables).
+            </p>
+
+            <h3>The Mechanism</h3>
+            <pre
+                class="code-block"><code><span class="code-sql">SELECT</span> * <span class="code-sql">FROM</span> instructor, teaches;</code></pre>
+            <ul>
+                <li>The result contains attributes (columns) of both tables.</li>
+                <li>Every single <code>instructor</code> row is paired with every single <code>teaches</code> row.</li>
+            </ul>
+
+            <div class="notes-box careful">
+                <h3 style="margin-top: 0; color: inherit;">⚠️ The Problem</h3>
+                <p style="margin-bottom: 0;">
+                    Executing a raw Cartesian product produces an explosion of rows, many of which are completely
+                    meaningless
+                    (e.g., pairing an instructor with a course they don't actually teach).
+                </p>
+            </div>
+
+            <h3>The Solution: Join via WHERE Condition</h3>
+            <p>
+                To filter out meaningless combinations, we apply a <code>WHERE</code> condition. This acts conceptually
+                as an <strong>Equi-join</strong>
+                or provides <strong>Natural Join</strong> behavior.
+            </p>
+
+            <pre class="code-block"><code><span class="code-sql">SELECT</span> name, course_id 
+<span class="code-sql">FROM</span> instructor, teaches 
+<span class="code-sql">WHERE</span> instructor.ID = teaches.ID;</code></pre>
+
+            <div class="notes-box">
+                <p><strong>💡 Deep Insight (Important):</strong></p>
+                <p>
+                    The Cartesian product is the primitive operation in relational algebra. Conceptually, every SQL join
+                    happens in this order:
+                    <br><br>
+                    <strong>Cartesian Product &rarr; Selection (Filtering) &rarr; Projection (Choosing Columns)</strong>
+                    <br><br>
+                    This is pure relational algebra thinking applied to SQL!
+                </p>
+            </div>
+
+            <h2 id="rename-operation">3. The Rename Operation (AS) & Self Joins</h2>
+
+            <p>
+                The <strong>Rename</strong> operation is where the real power of relational databases shines,
+                particularly when dealing with hierarchies.
+            </p>
+
+            <h3>Why do we need to Rename?</h3>
+            <ul>
+                <li><strong>Attribute ambiguity:</strong> Resolving conflicts when two tables have identical column
+                    names.</li>
+                <li><strong>Self-joins:</strong> When the exact same table needs to appear multiple times in the
+                    <code>FROM</code> clause.
+                    You <em>cannot</em> compare rows within the same table without creating logical copies.
+                </li>
+            </ul>
+
+            <div class="notes-box example">
+                <h3>Example: Self Join</h3>
+                <p><em>Find instructors earning more than some Computer Science instructor.</em></p>
+                <pre class="code-block" style="margin-top: 0.5rem;"><code><span class="code-sql">SELECT DISTINCT</span> T.name 
+<span class="code-sql">FROM</span> instructor <span class="code-sql">AS</span> T, instructor <span class="code-sql">AS</span> S 
+<span class="code-sql">WHERE</span> T.salary > S.salary 
+<span class="code-sql">AND</span> S.dept_name = 'Comp. Sci.';</code></pre>
+            </div>
+
+            <p>
+                <strong>Key Concept:</strong> <code>AS</code> creates logical copies of a relation in memory during
+                query execution.
+                Note that the keyword <code>AS</code> is optional (e.g., writing <code>instructor T</code> is perfectly
+                valid).
+            </p>
+
+            <h2 id="string-operations">4. String Operations — Pattern Matching (LIKE)</h2>
+
+            <p>
+                The <code>LIKE</code> operator acts as a primitive text search operator before implementing heavy
+                full-text indexing solutions.
+            </p>
+
+            <h3>Pattern Matching Symbols</h3>
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>Symbol</th>
+                        <th>Meaning</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>%</code></td>
+                        <td>Matches any substring (including an empty string).</td>
+                    </tr>
+                    <tr>
+                        <td><code>_</code></td>
+                        <td>Matches exactly one character.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="notes-box example">
+                <h3>Example: Search by Substring</h3>
+                <pre class="code-block" style="margin-top: 0.5rem;"><code><span class="code-sql">SELECT</span> name 
+<span class="code-sql">FROM</span> instructor 
+<span class="code-sql">WHERE</span> name <span class="code-sql">LIKE</span> '%dar%';</code></pre>
+                <p><em>Matches names like: Darwin, Majumdar, Sardar.</em></p>
+            </div>
+
+            <p><strong>Important Rules:</strong></p>
+            <ul>
+                <li>String comparisons are typically <strong>case-sensitive</strong>.</li>
+                <li><strong>Escaping Characters:</strong> Used when the character <code>%</code> or <code>_</code> is
+                    meant to be read as a literal string.
+                    <br><em>Example:</em> <code>LIKE '100\%' ESCAPE '\'</code>
+                </li>
+            </ul>
+
+            <h2 id="order-by-clause">5. Formatting Output: ORDER BY Clause</h2>
+
+            <p>The <code>ORDER BY</code> clause is used to sort the output of your query.</p>
+
+            <ul>
+                <li><strong>Default:</strong> Ascending order (<code>ASC</code>).</li>
+                <li><strong>Descending:</strong> Requires the <code>DESC</code> keyword.</li>
+                <li><strong>Multi-attribute sorting:</strong> Sorting occurs lexicographically. (e.g., sort by
+                    department first, then by name within that department).</li>
+            </ul>
+
+            <pre class="code-block"><code><span class="code-sql">SELECT DISTINCT</span> name 
+<span class="code-sql">FROM</span> instructor 
+<span class="code-sql">ORDER BY</span> dept_name, name <span class="code-sql">DESC</span>;</code></pre>
+
+            <h2 id="limiting-output">6. Limiting Output Size</h2>
+
+            <p>
+                Limiting results is crucial for performance, database pagination, and user interfaces. Very large result
+                sets must be paginated.
+                Syntax for limiting results varies significantly depending on your specific DBMS.
+            </p>
+
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>DBMS</th>
+                        <th>Syntax Used</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Oracle / PostgreSQL (Standard SQL)</strong></td>
+                        <td><code>FETCH FIRST n ROWS ONLY</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>MySQL / PostgreSQL</strong></td>
+                        <td><code>LIMIT n</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>SQL Server</strong></td>
+                        <td><code>TOP n</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="notes-box example">
+                <h3>Example (Standard SQL Form):</h3>
+                <pre class="code-block" style="margin-top: 0.5rem;"><code><span class="code-sql">SELECT DISTINCT</span> name 
+<span class="code-sql">FROM</span> instructor 
+<span class="code-sql">ORDER BY</span> name 
+<span class="code-sql">FETCH FIRST</span> 10 <span class="code-sql">ROWS ONLY</span>;</code></pre>
+            </div>
+
+            <h2 id="where-predicates">7. Advanced WHERE Clause Predicates</h2>
+
+            <p>To write more expressive queries, SQL provides advanced conditional predicates:</p>
+
+            <div class="notes-box">
+                <ol style="margin-top: 0.5rem; margin-bottom: 0;">
+                    <li style="margin-bottom: 1rem;">
+                        <strong>Range — BETWEEN:</strong>
+                        <br>
+                        <code><span class="code-sql">WHERE</span> salary <span class="code-sql">BETWEEN</span> 90000 <span class="code-sql">AND</span> 100000;</code>
+                        <br>
+                        <em>Equivalent to:</em> <code>salary >= 90000 AND salary <= 100000</code>
+                    </li>
+                    <li style="margin-bottom: 1rem;">
+                        <strong>Tuple Comparison:</strong>
+                        <br>
+                        <code><span class="code-sql">WHERE</span> (instructor.ID, dept_name) = (teaches.ID, 'Biology');</code>
+                        <br>
+                        <em>More compact multi-condition equality check.</em>
+                    </li>
+                    <li>
+                        <strong>Set Membership — IN:</strong>
+                        <br>
+                        <code><span class="code-sql">WHERE</span> dept_name <span class="code-sql">IN</span> ('Comp. Sci.', 'Biology');</code>
+                        <br>
+                        <em>Equivalent to writing multiple OR conditions.</em>
+                    </li>
+                </ol>
+            </div>
+
+            <h2 id="multiset-semantics">8. Duplicates & Multiset Semantics</h2>
+
+            <p>
+                To deeply understand database behavior, you must understand how SQL handles data collections under the
+                hood.
+                We must differentiate between standard Set Theory (from Relational Algebra) and how SQL actually
+                operates.
+            </p>
+
+            <h3>The Key Difference</h3>
+            <ul>
+                <li><strong>Relational Algebra:</strong> Operates strictly on <em>Set semantics</em>. A mathematical set
+                    cannot contain duplicate elements.</li>
+                <li><strong>SQL:</strong> Operates on <strong>Multiset (bag) semantics</strong>. SQL inherently allows
+                    duplicates.</li>
+            </ul>
+
+            <div class="notes-box careful">
+                <h3 style="margin-top: 0; color: inherit;">Multiset Behavior Rule</h3>
+                <p>If a specific tuple appears <em>c</em> times in a relation:</p>
+                <ul style="margin-bottom: 0;">
+                    <li><strong>Selection:</strong> Retains all <em>c</em> copies.</li>
+                    <li><strong>Projection:</strong> May create even more duplicates by dropping distinguishing columns.
+                    </li>
+                    <li><strong>Cartesian Product:</strong> Multiplies duplicates across relations.</li>
+                </ul>
+            </div>
+
+            <h3>The Important Conceptual Formula</h3>
+
+            <p>
+                Consider this SQL query structure:
+                <br><br>
+                <code>SELECT A1, A2 FROM r1, r2 WHERE P</code>
+                <br><br>
+
+                This query is <strong>mathematically equivalent</strong> to the
+                following Relational Algebra expression:
+                <br><br>
+
+                $$
+                \Pi_{A1,\, A2}\bigl(\,\sigma_{P}(r_1 \times r_2)\,\bigr)
+                $$
+                <br>
+                <em>
+                    This formula represents a
+                    <strong>Projection ( Π )</strong> applied on top of a
+                    <strong>Selection ( σ )</strong> applied on top of a
+                    <strong>Cartesian Product ( × )</strong> of two relations —
+                    often abbreviated as:
+                    <strong>"Projection of a Selection on a Cartesian Product."</strong>
+                </em>
+
+                <br><br>
+
+                <strong>
+                    ⚠️ Note: This entire operation is evaluated using
+                    <em>multiset (bag) semantics</em> — meaning duplicate rows are
+                    preserved in the output, just like standard SQL behavior
+                    (unless you use SELECT DISTINCT).
+                </strong>
+            </p>
+
+            <div class="notes-box summary" style="margin-top: 3rem;">
+                <h2 style="margin-top: 0; color: inherit;">Final Conceptual Takeaway</h2>
+                <p>
+                    Everything you do with basic SQL data retrieval boils down to mastering these five primitive steps
+                    in sequence:
+                </p>
+                <ol>
+                    <li><strong>Cartesian Product</strong> (Combining datasets)</li>
+                    <li><strong>Selection</strong> (Filtering rows)</li>
+                    <li><strong>Projection</strong> (Selecting specific columns)</li>
+                    <li><strong>Ordering</strong> (Sorting the output)</li>
+                    <li><strong>Renaming</strong> (Resolving logic and ambiguity)</li>
+                </ol>
+            </div>
+
+            <div class="navigation-buttons" style="margin-top: 2.5rem;">
+                <a href="./01-ddl-commands.html" class="btn"
+                    style="background: transparent; color: var(--primary-color); border: 1.5px solid var(--primary-color);">
+                    ← Back: DDL Commands
+                </a>
+                <a href="./02-lab-basic-sql-operations.html" class="btn">
+                    Practice Lab: SQL Operations
+                </a>
+            </div>
+
+            <div class="notes-watermark">RaushanSYNC CS &amp; DS · Basic SQL Operations · Educational Content</div>
+
+        </div>
+    </main>
+
+    <div id="support-cta"></div>
+    <div id="footer"></div>
+
+    <script src="/assets/css/style.css"></script>
+    <script src="/assets/js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+        function renderMath() {
+            if (window.renderMathInElement) {
+                window.renderMathInElement(document.body, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false }
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', renderMath);
+        } else {
+            renderMath();
+        }
+    </script>
+</body>
+
+</html>

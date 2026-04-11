@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3b82f6" id="theme-color-meta">
+
+    <title>PostgreSQL Advanced Concepts: Set Operations, NULLs & Aggregation | RaushanSYNC CS & DS</title>
+
+    <meta name="description"
+        content="Master advanced SQL concepts. Explore Set Operations (UNION, INTERSECT, EXCEPT), Three-Valued Logic with NULLs, and powerful Aggregations using GROUP BY and HAVING.">
+
+    <meta name="keywords"
+        content="sql set operations, sql union intersect except, sql null values, three valued logic sql, sql aggregation, group by having clause, RaushanSYNC, computer science">
+
+    <meta name="author" content="Raushan Kumar">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+
+    <link rel="canonical"
+        href="https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/03-advanced-concepts.html">
+
+    <meta property="og:site_name" content="RaushanSYNC CS & DS">
+    <meta property="og:title" content="Advanced SQL: Set Operations, NULLs & Aggregation — RaushanSYNC">
+    <meta property="og:description"
+        content="Take your SQL skills to the next level by mastering set theory in queries, handling unknown data with three-valued logic, and building complex data aggregations.">
+    <meta property="og:type" content="article">
+    <meta property="og:url"
+        content="https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/03-advanced-concepts.html">
+    <meta property="og:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@raushansync">
+    <meta name="twitter:title" content="Advanced SQL: Set Operations, NULLs & Aggregation">
+    <meta name="twitter:description"
+        content="Dive deep into advanced SQL mechanics, including relational algebra implementation, grouping, and null logic semantics.">
+    <meta name="twitter:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Article",
+                "headline": "PostgreSQL Advanced Concepts: Set Operations, NULLs & Aggregation",
+                "description": "Master advanced SQL concepts. Explore Set Operations (UNION, INTERSECT, EXCEPT), Three-Valued Logic with NULLs, and powerful Aggregations using GROUP BY and HAVING.",
+                "url": "https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/03-advanced-concepts.html",
+                "author": {
+                    "@type": "Person",
+                    "name": "Raushan Kumar"
+                },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "RaushanSYNC CS & DS",
+                    "url": "https://cs.raushansync.com/"
+                },
+                "isPartOf": {
+                    "@type": "WebSite",
+                    "name": "RaushanSYNC CS & DS",
+                    "url": "https://cs.raushansync.com/"
+                }
+            },
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "Home",
+                        "item": "https://cs.raushansync.com/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": "Computer Science",
+                        "item": "https://cs.raushansync.com/computer-science/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 3,
+                        "name": "SQL",
+                        "item": "https://cs.raushansync.com/computer-science/sql/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 4,
+                        "name": "03 Filtering and Conditions",
+                        "item": "https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 5,
+                        "name": "3.3 Advanced Concepts",
+                        "item": "https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/03-advanced-concepts.html"
+                    }
+                ]
+            }
+        ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"
+        integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo">RaushanSYNC CS & DS</a>
+            <div id="nav"></div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode">
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                    </svg>
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                    </svg>
+                </button>
+                <button class="hamburger" id="hamburger" aria-label="Open menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="notes-page practice-page">
+        <div class="notes-container">
+
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <ol>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/computer-science/">Computer Science</a></li>
+                    <li><a href="/computer-science/sql/">SQL</a></li>
+                    <li><a href="/computer-science/sql/03-filtering-and-conditions/">03 Filtering and Conditions</a>
+                    </li>
+                    <li aria-current="page">3.3 Advanced Concepts</li>
+                </ol>
+            </nav>
+
+            <div class="notes-header">
+                <h1>Advanced SQL Concepts: Sets, NULLs, and Aggregation</h1>
+                <p>
+                    Previously, we covered basic query structures, selections, projections, and standard joins. 
+                    Now, we extend SQL in <strong>three powerful directions</strong>: treating tables as mathematical sets, gracefully handling missing information with Three-Valued Logic, and summarizing datasets using aggregate functions.
+                </p>
+            </div>
+
+            <div class="lesson-progress">
+                <span class="lesson-badge">Part 3</span>
+                <span class="lesson-title-small">Advanced Concepts</span>
+            </div>
+
+            <h2 id="set-operations">1. Set Operations</h2>
+            <p>
+                The core idea here is to temporarily treat our database relations purely as mathematical <strong>sets</strong>, rather than multisets. 
+            </p>
+            
+            <div class="notes-box careful">
+                <h3 style="margin-top: 0; color: inherit;">⚠️ The Structural Condition</h3>
+                <p style="margin-bottom: 0;">
+                    To perform set operations, the two relations involved must have an <strong>identical structure</strong>. This means they must have the <em>same number of columns</em>, and corresponding columns must have <em>compatible data types</em>. You cannot union a table of (A, B, C) with a table of (A, B).
+                </p>
+            </div>
+
+            <h3>1.1 UNION (Logical OR)</h3>
+            <p>
+                The <code>UNION</code> operator combines the result sets of two queries. Conceptually, each subquery gives a table, and UNION combines both while <strong>automatically removing duplicates</strong>. This is equivalent to the mathematical operation $R \cup S$.
+            </p>
+
+            <div class="notes-box example">
+                <p><em>Example: Find all employees who were assigned to a project in Q1 2023 OR Q2 2024.</em></p>
+                <pre class="code-block" style="margin-top: 0.5rem;"><code>(<span class="code-sql">SELECT</span> emp_id 
+<span class="code-sql">FROM</span> project_assignment 
+<span class="code-sql">WHERE</span> quarter = 'Q1' <span class="code-sql">AND</span> fiscal_year = 2023)
+
+<span class="code-sql">UNION</span>
+
+(<span class="code-sql">SELECT</span> emp_id 
+<span class="code-sql">FROM</span> project_assignment 
+<span class="code-sql">WHERE</span> quarter = 'Q2' <span class="code-sql">AND</span> fiscal_year = 2024);</code></pre>
+            </div>
+
+            <h3>1.2 INTERSECT (Logical AND)</h3>
+            <p>
+                The <code>INTERSECT</code> operator returns only the tuples (rows) that are common to both query results. Like UNION, it removes duplicates by default.
+            </p>
+            <pre class="code-block"><code>(<span class="code-sql">SELECT</span> emp_id 
+<span class="code-sql">FROM</span> project_assignment 
+<span class="code-sql">WHERE</span> quarter = 'Q1' <span class="code-sql">AND</span> fiscal_year = 2023)
+
+<span class="code-sql">INTERSECT</span>
+
+(<span class="code-sql">SELECT</span> emp_id 
+<span class="code-sql">FROM</span> project_assignment 
+<span class="code-sql">WHERE</span> quarter = 'Q2' <span class="code-sql">AND</span> fiscal_year = 2024);</code></pre>
+            <p><em>This returns only those employees who worked in BOTH of the specified periods.</em></p>
+
+            <h3>1.3 EXCEPT (Set Difference)</h3>
+            <p>
+                The <code>EXCEPT</code> operator (equivalent to $R - S$) returns tuples that appear in the first relation but <strong>NOT</strong> in the second.
+            </p>
+            <pre class="code-block"><code>(<span class="code-sql">SELECT</span> emp_id 
+<span class="code-sql">FROM</span> project_assignment 
+<span class="code-sql">WHERE</span> quarter = 'Q1' <span class="code-sql">AND</span> fiscal_year = 2023)
+
+<span class="code-sql">EXCEPT</span>
+
+(<span class="code-sql">SELECT</span> emp_id 
+<span class="code-sql">FROM</span> project_assignment 
+<span class="code-sql">WHERE</span> quarter = 'Q2' <span class="code-sql">AND</span> fiscal_year = 2024);</code></pre>
+
+            <h2 id="multiset-versions">2. Multiset Versions of Set Operations</h2>
+            <p>
+                By default, <code>UNION</code>, <code>INTERSECT</code>, and <code>EXCEPT</code> remove duplicates. If you need to strictly preserve duplicate entries (retaining SQL's natural multiset behavior), you append the keyword <code>ALL</code>.
+            </p>
+
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>Operation</th>
+                        <th>Result Count Formula (Tuple $t$ occurs $m$ times in $R$, $n$ times in $S$)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>UNION ALL</code></td>
+                        <td>$m + n$</td>
+                    </tr>
+                    <tr>
+                        <td><code>INTERSECT ALL</code></td>
+                        <td>$\min(m, n)$</td>
+                    </tr>
+                    <tr>
+                        <td><code>EXCEPT ALL</code></td>
+                        <td>$\max(0, m - n)$</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p><em>Note: This is pure multiset arithmetic.</em></p>
+
+            <h2 id="maximum-without-aggregates">3. Using Sets to Find the Maximum (Without Aggregates)</h2>
+            <p>
+                This is a classic and conceptually vital exercise in relational algebra. How do we find the highest value (e.g., maximum salary) without utilizing the built-in <code>MAX()</code> function?
+            </p>
+            
+            <div class="notes-box">
+                <p><strong>The Strategy:</strong></p>
+                <ol>
+                    <li><strong>Step 1: Find salaries that are NOT the highest.</strong> If a salary is less than *some other* salary in the table, it is not the maximum.</li>
+                    <li><strong>Step 2: Get a list of all salaries.</strong></li>
+                    <li><strong>Step 3: Subtract the non-highest salaries from the total list.</strong> What remains is the maximum.</li>
+                </ol>
+            </div>
+
+            <pre class="code-block"><code><span class="code-sql">-- Step 2: All salaries</span>
+(<span class="code-sql">SELECT DISTINCT</span> base_salary 
+<span class="code-sql">FROM</span> staff)
+
+<span class="code-sql">EXCEPT</span>
+
+<span class="code-sql">-- Step 1: All non-highest salaries (comparing Cartesian Product)</span>
+(<span class="code-sql">SELECT DISTINCT</span> T.base_salary 
+<span class="code-sql">FROM</span> staff <span class="code-sql">AS</span> T, staff <span class="code-sql">AS</span> S 
+<span class="code-sql">WHERE</span> T.base_salary < S.base_salary);</code></pre>
+            <p>
+                <strong>Important Conceptual Difference:</strong> Aggregate functions (like <code>MAX()</code>) return a single scalar value. This set-based method returns a <em>table</em> containing a single tuple.
+            </p>
+
+            <h2 id="null-values">4. NULL Values & Three-Valued Logic</h2>
+
+            <h3>What is NULL?</h3>
+            <p>
+                In SQL, <code>NULL</code> signifies that a value is <strong>Unknown</strong> OR the <strong>Value does not exist</strong> (e.g., missing data because a student might not have a passport, or a value simply hasn't been assigned yet).
+            </p>
+            <p>
+                Crucially, <code>NULL</code> is <strong>NOT</strong>:
+            </p>
+            <ul>
+                <li>The number 0</li>
+                <li>An empty string ('')</li>
+                <li>The boolean value False</li>
+            </ul>
+
+            <div class="notes-box careful">
+                <h3 style="margin-top: 0; color: inherit;">Checking for NULL</h3>
+                <p>
+                    Because <code>NULL</code> is an unknown state, you cannot use standard equality operators.
+                </p>
+                <p>
+                    ❌ <strong>Wrong:</strong> <code>WHERE salary = NULL</code> (Comparing anything to NULL yields UNKNOWN).<br>
+                    ✅ <strong>Correct:</strong> <code>WHERE salary IS NULL</code> or <code>WHERE salary IS NOT NULL</code>
+                </p>
+            </div>
+
+            <h3>Arithmetic with NULL</h3>
+            <p>Any arithmetic operation involving a NULL value directly yields NULL. (e.g., <code>5 + NULL &rarr; NULL</code>).</p>
+
+            <h2 id="three-valued-logic">5. Three-Valued Logic (TRUE, FALSE, UNKNOWN)</h2>
+            <p>
+                Because <code>NULL</code> exists, standard boolean logic is insufficient. SQL utilizes Three-Valued Logic. Any standard comparison (<code>></code>, <code><</code>, <code>=</code>, <code><></code>) involving a <code>NULL</code> evaluates to <strong>UNKNOWN</strong>.
+            </p>
+
+            <h3>Logical Operators under Unknown states</h3>
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>Expression</th>
+                        <th>Result</th>
+                        <th>Shortcut Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>UNKNOWN OR TRUE</code></td>
+                        <td>TRUE</td>
+                        <td>If at least one side is TRUE, OR is TRUE.</td>
+                    </tr>
+                    <tr>
+                        <td><code>UNKNOWN OR FALSE</code></td>
+                        <td>UNKNOWN</td>
+                        <td>Depends entirely on what the unknown value actually is.</td>
+                    </tr>
+                    <tr>
+                        <td><code>TRUE AND UNKNOWN</code></td>
+                        <td>UNKNOWN</td>
+                        <td>Depends entirely on what the unknown value actually is.</td>
+                    </tr>
+                    <tr>
+                        <td><code>FALSE AND UNKNOWN</code></td>
+                        <td>FALSE</td>
+                        <td>If one side is FALSE, AND is strictly FALSE.</td>
+                    </tr>
+                    <tr>
+                        <td><code>NOT UNKNOWN</code></td>
+                        <td>UNKNOWN</td>
+                        <td>The inverse of unknown is still unknown.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="notes-box careful">
+                <h3 style="margin-top: 0; color: inherit;">The WHERE Clause Rule</h3>
+                <p style="margin-bottom: 0;">
+                    <strong>Extremely Important:</strong> If a <code>WHERE</code> predicate evaluates to <strong>UNKNOWN</strong>, SQL treats it as <strong>FALSE</strong> for the purpose of row selection. The row will NOT be returned in the result set.
+                </p>
+            </div>
+
+            <h2 id="aggregate-functions">6. Aggregate Functions</h2>
+            <p>
+                Aggregate functions operate on the multiset of a given column and return a single summarizing value. The standard functions are: <code>AVG</code>, <code>MIN</code>, <code>MAX</code>, <code>SUM</code>, and <code>COUNT</code>.
+            </p>
+
+            <div class="notes-box example">
+                <h3>Examples:</h3>
+                <pre class="code-block" style="margin-top: 0.5rem;"><code><span class="code-sql">-- Example 1: Average Salary in a Specific Department</span>
+<span class="code-sql">SELECT AVG</span>(base_salary) 
+<span class="code-sql">FROM</span> staff 
+<span class="code-sql">WHERE</span> department = 'Engineering';
+
+<span class="code-sql">-- Example 2: Count distinct employees</span>
+<span class="code-sql">SELECT COUNT</span>(<span class="code-sql">DISTINCT</span> emp_id) 
+<span class="code-sql">FROM</span> project_assignment;
+
+<span class="code-sql">-- Example 3: Count all rows (tuples) in a table</span>
+<span class="code-sql">SELECT COUNT</span>(*) 
+<span class="code-sql">FROM</span> staff;</code></pre>
+            </div>
+
+            <h2 id="group-by-clause">7. The GROUP BY Clause</h2>
+            <p>
+                What if we want the average salary not just globally, but <em>per department</em>? Without <code>GROUP BY</code>, applying an aggregate function collapses the entire result set into one global average.
+            </p>
+
+            <h3>What GROUP BY does:</h3>
+            <ol>
+                <li>Partitions the table into logical groups based on the specified attribute(s).</li>
+                <li>Applies the aggregate function independently to each group.</li>
+                <li>Returns exactly one row per group.</li>
+            </ol>
+
+            <pre class="code-block"><code><span class="code-sql">SELECT</span> department, <span class="code-sql">AVG</span>(base_salary) <span class="code-sql">AS</span> avg_salary
+<span class="code-sql">FROM</span> staff
+<span class="code-sql">GROUP BY</span> department;</code></pre>
+
+            <div class="notes-box careful">
+                <h3 style="margin-top: 0; color: inherit;">The Strict Grouping Rule</h3>
+                <p style="margin-bottom: 0;">
+                    Every attribute present in the <code>SELECT</code> clause that is <strong>NOT</strong> aggregated <em>must</em> appear in the <code>GROUP BY</code> clause. Failing to do this results in a syntax error because the database wouldn't know which individual row's data to display alongside the collapsed group data.
+                </p>
+            </div>
+
+            <h2 id="having-clause">8. The HAVING Clause & NULLs in Aggregates</h2>
+
+            <h3>The HAVING Clause</h3>
+            <p>
+                The <code>HAVING</code> clause is used exclusively to <strong>filter groups</strong>, exactly as the <code>WHERE</code> clause is used to filter individual rows. 
+            </p>
+
+            <div class="notes-box example">
+                <p><em>Example: Find departments where the average base salary is greater than $85,000.</em></p>
+                <pre class="code-block" style="margin-top: 0.5rem;"><code><span class="code-sql">SELECT</span> department, <span class="code-sql">AVG</span>(base_salary)
+<span class="code-sql">FROM</span> staff
+<span class="code-sql">GROUP BY</span> department
+<span class="code-sql">HAVING AVG</span>(base_salary) > 85000;</code></pre>
+            </div>
+
+            <table class="notes-table" style="margin-top: 1.5rem;">
+                <thead>
+                    <tr>
+                        <th>WHERE Clause</th>
+                        <th>HAVING Clause</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Works <strong>before</strong> grouping</td>
+                        <td>Works <strong>after</strong> grouping</td>
+                    </tr>
+                    <tr>
+                        <td>Filters individual rows</td>
+                        <td>Filters aggregated groups</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cannot</strong> use aggregate functions</td>
+                        <td><strong>Can</strong> use aggregate functions</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Order of Execution</h3>
+            <p>When processing a query, the DBMS follows this conceptual order:</p>
+            <ol>
+                <li><code>WHERE</code> filters the raw rows.</li>
+                <li><code>GROUP BY</code> forms the groups from the surviving rows.</li>
+                <li><code>HAVING</code> filters those newly created groups.</li>
+            </ol>
+
+            <h3>Rule: NULL Values & Aggregates</h3>
+            <p>
+                All aggregate functions (except for <code>COUNT(*)</code>) completely <strong>ignore NULL values</strong>. For example, if some salaries are NULL, <code>SUM(salary)</code> simply adds up the numeric ones and ignores the NULLs.
+            </p>
+            <p>
+                <strong>Special Case:</strong> If <em>all</em> values being aggregated are NULL, or if the resulting group is completely empty:
+            </p>
+            <ul>
+                <li><code>COUNT(column)</code> returns <strong>0</strong>.</li>
+                <li><code>COUNT(*)</code> returns the <strong>number of rows</strong>.</li>
+                <li><code>AVG</code>, <code>SUM</code>, <code>MIN</code>, <code>MAX</code> return <strong>NULL</strong>.</li>
+            </ul>
+
+            <div class="notes-box summary" style="margin-top: 3rem;">
+                <h2 style="margin-top: 0; color: inherit;">Final Insight</h2>
+                <p>
+                    This module proves that SQL is far more than a simple query language:
+                </p>
+                <ol>
+                    <li>It is an applied implementation of formal relational algebra combined with three-valued logic.</li>
+                    <li>The existence of <code>NULL</code> fundamentally alters boolean logic semantics.</li>
+                    <li>Aggregation isn't just math; it is controlled relational grouping mapping multi-row sets to single-row outputs.</li>
+                    <li>Set operations (UNION, INTERSECT, EXCEPT) connect everyday SQL back to its formal mathematical roots.</li>
+                </ol>
+            </div>
+
+            <div class="navigation-buttons" style="margin-top: 2.5rem;">
+                <a href="./02-basic-sql-operations.html" class="btn"
+                    style="background: transparent; color: var(--primary-color); border: 1.5px solid var(--primary-color);">
+                    ← Back: Basic SQL Operations
+                </a>
+                <a href="./03-lab-advanced-concepts.html" class="btn">
+                    Practice Lab: Advanced SQL
+                </a>
+            </div>
+
+            <div class="notes-watermark">RaushanSYNC CS &amp; DS · Advanced SQL Concepts · Educational Content</div>
+
+        </div>
+    </main>
+
+    <div id="support-cta"></div>
+    <div id="footer"></div>
+
+    <script src="/assets/css/style.css"></script>
+    <script src="/assets/js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script>
+        function renderMath() {
+            if (window.renderMathInElement) {
+                window.renderMathInElement(document.body, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false }
+                    ],
+                    throwOnError: false
+                });
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', renderMath);
+        } else {
+            renderMath();
+        }
+    </script>
+</body>
+
+</html>

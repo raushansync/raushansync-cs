@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3b82f6" id="theme-color-meta">
+
+    <title>PostgreSQL Foundations — What Is PostgreSQL & How It Works | RaushanSYNC CS & DS</title>
+
+    <meta name="description"
+        content="Learn PostgreSQL from first principles. Understand what a database is, how PostgreSQL works internally, how to set up psql, and the mental model you need before writing your first SQL query.">
+
+    <meta name="keywords"
+        content="postgresql foundations, what is postgresql, postgresql tutorial for beginners, psql setup, how postgresql works, database fundamentals, sql first principles, RaushanSYNC, relational database concepts, postgresql vs mysql">
+
+    <meta name="author" content="Raushan Kumar">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+
+    <link rel="canonical" href="https://cs.raushansync.com/computer-science/sql/01-postgresql-foundations/">
+
+    <!-- Open Graph -->
+    <meta property="og:site_name" content="RaushanSYNC CS & DS">
+    <meta property="og:title" content="PostgreSQL Foundations — RaushanSYNC CS & DS">
+    <meta property="og:description"
+        content="Build a rock-solid mental model of PostgreSQL before you write a single query. Covers databases, tables, psql setup, and how Postgres thinks about data.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://cs.raushansync.com/computer-science/sql/01-postgresql-foundations/">
+    <meta property="og:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@raushansync">
+    <meta name="twitter:title" content="PostgreSQL Foundations — RaushanSYNC CS & DS">
+    <meta name="twitter:description"
+        content="Understand what PostgreSQL is, how it organises data, and how to set up psql — the conceptual foundation you need before writing SQL.">
+    <meta name="twitter:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Article",
+                "headline": "PostgreSQL Foundations — What Is PostgreSQL & How It Works",
+                "description": "Learn PostgreSQL from first principles. Understand what a database is, how PostgreSQL works internally, how to set up psql, and the mental model you need before writing your first SQL query.",
+                "url": "https://cs.raushansync.com/computer-science/sql/01-postgresql-foundations/",
+                "author": {
+                    "@type": "Person",
+                    "name": "Raushan Kumar"
+                },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "RaushanSYNC CS & DS",
+                    "url": "https://cs.raushansync.com/"
+                },
+                "isPartOf": {
+                    "@type": "WebSite",
+                    "name": "RaushanSYNC CS & DS",
+                    "url": "https://cs.raushansync.com/"
+                }
+            },
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "Home",
+                        "item": "https://cs.raushansync.com/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": "Computer Science",
+                        "item": "https://cs.raushansync.com/computer-science/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 3,
+                        "name": "SQL",
+                        "item": "https://cs.raushansync.com/computer-science/sql/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 4,
+                        "name": "PostgreSQL Foundations",
+                        "item": "https://cs.raushansync.com/computer-science/sql/01-postgresql-foundations/"
+                    }
+                ]
+            }
+        ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo">RaushanSYNC CS & DS</a>
+            <div id="nav"></div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode">
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                    </svg>
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                    </svg>
+                </button>
+                <button class="hamburger" id="hamburger" aria-label="Open menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="notes-page practice-page">
+        <div class="notes-container">
+
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <ol>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/computer-science/">Computer Science</a></li>
+                    <li><a href="/computer-science/sql/">SQL</a></li>
+                    <li aria-current="page">PostgreSQL Foundations</li>
+                </ol>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="notes-header">
+                <h1>PostgreSQL Foundations</h1>
+                <p>
+                    Before you write a single query, build the mental model that makes
+                    everything else click — what PostgreSQL is, how it organises data,
+                    and how to get your environment ready.
+                </p>
+            </div>
+
+            <!-- Progress indicator -->
+            <div class="lesson-progress">
+                <span class="lesson-badge">Part 1 of 13</span>
+                <span class="lesson-title-small">PostgreSQL Foundations</span>
+            </div>
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 1 — What Is a Database?
+                 ═══════════════════════════════════════════ -->
+            <h2 id="what-is-a-database">1. What Is a Database?</h2>
+
+            <p>
+                A <strong>database</strong> is an organised collection of data that can be stored,
+                retrieved, and modified in a controlled way. The word "organised" is the important
+                part — it means data lives in a predictable structure, not scattered across
+                files or spreadsheets.
+            </p>
+
+            <p>
+                Think of a database as the difference between a pile of paper receipts thrown
+                in a drawer versus those same receipts filed by month, vendor, and amount
+                in a cabinet with labelled folders. Both hold the same information;
+                only one lets you find anything quickly.
+            </p>
+
+            <div class="notes-box example">
+                <h3>Real-World Analogy</h3>
+                <p>
+                    A library catalogue is a database. Every book has a record: title, author,
+                    ISBN, shelf location. The catalogue lets you ask — <em>"show me all books
+                        by Tolkien published after 1950"</em> — and get an instant answer.
+                    PostgreSQL is the engine that handles requests like that, but for
+                    any kind of data you define.
+                </p>
+            </div>
+
+            <h3>Why Not Just Use Spreadsheets?</h3>
+            <p>
+                Spreadsheets like Excel or Google Sheets are great for small, manual work.
+                Databases are built for:
+            </p>
+
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>Concern</th>
+                        <th>Spreadsheet</th>
+                        <th>Database (PostgreSQL)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Scale</td>
+                        <td>Slows down past ~100k rows</td>
+                        <td>Handles billions of rows efficiently</td>
+                    </tr>
+                    <tr>
+                        <td>Multiple users</td>
+                        <td>Conflicts when two people edit</td>
+                        <td>Concurrent access with transaction safety</td>
+                    </tr>
+                    <tr>
+                        <td>Relationships</td>
+                        <td>Manually duplicated data across sheets</td>
+                        <td>Foreign keys link tables automatically</td>
+                    </tr>
+                    <tr>
+                        <td>Data integrity</td>
+                        <td>Anyone can type anything anywhere</td>
+                        <td>Constraints enforce what is allowed</td>
+                    </tr>
+                    <tr>
+                        <td>Querying</td>
+                        <td>Formulas that break easily</td>
+                        <td>SQL — a powerful, declarative language</td>
+                    </tr>
+                    <tr>
+                        <td>Automation</td>
+                        <td>Requires manual intervention</td>
+                        <td>Applications read/write programmatically</td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 2 — What Is PostgreSQL?
+                 ═══════════════════════════════════════════ -->
+            <h2 id="what-is-postgresql">2. What Is PostgreSQL?</h2>
+
+            <p>
+                <strong>PostgreSQL</strong> (often called <em>Postgres</em>) is a free,
+                open-source <strong>relational database management system</strong> (RDBMS).
+                It stores data in tables made of rows and columns, and you talk to it
+                using <strong>SQL</strong> — Structured Query Language.
+            </p>
+
+            <p>
+                PostgreSQL has been in active development since 1986, making it one of the
+                most mature and battle-tested database systems in existence. It is used by
+                companies like Instagram, Spotify, GitHub, and Apple — often handling
+                millions of queries per day.
+            </p>
+
+            <div class="notes-box summary">
+                <h3>Key Characteristics of PostgreSQL</h3>
+                <ul>
+                    <li><strong>Relational:</strong> Data lives in structured tables with defined relationships between
+                        them.</li>
+                    <li><strong>ACID-compliant:</strong> Every transaction is Atomic, Consistent, Isolated, and Durable
+                        — your data won't get corrupted even if the power goes out mid-write.</li>
+                    <li><strong>Extensible:</strong> You can add custom data types, functions, and even programming
+                        languages (Python, JavaScript, etc.) directly inside Postgres.</li>
+                    <li><strong>Standards-compliant:</strong> Postgres follows the SQL standard closely, with useful
+                        extensions on top.</li>
+                    <li><strong>Open source:</strong> Free to use, deploy, and modify under the PostgreSQL licence.</li>
+                </ul>
+            </div>
+
+            <h3>PostgreSQL vs Other Databases</h3>
+
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>Database</th>
+                        <th>Type</th>
+                        <th>Key difference from Postgres</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>MySQL / MariaDB</td>
+                        <td>Relational</td>
+                        <td>Simpler feature set; Postgres has richer types, better standards compliance, and stronger
+                            write-safety defaults</td>
+                    </tr>
+                    <tr>
+                        <td>SQLite</td>
+                        <td>Relational</td>
+                        <td>Embedded, file-based; great for local apps but not designed for multiple concurrent users
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>MongoDB</td>
+                        <td>Document (NoSQL)</td>
+                        <td>Stores JSON-like documents, no fixed schema; Postgres can also store JSON natively, so the
+                            trade-off is narrower than it seems</td>
+                    </tr>
+                    <tr>
+                        <td>Oracle / SQL Server</td>
+                        <td>Relational</td>
+                        <td>Enterprise, commercial, expensive; Postgres matches or exceeds them for most use cases at
+                            zero cost</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="notes-box">
+                <h3>Why Learn PostgreSQL Specifically?</h3>
+                <p>
+                    SQL concepts transfer across almost every relational database.
+                    But Postgres is worth learning directly because it has the richest
+                    feature set for free, the most active community, and it is the
+                    default choice for modern backends. Skills you build here are
+                    immediately employable.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 3 — How PostgreSQL Organises Data
+                 ═══════════════════════════════════════════ -->
+            <h2 id="how-postgres-organises-data">3. How PostgreSQL Organises Data</h2>
+
+            <p>
+                Understanding the hierarchy of objects inside PostgreSQL will save you
+                a lot of confusion later. Here is the structure from largest to smallest:
+            </p>
+
+            <!-- Hierarchy diagram using pure CSS -->
+            <div class="pg-hierarchy" aria-label="PostgreSQL object hierarchy diagram">
+                <div class="pg-hier-level pg-hier-cluster">
+                    <span class="pg-hier-icon">🖥️</span>
+                    <div class="pg-hier-content">
+                        <strong>PostgreSQL Server (Cluster)</strong>
+                        <span class="pg-hier-desc">One running PostgreSQL installation on a machine</span>
+                    </div>
+                </div>
+                <div class="pg-hier-connector" aria-hidden="true">└──</div>
+                <div class="pg-hier-level pg-hier-db">
+                    <span class="pg-hier-icon">🗄️</span>
+                    <div class="pg-hier-content">
+                        <strong>Database</strong>
+                        <span class="pg-hier-desc">A named container — e.g. <code>ecommerce_db</code>,
+                            <code>analytics</code></span>
+                    </div>
+                </div>
+                <div class="pg-hier-connector" aria-hidden="true">└──</div>
+                <div class="pg-hier-level pg-hier-schema">
+                    <span class="pg-hier-icon">📂</span>
+                    <div class="pg-hier-content">
+                        <strong>Schema</strong>
+                        <span class="pg-hier-desc">A namespace inside a database — default is <code>public</code></span>
+                    </div>
+                </div>
+                <div class="pg-hier-connector" aria-hidden="true">└──</div>
+                <div class="pg-hier-level pg-hier-table">
+                    <span class="pg-hier-icon">📋</span>
+                    <div class="pg-hier-content">
+                        <strong>Table</strong>
+                        <span class="pg-hier-desc">Named grid of rows and columns — e.g. <code>users</code>,
+                            <code>orders</code></span>
+                    </div>
+                </div>
+                <div class="pg-hier-connector" aria-hidden="true">└──</div>
+                <div class="pg-hier-level pg-hier-row">
+                    <span class="pg-hier-icon">➡️</span>
+                    <div class="pg-hier-content">
+                        <strong>Row (Record / Tuple)</strong>
+                        <span class="pg-hier-desc">One entry in the table — e.g. a single user</span>
+                    </div>
+                </div>
+                <div class="pg-hier-connector" aria-hidden="true">└──</div>
+                <div class="pg-hier-level pg-hier-col">
+                    <span class="pg-hier-icon">📌</span>
+                    <div class="pg-hier-content">
+                        <strong>Column (Field / Attribute)</strong>
+                        <span class="pg-hier-desc">A named, typed piece of data — e.g. <code>email TEXT</code></span>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Tables, Rows, and Columns — Concretely</h3>
+            <p>
+                Every table has a fixed set of <strong>columns</strong>, each with a
+                specific <strong>data type</strong> (text, number, date, etc.).
+                Every <strong>row</strong> is one record that fills in values for each column.
+            </p>
+
+            <p>Here is what a <code>users</code> table might look like:</p>
+
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>name</th>
+                        <th>email</th>
+                        <th>created_at</th>
+                        <th>is_active</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Priya Sharma</td>
+                        <td>priya@example.com</td>
+                        <td>2024-01-15</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Arjun Mehta</td>
+                        <td>arjun@example.com</td>
+                        <td>2024-02-03</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Sara Nair</td>
+                        <td>sara@example.com</td>
+                        <td>2024-03-11</td>
+                        <td>false</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                Each column has a data type enforced by Postgres. <code>id</code> is an integer,
+                <code>name</code> and <code>email</code> are text, <code>created_at</code> is a date,
+                and <code>is_active</code> is a boolean. You cannot put text into <code>id</code> —
+                Postgres will reject it.
+            </p>
+
+            <h3>What Is a Schema?</h3>
+            <p>
+                A <strong>schema</strong> is a namespace — a way of grouping related tables
+                inside one database. By default, all your tables go into the <code>public</code>
+                schema. You can create others (e.g. <code>sales</code>, <code>analytics</code>)
+                to organise large projects and control permissions.
+            </p>
+
+            <div class="notes-box">
+                <p>
+                    For now, you never need to think about schemas explicitly.
+                    Every table you create goes into <code>public</code> automatically,
+                    and every query you write can find it there.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 4 — The Client–Server Architecture
+                 ═══════════════════════════════════════════ -->
+            <h2 id="client-server">4. The Client–Server Architecture</h2>
+
+            <p>
+                PostgreSQL runs as a <strong>server process</strong> — a program that sits
+                in the background, listening for incoming connections. You, the developer,
+                connect to it using a <strong>client</strong>.
+            </p>
+
+            <!-- Architecture diagram -->
+            <div class="pg-arch-diagram" aria-label="PostgreSQL client-server architecture">
+                <div class="pg-arch-box pg-arch-client">
+                    <div class="pg-arch-label">Client</div>
+                    <div class="pg-arch-items">
+                        <span class="pg-arch-chip">psql (terminal)</span>
+                        <span class="pg-arch-chip">Your Python app</span>
+                        <span class="pg-arch-chip">DBeaver / pgAdmin</span>
+                        <span class="pg-arch-chip">Node.js backend</span>
+                    </div>
+                </div>
+                <div class="pg-arch-arrow" aria-hidden="true">
+                    <span class="pg-arch-arrow-line"></span>
+                    <div class="pg-arch-arrow-labels">
+                        <span>SQL query →</span>
+                        <span>← Result rows</span>
+                    </div>
+                </div>
+                <div class="pg-arch-box pg-arch-server">
+                    <div class="pg-arch-label">PostgreSQL Server</div>
+                    <div class="pg-arch-items">
+                        <span class="pg-arch-chip">Parser</span>
+                        <span class="pg-arch-chip">Query Planner</span>
+                        <span class="pg-arch-chip">Executor</span>
+                        <span class="pg-arch-chip">Storage Engine</span>
+                    </div>
+                </div>
+            </div>
+
+            <p>
+                The client sends a SQL query as text. The server parses it,
+                plans the most efficient way to execute it, runs it, and sends
+                back the results. The client displays them.
+            </p>
+
+            <p>
+                This matters because <strong>psql</strong> — the command-line client we use
+                in this course — is not PostgreSQL itself. It is a tool that talks to
+                the PostgreSQL server. The server is the database; psql is just one
+                way to talk to it.
+            </p>
+
+            <div class="notes-box example">
+                <h3>Analogy: Restaurant</h3>
+                <p>
+                    The PostgreSQL server is the kitchen. psql is a waiter.
+                    You speak to the waiter (psql), who passes your order (SQL) to the kitchen
+                    (Postgres), which prepares the result and hands it back.
+                    The kitchen does the actual work; the waiter just carries the messages.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 5 — Installing PostgreSQL
+                 ═══════════════════════════════════════════ -->
+            <h2 id="installing-postgresql">5. Installing PostgreSQL</h2>
+
+            <p>
+                The official PostgreSQL website at <strong>postgresql.org</strong> has
+                installers for every major operating system. Here is the fastest
+                path for each platform:
+            </p>
+
+            <div class="install-tabs" role="tablist" aria-label="Installation instructions by operating system">
+                <button class="install-tab active" role="tab" aria-selected="true" data-tab="mac">macOS</button>
+                <button class="install-tab" role="tab" aria-selected="false" data-tab="linux">Linux
+                    (Ubuntu/Debian)</button>
+                <button class="install-tab" role="tab" aria-selected="false" data-tab="windows">Windows</button>
+            </div>
+
+            <div class="install-panel active" id="tab-mac">
+                <p>The easiest way on macOS is via <strong>Homebrew</strong>:</p>
+                <pre class="code-block"><code><span class="code-comment"># Install Homebrew first if you don't have it:</span>
+<span class="code-comment"># /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</span>
+
+<span class="code-cmd">brew install postgresql@16</span>
+
+<span class="code-comment"># Start the PostgreSQL service</span>
+<span class="code-cmd">brew services start postgresql@16</span>
+
+<span class="code-comment"># Connect using psql</span>
+<span class="code-cmd">psql postgres</span></code></pre>
+                <p>
+                    Alternatively, download the <strong>Postgres.app</strong> from
+                    <code>postgresapp.com</code> — a one-click install that puts everything
+                    in your Applications folder.
+                </p>
+            </div>
+
+            <div class="install-panel" id="tab-linux" hidden>
+                <pre class="code-block"><code><span class="code-comment"># Update package list</span>
+<span class="code-cmd">sudo apt update</span>
+
+<span class="code-comment"># Install PostgreSQL</span>
+<span class="code-cmd">sudo apt install postgresql postgresql-contrib</span>
+
+<span class="code-comment"># Start the service</span>
+<span class="code-cmd">sudo systemctl start postgresql</span>
+<span class="code-cmd">sudo systemctl enable postgresql</span>
+
+<span class="code-comment"># Switch to the postgres user and open psql</span>
+<span class="code-cmd">sudo -u postgres psql</span></code></pre>
+            </div>
+
+            <div class="install-panel" id="tab-windows" hidden>
+                <p>
+                    Download the graphical installer from
+                    <strong>postgresql.org/download/windows</strong>.
+                    Run the installer, set a password for the <code>postgres</code> superuser,
+                    and keep the default port <code>5432</code>.
+                </p>
+                <p>
+                    The installer also includes <strong>pgAdmin 4</strong> — a graphical
+                    interface if you prefer not to use the command line immediately.
+                    After installation, search for <strong>SQL Shell (psql)</strong>
+                    in your Start menu to launch it.
+                </p>
+                <div class="notes-box">
+                    <p>
+                        On Windows you can also use <strong>WSL2</strong>
+                        (Windows Subsystem for Linux) and follow the Linux instructions above.
+                        This gives you a much nicer terminal experience and is recommended
+                        for serious development.
+                    </p>
+                </div>
+            </div>
+
+            <h3>Verifying the Installation</h3>
+            <p>After installation, run this in your terminal to confirm Postgres is running:</p>
+            <pre class="code-block"><code><span class="code-cmd">psql --version</span>
+<span class="code-output"># psql (PostgreSQL) 16.x</span></code></pre>
+
+            <div class="notes-box careful">
+                <h3>Common Trouble: Port Already in Use</h3>
+                <p>
+                    If you see an error like <em>"could not connect to server"</em> or
+                    <em>"port 5432 already in use"</em>, another Postgres instance may already
+                    be running. On macOS/Linux run <code>pg_lsclusters</code> (Linux) or
+                    check Postgres.app (macOS). On Windows, check Services in Task Manager.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 6 — Using psql
+                 ═══════════════════════════════════════════ -->
+            <h2 id="using-psql">6. Using psql — Your Command-Line Interface</h2>
+
+            <p>
+                <strong>psql</strong> is the official command-line client for PostgreSQL.
+                You type SQL directly into it and see results immediately.
+                It is the best way to learn because there is no abstraction between
+                you and the database.
+            </p>
+
+            <h3>Connecting to a Database</h3>
+            <pre class="code-block"><code><span class="code-comment"># Connect to the default 'postgres' database as user 'postgres'</span>
+<span class="code-cmd">psql -U postgres -d postgres</span>
+<span class="code-comment"># Note: If you omit -U, PostgreSQL tries to use your system username as the database user.</span>
+
+<span class="code-comment"># Connect to a specific database</span>
+<span class="code-cmd">psql -d my_database</span>
+<span class="code-comment"># This works only if your system username exists as a PostgreSQL user.</span>
+<span class="code-comment"># -d specifies the database name</span>
+<span class="code-comment"># -U specifies the username</span>
+
+<span class="code-comment"># Connect as a specific user</span>
+<span class="code-cmd">psql -U postgres -d my_database</span>
+
+<span class="code-comment"># Full connection string</span>
+<span class="code-cmd">psql "postgresql://username@localhost:5432/my_database"</span>
+<span class="code-comment"># You will be prompted for the password securely.</span></code></pre>
+
+            <p>Once connected, you will see a prompt like this:</p>
+            <pre class="code-block"><code><span class="code-output">psql (16.2)
+Type "help" for help.
+
+postgres=#</span></code></pre>
+            <p><em>Note: You may see additional warnings (especially on Windows). This is normal and can be ignored if you see the `postgres=#` prompt.</em></p>
+
+            <p>
+                The <code>#</code> means you are connected as a superuser.
+                A regular user sees <code>=&gt;</code> instead. The word before the prompt
+                (<code>postgres</code>) is the name of the database you are connected to.
+            </p>
+
+            <h3>Essential psql Meta-Commands</h3>
+            <p>
+                psql has special commands that start with a backslash <code>\</code>.
+                These are <em>not</em> SQL — they are instructions to the psql client itself.
+            </p>
+
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>Command</th>
+                        <th>What it does</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>\l</code> or <code>\list</code></td>
+                        <td>List all databases on this server</td>
+                    </tr>
+                    <tr>
+                        <td><code>\c dbname</code></td>
+                        <td>Connect (switch) to a different database</td>
+                    </tr>
+                    <tr>
+                        <td><code>\dt</code></td>
+                        <td>List all tables in the current database (current schema)</td>
+                    </tr>
+                    <tr>
+                        <td><code>\d tablename</code></td>
+                        <td>Describe a table — show its columns and data types</td>
+                    </tr>
+                    <tr>
+                        <td><code>\dn</code></td>
+                        <td>List all schemas in the current database</td>
+                    </tr>
+                    <tr>
+                        <td><code>\du</code></td>
+                        <td>List all roles (users) on the server</td>
+                    </tr>
+                    <tr>
+                        <td><code>\timing</code></td>
+                        <td>Toggle query execution time display</td>
+                    </tr>
+                    <tr>
+                        <td><code>\e</code></td>
+                        <td>Open the last query in your system text editor</td>
+                    </tr>
+                    <tr>
+                        <td><code>\i filename.sql</code></td>
+                        <td>Run all SQL from a file</td>
+                    </tr>
+                    <tr>
+                        <td><code>\q</code></td>
+                        <td>Quit psql</td>
+                    </tr>
+                    <tr>
+                        <td><code>\?</code></td>
+                        <td>Show all psql meta-commands</td>
+                    </tr>
+                    <tr>
+                        <td><code>\h SELECT</code></td>
+                        <td>Show SQL syntax help for a command</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="notes-box example">
+                <h3>Try This Right Now</h3>
+                <p>Open psql and type these commands one at a time:</p>
+                <pre class="code-block" style="margin-top: 0.5rem;"><code><span class="code-cmd">\l</span>           <span class="code-comment">-- see all databases</span>
+<span class="code-cmd">\c postgres</span>  <span class="code-comment">-- connect to the postgres database</span>
+<span class="code-cmd">\dt</span>          <span class="code-comment">-- list tables (probably empty at first)</span>
+<span class="code-cmd">\q</span>           <span class="code-comment">-- quit</span></code></pre>
+            </div>
+
+            <h3>Writing SQL in psql</h3>
+            <p>
+                To run a SQL statement, type it and press <kbd>Enter</kbd> after the
+                semicolon <code>;</code>. The semicolon tells Postgres the statement is complete.
+                Without it, pressing Enter just moves to the next line —
+                psql is waiting for you to finish.
+            </p>
+            <pre class="code-block"><code><span class="code-output">postgres=# SELECT 1 + 1;</span>
+<span class="code-output"> ?column?
+----------
+        2
+(1 row)</span></code></pre>
+
+            <div class="notes-box careful">
+                <h3>Stuck on a Multi-Line Prompt?</h3>
+                <p>
+                    If your prompt shows <code>-#</code> or <code>-&gt;</code> instead of
+                    <code>=#</code> or <code>=&gt;</code>, psql is waiting for a semicolon.
+                    Type <code>;</code> and press Enter, or press <kbd>Ctrl + C</kbd>
+                    to cancel the current input and start fresh.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 7 — Creating Your First Database
+                 ═══════════════════════════════════════════ -->
+            <h2 id="creating-a-database">7. Creating Your First Database</h2>
+
+            <p>
+                You can create a database either from the terminal or from inside psql.
+                Both do the same thing.
+            </p>
+
+            <pre class="code-block"><code><span class="code-comment">-- From inside psql:</span>
+<span class="code-sql">CREATE DATABASE</span> learning_sql;
+
+<span class="code-comment">-- Then connect to it:</span>
+<span class="code-cmd">\c learning_sql</span>
+
+<span class="code-comment">-- Or from the terminal (outside psql):</span>
+<span class="code-cmd">createdb learning_sql</span></code></pre>
+
+            <p>
+                To remove a database (be careful — this is permanent):
+            </p>
+            <pre class="code-block"><code><span class="code-sql">DROP DATABASE</span> learning_sql;</code></pre>
+
+            <div class="notes-box">
+                <p>
+                    For the rest of this course, create a database called
+                    <code>learning_sql</code> and keep all your practice tables there.
+                    It keeps your work isolated from any system databases.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 8 — How Postgres Processes a Query
+                 ═══════════════════════════════════════════ -->
+            <h2 id="query-lifecycle">8. How PostgreSQL Processes a Query</h2>
+
+            <p>
+                When you send a SQL statement to PostgreSQL, it does not execute it blindly.
+                It goes through a careful pipeline. Understanding this at a high level
+                will help you interpret errors and performance later.
+            </p>
+
+            <div class="pg-pipeline" aria-label="PostgreSQL query processing pipeline">
+                <div class="pipeline-step">
+                    <div class="pipeline-num">1</div>
+                    <div class="pipeline-content">
+                        <strong>Parse</strong>
+                        <p>Postgres reads your SQL text and checks the syntax. If you mistype <code>SELCT</code> instead
+                            of <code>SELECT</code>, the error comes from here.</p>
+                    </div>
+                </div>
+                <div class="pipeline-arrow" aria-hidden="true">↓</div>
+                <div class="pipeline-step">
+                    <div class="pipeline-num">2</div>
+                    <div class="pipeline-content">
+                        <strong>Analyse / Rewrite</strong>
+                        <p>Postgres checks that all table names, column names, and types actually exist. References to
+                            undefined tables fail here.</p>
+                    </div>
+                </div>
+                <div class="pipeline-arrow" aria-hidden="true">↓</div>
+                <div class="pipeline-step">
+                    <div class="pipeline-num">3</div>
+                    <div class="pipeline-content">
+                        <strong>Plan</strong>
+                        <p>The query planner considers multiple ways to execute your query and picks the fastest one
+                            based on table statistics. This is where indexes matter.</p>
+                    </div>
+                </div>
+                <div class="pipeline-arrow" aria-hidden="true">↓</div>
+                <div class="pipeline-step">
+                    <div class="pipeline-num">4</div>
+                    <div class="pipeline-content">
+                        <strong>Execute</strong>
+                        <p>The executor actually reads the data from disk (or cache), applies filters, joins tables, and
+                            builds the result set.</p>
+                    </div>
+                </div>
+                <div class="pipeline-arrow" aria-hidden="true">↓</div>
+                <div class="pipeline-step">
+                    <div class="pipeline-num">5</div>
+                    <div class="pipeline-content">
+                        <strong>Return</strong>
+                        <p>Results are sent back to the client. psql formats them into the table you see on screen.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notes-box summary">
+                <h3>The Key Insight</h3>
+                <p>
+                    SQL is <strong>declarative</strong> — you describe <em>what</em> you want,
+                    not <em>how</em> to get it. The query planner decides how.
+                    This is fundamentally different from writing a for-loop in Python.
+                    You say <em>"give me all users older than 30"</em> and Postgres
+                    figures out the most efficient way to retrieve them.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 9 — ACID & Why It Matters
+                 ═══════════════════════════════════════════ -->
+            <h2 id="acid">9. ACID — The Guarantee That Postgres Gives You</h2>
+
+            <p>
+                When applications write data, things can go wrong — power failures,
+                network drops, simultaneous writes. PostgreSQL protects you through
+                a set of guarantees called <strong>ACID</strong>:
+            </p>
+
+            <div class="acid-grid">
+                <div class="acid-card">
+                    <div class="acid-letter">A</div>
+                    <div class="acid-body">
+                        <strong>Atomicity</strong>
+                        <p>A transaction either completes entirely or not at all. If you transfer money between accounts
+                            and the power cuts mid-way, neither account is changed.</p>
+                    </div>
+                </div>
+                <div class="acid-card">
+                    <div class="acid-letter">C</div>
+                    <div class="acid-body">
+                        <strong>Consistency</strong>
+                        <p>Every transaction brings the database from one valid state to another. Constraints (e.g.
+                            "email must be unique") are always enforced.</p>
+                    </div>
+                </div>
+                <div class="acid-card">
+                    <div class="acid-letter">I</div>
+                    <div class="acid-body">
+                        <strong>Isolation</strong>
+                        <p>Concurrent transactions do not interfere with each other. Two users updating the same row
+                            don't overwrite each other's changes silently.</p>
+                    </div>
+                </div>
+                <div class="acid-card">
+                    <div class="acid-letter">D</div>
+                    <div class="acid-body">
+                        <strong>Durability</strong>
+                        <p>Once a transaction is committed, it is saved permanently — even if the server crashes a
+                            millisecond later.</p>
+                    </div>
+                </div>
+            </div>
+
+            <p>
+                You do not need to implement any of this yourself. Postgres handles
+                ACID automatically for every query you run. It is one of the primary
+                reasons Postgres is trusted for financial, medical, and critical
+                production systems.
+            </p>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 10 — A Brief Look at Data Types
+                 ═══════════════════════════════════════════ -->
+            <h2 id="data-types-preview">10. A First Look at PostgreSQL Data Types</h2>
+
+            <p>
+                Every column in a Postgres table has a <strong>data type</strong>.
+                The type determines what values are allowed and how Postgres stores
+                and compares them. You will study types in depth in a later section,
+                but here is the vocabulary you will see immediately:
+            </p>
+
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Common Types</th>
+                        <th>Example Values</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Text</td>
+                        <td><code>TEXT</code>, <code>VARCHAR(n)</code>, <code>CHAR(n)</code></td>
+                        <td><code>'hello'</code>, <code>'raushan@example.com'</code></td>
+                    </tr>
+                    <tr>
+                        <td>Integer</td>
+                        <td><code>INTEGER</code>, <code>BIGINT</code>, <code>SMALLINT</code></td>
+                        <td><code>42</code>, <code>-7</code>, <code>1000000</code></td>
+                    </tr>
+                    <tr>
+                        <td>Decimal</td>
+                        <td><code>NUMERIC</code>, <code>REAL</code>, <code>DOUBLE PRECISION</code></td>
+                        <td><code>3.14</code>, <code>99.99</code></td>
+                    </tr>
+                    <tr>
+                        <td>Boolean</td>
+                        <td><code>BOOLEAN</code></td>
+                        <td><code>true</code>, <code>false</code></td>
+                    </tr>
+                    <tr>
+                        <td>Date &amp; Time</td>
+                        <td><code>DATE</code>, <code>TIMESTAMP</code>, <code>TIMESTAMPTZ</code></td>
+                        <td><code>'2024-06-01'</code>, <code>'2024-06-01 14:30:00+05:30'</code></td>
+                    </tr>
+                    <tr>
+                        <td>Auto-increment</td>
+                        <td><code>SERIAL</code>, <code>BIGSERIAL</code></td>
+                        <td>Automatically assigned: 1, 2, 3…</td>
+                    </tr>
+                    <tr>
+                        <td>Unique ID</td>
+                        <td><code>UUID</code></td>
+                        <td><code>'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'</code></td>
+                    </tr>
+                    <tr>
+                        <td>Missing value</td>
+                        <td><code>NULL</code></td>
+                        <td>Represents the absence of any value</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="notes-box careful">
+                <h3>NULL Is Not Zero or Empty String</h3>
+                <p>
+                    <code>NULL</code> means <em>unknown</em> or <em>absent</em>. It is not
+                    the number zero and not an empty string <code>''</code>.
+                    This distinction causes many beginner bugs. Postgres treats
+                    <code>NULL</code> specially — any comparison with <code>NULL</code>
+                    returns <code>NULL</code> (not true or false), which is why you
+                    use <code>IS NULL</code> rather than <code>= NULL</code>.
+                    You will see this in the Filtering section.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 11 — Your Mental Model Checklist
+                 ═══════════════════════════════════════════ -->
+            <h2 id="mental-model">11. Your Mental Model Before the First Query</h2>
+
+            <p>
+                Before moving to the next section, make sure you can confidently
+                answer these questions without looking them up:
+            </p>
+
+            <div class="checklist-card">
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>A database is an organised store of data with enforced structure — not just a file.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>PostgreSQL is a relational database: data lives in tables made of rows and columns.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>The hierarchy is: server → database → schema → table → row → column.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>psql is a client — it talks to the Postgres server but is not the server itself.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>I can open psql, list databases with <code>\l</code>, connect with <code>\c</code>, and quit
+                        with <code>\q</code>.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>SQL is declarative — I describe what I want, and Postgres figures out how to get it.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>Every column has a data type that Postgres enforces strictly.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>NULL means absent/unknown, not zero or empty string.</span>
+                </label>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 12 — Summary
+                 ═══════════════════════════════════════════ -->
+            <div class="notes-box summary" style="margin-top: 3rem;">
+                <h2 style="margin-top: 0; color: inherit;">Section Summary</h2>
+                <p>In this foundation section you learned:</p>
+                <ul>
+                    <li>What a database is and why it outperforms spreadsheets at scale</li>
+                    <li>What PostgreSQL is — an open-source, ACID-compliant relational database</li>
+                    <li>How Postgres organises data: server → database → schema → table → row → column</li>
+                    <li>The client–server model and how psql fits in</li>
+                    <li>How to install Postgres and verify it is running</li>
+                    <li>The essential psql meta-commands: <code>\l</code>, <code>\c</code>, <code>\dt</code>,
+                        <code>\d</code>, <code>\q</code></li>
+                    <li>How Postgres processes a query: parse → analyse → plan → execute → return</li>
+                    <li>What ACID means and why it matters</li>
+                    <li>A preview of Postgres data types and how NULL behaves</li>
+                </ul>
+            </div>
+
+            <!-- Navigation buttons -->
+            <div class="navigation-buttons" style="margin-top: 2.5rem;">
+                <a href="/computer-science/sql/" class="btn"
+                    style="background: transparent; color: var(--primary-color); border: 1.5px solid var(--primary-color);">
+                    ← Back to SQL Index
+                </a>
+                <a href="/computer-science/sql/01-postgresql-foundations/lab.html" class="btn">
+                    Lab: For practical understanding
+                </a>
+            </div>
+
+            <div class="notes-watermark">RaushanSYNC CS &amp; DS · PostgreSQL Foundations · Educational Content</div>
+
+        </div>
+    </main>
+
+    <div id="support-cta"></div>
+    <div id="footer"></div>
+
+    <script src="/assets/css/style.css"></script>
+    <script src="/assets/js/script.js"></script>
+    <script>
+        /* ── Installation Tabs ── */
+        document.querySelectorAll('.install-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.dataset.tab;
+
+                document.querySelectorAll('.install-tab').forEach(t => {
+                    t.classList.remove('active');
+                    t.setAttribute('aria-selected', 'false');
+                });
+                document.querySelectorAll('.install-panel').forEach(p => {
+                    p.classList.remove('active');
+                    p.hidden = true;
+                });
+
+                tab.classList.add('active');
+                tab.setAttribute('aria-selected', 'true');
+                const panel = document.getElementById('tab-' + target);
+                if (panel) {
+                    panel.classList.add('active');
+                    panel.hidden = false;
+                }
+            });
+        });
+
+        /* ── Checklist persistence ── */
+        const checkboxes = document.querySelectorAll('.checklist-check');
+        const STORAGE_KEY = 'pg-foundations-checklist';
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        checkboxes.forEach((cb, i) => {
+            if (saved[i]) cb.checked = true;
+            cb.addEventListener('change', () => {
+                const state = Array.from(checkboxes).map(c => c.checked);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            });
+        });
+    </script>
+</body>
+
+</html>

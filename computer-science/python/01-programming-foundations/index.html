@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3b82f6" id="theme-color-meta">
+
+    <title>Programming Foundations in Python | RaushanSYNC CS & DS</title>
+
+    <meta name="description"
+        content="Build strong Python programming foundations from first principles: computational thinking, first programs, variables, data types, operators, input/output, and debugging basics.">
+
+    <meta name="keywords"
+        content="python programming foundations, python basics, computational thinking, python variables, python data types, python operators, python input output, python debugging, RaushanSYNC">
+
+    <meta name="author" content="Raushan Kumar">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+
+    <link rel="canonical" href="https://cs.raushansync.com/computer-science/python/01-programming-foundations/">
+
+    <!-- Open Graph -->
+    <meta property="og:site_name" content="RaushanSYNC CS & DS">
+    <meta property="og:title" content="Programming Foundations in Python - RaushanSYNC CS & DS">
+    <meta property="og:description"
+        content="A concept-first Python foundation path covering first programs, variables, data types, operators, input/output, and debugging.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://cs.raushansync.com/computer-science/python/01-programming-foundations/">
+    <meta property="og:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@raushansync">
+    <meta name="twitter:title" content="Programming Foundations in Python - RaushanSYNC CS & DS">
+    <meta name="twitter:description"
+        content="Learn Python foundations with conceptual clarity: code execution, variables, types, operators, I/O, and debugging.">
+    <meta name="twitter:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "WebPage",
+                "name": "Programming Foundations in Python - RaushanSYNC CS & DS",
+                "description": "Core Python foundations covering coding basics, variables, data types, operators, input/output, and debugging.",
+                "url": "https://cs.raushansync.com/computer-science/python/01-programming-foundations/"
+            },
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "Home",
+                        "item": "https://cs.raushansync.com/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": "Computer Science",
+                        "item": "https://cs.raushansync.com/computer-science/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 3,
+                        "name": "Python",
+                        "item": "https://cs.raushansync.com/computer-science/python/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 4,
+                        "name": "Programming Foundations",
+                        "item": "https://cs.raushansync.com/computer-science/python/01-programming-foundation/"
+                    }
+                ]
+            }
+        ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo">RaushanSYNC CS & DS</a>
+            <div id="nav"></div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode">
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                    </svg>
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                    </svg>
+                </button>
+                <button class="hamburger" id="hamburger" aria-label="Open menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="notes-page practice-page">
+        <div class="notes-container">
+            <div class="notes-header">
+                <h1>Programming Foundations</h1>
+                <p>
+                    Build the core mental model of programming in Python from first principles.
+                    Learn how code runs, how data is represented, and how to reason through problems.
+                </p>
+            </div>
+
+            <section class="palette important">
+                <h2>Thinking Like a Programmer</h2>
+                <p>
+                    Understand logic, decomposition, and step-by-step reasoning before writing code.
+                </p>
+                <a href="/computer-science/python/01-programming-foundation/thinking-like-a-programmer/"
+                    class="video-solution-btn">
+                    Start Thinking
+                </a>
+            </section>
+
+            <section class="palette important">
+                <h2>Your First Python Program</h2>
+                <p>
+                    Learn program structure, writing your first script, and running code confidently.
+                </p>
+                <a href="/computer-science/python/01-programming-foundation/first-program/" class="video-solution-btn">
+                    Write First Program
+                </a>
+            </section>
+
+            <section class="palette important">
+                <h2>How Python Executes Code</h2>
+                <p>
+                    Build a clear model of instruction flow, statements, and execution order.
+                </p>
+                <a href="/computer-science/python/01-programming-foundation/code-execution/" class="video-solution-btn">
+                    Explore Execution
+                </a>
+            </section>
+
+            <section class="palette important">
+                <h2>Variables and Assignment</h2>
+                <p>
+                    Understand names, values, memory references, and clean naming conventions.
+                </p>
+                <a href="/computer-science/python/01-programming-foundation/variables/" class="video-solution-btn">
+                    Learn Variables
+                </a>
+            </section>
+
+            <section class="palette important">
+                <h2>Data Types and Type Thinking</h2>
+                <p>
+                    Work with strings, numbers, booleans, and type conversion with conceptual clarity.
+                </p>
+                <a href="/computer-science/python/01-programming-foundation/data-types/" class="video-solution-btn">
+                    Study Data Types
+                </a>
+            </section>
+
+            <section class="palette important">
+                <h2>Operators and Expressions</h2>
+                <p>
+                    Learn arithmetic, comparison, and logical operators to build correct expressions.
+                </p>
+                <a href="/computer-science/python/01-programming-foundation/operators/" class="video-solution-btn">
+                    Practice Expressions
+                </a>
+            </section>
+
+            <section class="palette important">
+                <h2>Input, Output, and Formatting</h2>
+                <p>
+                    Read user input, present outputs clearly, and format values for readable programs.
+                </p>
+                <a href="/computer-science/python/01-programming-foundation/input-output/" class="video-solution-btn">
+                    Explore Input and Output
+                </a>
+            </section>
+
+            <section class="palette important">
+                <h2>Errors and Debugging Basics</h2>
+                <p>
+                    Read tracebacks, identify common mistakes, and develop a structured debugging process.
+                </p>
+                <a href="/computer-science/python/01-programming-foundation/errors-debugging/" class="video-solution-btn">
+                    Debug Smarter
+                </a>
+            </section>
+        </div>
+    </main>
+
+    <div id="support-cta"></div>
+    <div id="footer"></div>
+
+    <script src="/assets/js/script.js"></script>
+</body>
+
+</html>

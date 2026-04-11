@@ -1,42 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
   <url>
     <loc>https://cs.raushansync.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
-
   <url>
-    <loc>https://cs.raushansync.com/about.html</loc>
+    <loc>https://cs.raushansync.com/about/</loc>
     <changefreq>yearly</changefreq>
     <priority>0.8</priority>
   </url>
-
-  <!-- Actively maintained -->
   <url>
     <loc>https://cs.raushansync.com/class11/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
-
-  <!-- Present but not actively developed yet -->
   <url>
     <loc>https://cs.raushansync.com/class12/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
-
   <url>
     <loc>https://cs.raushansync.com/computer-science/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
-
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/python/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/python/01-programming-foundations/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/01-postgresql-foundations/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/01-postgresql-foundations/lab.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/02-your-first-queries/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/02-your-first-queries/lab.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/01-ddl-commands.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/01-lab-ddl-commands.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/02-basic-sql-operations.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/02-lab-basic-sql-operations.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/03-advanced-concepts.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/03-lab-advanced-concepts.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/01-intermediate-sql.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/01-lab-intermediate-sql.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/02-intermediate-sql.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/02-lab-intermediate-sql.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
   <url>
     <loc>https://cs.raushansync.com/data-science/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
-
 </urlset>

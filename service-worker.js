@@ -1,6 +1,6 @@
 /* RaushanSYNC Computer Science & Data Science PWA Service Worker */
 
-const CACHE_VERSION = 'csds-v1.0.2.5';
+const CACHE_VERSION = 'csds-v1.0.3.0';
 const CORE_CACHE = 'rs-core-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'rs-runtime-' + CACHE_VERSION;
 
@@ -26,11 +26,24 @@ const CORE_ASSETS = [
   '/icons/icon-512.png',
 
   '/about/',
+  '/about/index.html',
 
+  '/computer-science/',
   '/computer-science/index.html',
+  '/computer-science/python/',
+  '/computer-science/sql/',
+  '/computer-science/sql/index.html',
+  '/computer-science/sql/01-postgresql-foundations/',
+  '/computer-science/sql/02-your-first-queries/',
+  '/computer-science/sql/03-filtering-and-conditions/',
+  '/computer-science/sql/04-intermediate-sql/',
+  '/computer-science/python/01-programming-foundations/',
+  '/data-science/',
   '/data-science/index.html',
 
+  '/class11/',
   '/class11/index.html',
+  '/class12/',
   '/class12/index.html'
 ];
 

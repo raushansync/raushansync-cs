@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3b82f6" id="theme-color-meta">
+
+    <title>Lab: Intermediate SQL Subqueries & DML | RaushanSYNC CS & DS</title>
+
+    <meta name="description"
+        content="Interactive SQL lab environment. Practice Nested Subqueries, CTEs, and safe Data Modification (INSERT, UPDATE, DELETE) directly in your browser.">
+
+    <meta name="keywords"
+        content="sql lab, interactive sql, postgresql intermediate practice, nested subqueries, sql cte, sql exists, sql update case, RaushanSYNC, computer science">
+
+    <meta name="author" content="Raushan Kumar">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+
+    <link rel="canonical" href="https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/01-lab-intermediate-sql.html">
+
+    <meta property="og:site_name" content="RaushanSYNC CS & DS">
+    <meta property="og:title" content="Lab: Intermediate SQL Subqueries & DML — RaushanSYNC CS & DS">
+    <meta property="og:description"
+        content="Interactive SQL lab environment. Put your knowledge of nested queries, existential logic, and data manipulation to the test.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/01-lab-intermediate-sql.html">
+    <meta property="og:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@raushansync">
+    <meta name="twitter:title" content="Lab: Intermediate SQL Subqueries & DML — RaushanSYNC CS & DS">
+    <meta name="twitter:description"
+        content="Interactive SQL lab environment. Put your knowledge of nested queries, existential logic, and data manipulation to the test.">
+    <meta name="twitter:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo">RaushanSYNC CS & DS</a>
+            <div id="nav"></div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode">
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                    </svg>
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                    </svg>
+                </button>
+                <button class="hamburger" id="hamburger" aria-label="Open menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="practice-page">
+        <div class="notes-container">
+
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <ol>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/computer-science/">Computer Science</a></li>
+                    <li><a href="/computer-science/sql/">SQL</a></li>
+                    <li><a href="/computer-science/sql/04-intermediate-sql/">04 Intermediate SQL</a></li>
+                    <li aria-current="page">4.1 Lab: Subqueries & DML</li>
+                </ol>
+            </nav>
+
+            <div class="notes-header">
+                <h1>Interactive SQL Lab: Subqueries & DML</h1>
+                <p>Put your knowledge of nested queries, existential logic, and data manipulation to the test. This environment contains a complete mock database for a research organization.</p>
+            </div>
+
+            <div class="notes-box example">
+                <h3>Your Lab Tasks</h3>
+                <p>The database contains four tables: <code>divisions</code>, <code>staff</code>, <code>initiatives</code> (projects), and <code>staff_assignments</code>. Solve the following scenarios:</p>
+                <ol style="margin-bottom: 0;">
+                    <li style="margin-bottom: 0.75rem;"><strong>Set Membership (IN):</strong> Find the names of <code>staff</code> who are currently assigned to an initiative that has a budget of over $100,000. <em>(Requires nesting subqueries!)</em></li>
+                    
+                    <li style="margin-bottom: 0.75rem;"><strong>Set Comparison (ALL):</strong> Write a query to find the name and salary of the highest-paid staff member <strong>without</strong> using the <code>MAX()</code> function. Use the <code>&gt;= ALL</code> trick.</li>
+                    
+                    <li style="margin-bottom: 0.75rem;"><strong>Test for Empty Relations (NOT EXISTS):</strong> We suspect a division is completely inactive. Find the <code>div_name</code> of any division that currently has <strong>zero</strong> initiatives associated with it.</li>
+                    
+                    <li style="margin-bottom: 0.75rem;"><strong>Common Table Expressions (WITH):</strong> Calculate the average salary per division. Then, write a query using a <code>WITH</code> clause to list the <code>div_name</code> of divisions where the average salary is strictly greater than $80,000.</li>
+                    
+                    <li style="margin-bottom: 0.75rem;"><strong>Scalar Subqueries:</strong> Generate a report listing the title of every initiative alongside a dynamically computed column called <code>team_size</code> (the count of staff assigned to that specific initiative).</li>
+                    
+                    <li style="margin-bottom: 0.75rem;"><strong>Atomic Updates (CASE):</strong> Due to budget restructuring, update the <code>staff</code> table: Give a 10% raise (multiply by 1.10) to anyone earning under $75,000, and a 5% raise to everyone else. Use a single <code>UPDATE</code> with a <code>CASE</code> statement. <em>(Run <code>SELECT * FROM staff;</code> afterward to check your work)</em>.</li>
+
+                    <li><strong>Safe Deletion:</strong> Clean up the database by deleting any <code>initiatives</code> that currently have NO staff members assigned to them.</li>
+                </ol>
+            </div>
+
+            <div class="sql-lab-environment">
+                <div class="sql-editor-wrapper">
+                    <div class="sql-editor-header">
+                        <span>Query Editor</span>
+                        <span id="db-status" class="status-badge initializing">Initializing DB...</span>
+                    </div>
+                    <textarea id="sql-input" class="sql-textarea"
+                        placeholder="Type your SQL query here...&#10;e.g., SELECT * FROM staff;"></textarea>
+                    <div class="sql-editor-footer">
+                        <button id="run-btn" class="btn" disabled>Run Query (Ctrl + Enter)</button>
+                    </div>
+                </div>
+
+                <div id="error-container" class="sql-error hidden"></div>
+
+                <div class="sql-results-wrapper">
+                    <div class="sql-results-header">Results / Status</div>
+                    <div class="sql-table-container">
+                        <table id="results-table" class="notes-table hidden">
+                            <thead id="results-head"></thead>
+                            <tbody id="results-body"></tbody>
+                        </table>
+                        <div id="empty-state" class="sql-empty-state">
+                            No queries run yet. Start typing to interact with the database.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notes-box summary" style="margin-top: 2rem;">
+                <details>
+                    <summary style="cursor: pointer; font-weight: 600; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
+                        💡 Stuck? Click here to reveal hints and solutions
+                    </summary>
+                    <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                        <p><strong>Task 1: Subquery with IN</strong></p>
+                        <pre class="code-block" style="margin-top: 0.5rem; margin-bottom: 1.5rem;"><code><span class="code-sql">SELECT</span> name <span class="code-sql">FROM</span> staff
+<span class="code-sql">WHERE</span> staff_id <span class="code-sql">IN</span> (
+    <span class="code-sql">SELECT</span> staff_id <span class="code-sql">FROM</span> staff_assignments
+    <span class="code-sql">WHERE</span> init_id <span class="code-sql">IN</span> (
+        <span class="code-sql">SELECT</span> init_id <span class="code-sql">FROM</span> initiatives <span class="code-sql">WHERE</span> budget > 100000
+    )
+);</code></pre>
+
+                        <p><strong>Task 2: Set Comparison (ALL)</strong></p>
+                        <p class="quiz-inline-hint">Hint: If someone's salary is >= EVERY salary in the table, they must be the highest earner.</p>
+                        <pre class="code-block" style="margin-top: 0.5rem; margin-bottom: 1.5rem;"><code><span class="code-sql">SELECT</span> name, salary <span class="code-sql">FROM</span> staff
+<span class="code-sql">WHERE</span> salary >= <span class="code-sql">ALL</span> (
+    <span class="code-sql">SELECT</span> salary <span class="code-sql">FROM</span> staff
+);</code></pre>
+
+                        <p><strong>Task 3: Test for Empty Relations (NOT EXISTS)</strong></p>
+                        <pre class="code-block" style="margin-top: 0.5rem; margin-bottom: 1.5rem;"><code><span class="code-sql">SELECT</span> div_name <span class="code-sql">FROM</span> divisions D
+<span class="code-sql">WHERE NOT EXISTS</span> (
+    <span class="code-sql">SELECT</span> * <span class="code-sql">FROM</span> initiatives I
+    <span class="code-sql">WHERE</span> I.div_id = D.div_id
+);</code></pre>
+
+                        <p><strong>Task 4: The WITH Clause</strong></p>
+                        <pre class="code-block" style="margin-top: 0.5rem; margin-bottom: 1.5rem;"><code><span class="code-sql">WITH</span> DivAverages(div_id, avg_sal) <span class="code-sql">AS</span> (
+    <span class="code-sql">SELECT</span> div_id, <span class="code-sql">AVG</span>(salary)
+    <span class="code-sql">FROM</span> staff
+    <span class="code-sql">GROUP BY</span> div_id
+)
+<span class="code-sql">SELECT</span> D.div_name
+<span class="code-sql">FROM</span> divisions D, DivAverages DA
+<span class="code-sql">WHERE</span> D.div_id = DA.div_id <span class="code-sql">AND</span> DA.avg_sal > 80000;</code></pre>
+
+                        <p><strong>Task 5: Scalar Subqueries</strong></p>
+                        <pre class="code-block" style="margin-top: 0.5rem; margin-bottom: 1.5rem;"><code><span class="code-sql">SELECT</span> title, 
+       (
+           <span class="code-sql">SELECT COUNT</span>(*) 
+           <span class="code-sql">FROM</span> staff_assignments SA 
+           <span class="code-sql">WHERE</span> SA.init_id = I.init_id
+       ) <span class="code-sql">AS</span> team_size
+<span class="code-sql">FROM</span> initiatives I;</code></pre>
+
+                        <p><strong>Task 6: UPDATE with CASE</strong></p>
+                        <p class="quiz-inline-hint">Hint: Run the UPDATE statement, then run a SELECT statement separately to see the changes.</p>
+                        <pre class="code-block" style="margin-top: 0.5rem; margin-bottom: 1.5rem;"><code><span class="code-sql">UPDATE</span> staff
+<span class="code-sql">SET</span> salary = <span class="code-sql">CASE</span>
+    <span class="code-sql">WHEN</span> salary < 75000 <span class="code-sql">THEN</span> salary * 1.10
+    <span class="code-sql">ELSE</span> salary * 1.05
+<span class="code-sql">END</span>;</code></pre>
+
+                        <p><strong>Task 7: DELETE</strong></p>
+                        <pre class="code-block" style="margin-top: 0.5rem; margin-bottom: 0;"><code><span class="code-sql">DELETE FROM</span> initiatives
+<span class="code-sql">WHERE</span> init_id <span class="code-sql">NOT IN</span> (
+    <span class="code-sql">SELECT</span> init_id <span class="code-sql">FROM</span> staff_assignments
+);</code></pre>
+                    </div>
+                </details>
+            </div>
+
+            <div class="navigation-buttons" style="margin-top: 3.5rem;">
+                <a href="./01-intermediate-sql.html" class="btn"
+                    style="background: transparent; color: var(--primary-color); border: 1.5px solid var(--primary-color);">
+                    ← Back to Intermediate SQL Notes
+                </a>
+                <a href="./02-intermediate-sql.html" class="btn">
+                    Next Section →
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="footer"></div>
+
+    <script src="/assets/js/script.js"></script>
+
+    <script type="module">
+        import { PGlite } from "https://cdn.jsdelivr.net/npm/@electric-sql/pglite/dist/index.js";
+
+        const sqlInput = document.getElementById('sql-input');
+        const runBtn = document.getElementById('run-btn');
+        const statusBadge = document.getElementById('db-status');
+        const errorContainer = document.getElementById('error-container');
+        const resultsTable = document.getElementById('results-table');
+        const resultsHead = document.getElementById('results-head');
+        const resultsBody = document.getElementById('results-body');
+        const emptyState = document.getElementById('empty-state');
+
+        let db;
+
+        async function initDB() {
+            try {
+                // Initialize the in-memory database
+                db = new PGlite();
+
+                // Pre-load the research organization database schema and data
+                await db.exec(`
+                    CREATE TABLE divisions (
+                        div_id VARCHAR(5) PRIMARY KEY, 
+                        div_name VARCHAR(30), 
+                        location VARCHAR(20)
+                    );
+                    
+                    CREATE TABLE staff (
+                        staff_id VARCHAR(5) PRIMARY KEY, 
+                        name VARCHAR(30), 
+                        div_id VARCHAR(5), 
+                        salary NUMERIC(10,2)
+                    );
+                    
+                    CREATE TABLE initiatives (
+                        init_id VARCHAR(5) PRIMARY KEY, 
+                        title VARCHAR(30), 
+                        budget NUMERIC(12,2), 
+                        div_id VARCHAR(5)
+                    );
+                    
+                    CREATE TABLE staff_assignments (
+                        staff_id VARCHAR(5), 
+                        init_id VARCHAR(5), 
+                        hours_logged INT
+                    );
+
+                    INSERT INTO divisions VALUES 
+                        ('D1', 'Applied Physics', 'Sector A'), 
+                        ('D2', 'Bioinformatics', 'Sector B'), 
+                        ('D3', 'Data Science', 'Sector C'), 
+                        ('D4', 'Robotics', 'Sector A'),
+                        ('D5', 'Public Relations', 'HQ'); -- Empty division for EXISTS task
+
+                    INSERT INTO staff VALUES 
+                        ('S101', 'Dr. Alan Grant', 'D1', 95000), 
+                        ('S102', 'Ellie Sattler', 'D2', 82000), 
+                        ('S103', 'Ian Malcolm', 'D3', 120000), 
+                        ('S104', 'Ray Arnold', 'D3', 70000), 
+                        ('S105', 'Dennis Nedry', 'D3', 68000), 
+                        ('S106', 'Henry Wu', 'D2', 105000);
+
+                    INSERT INTO initiatives VALUES 
+                        ('IN-1', 'Quantum Sensors', 150000, 'D1'), 
+                        ('IN-2', 'Genomic Sequencing', 90000, 'D2'), 
+                        ('IN-3', 'Predictive Modeling', 200000, 'D3'), 
+                        ('IN-4', 'Legacy Code Cleanup', 15000, 'D3'), 
+                        ('IN-5', 'Drone Prototyping', 300000, 'D4'),
+                        ('IN-6', 'Archived Data Dump', 5000, 'D3'); -- Empty initiative for DELETE task
+
+                    INSERT INTO staff_assignments VALUES 
+                        ('S101', 'IN-1', 120), 
+                        ('S102', 'IN-2', 80), 
+                        ('S103', 'IN-3', 40), 
+                        ('S104', 'IN-4', 60), 
+                        ('S105', 'IN-4', 20),
+                        ('S106', 'IN-2', 150);
+                `);
+
+                statusBadge.textContent = 'Database Ready';
+                statusBadge.className = 'status-badge ready';
+                runBtn.disabled = false;
+
+            } catch (err) {
+                console.error("Database initialization failed:", err);
+                statusBadge.textContent = 'Error Loading DB';
+                statusBadge.className = 'status-badge error';
+                showError("Failed to initialize the database environment. Please refresh the page.");
+            }
+        }
+
+        function showError(message) {
+            errorContainer.textContent = message;
+            errorContainer.classList.remove('hidden');
+            resultsTable.classList.add('hidden');
+            emptyState.classList.add('hidden');
+        }
+
+        function hideError() {
+            errorContainer.textContent = '';
+            errorContainer.classList.add('hidden');
+        }
+
+        async function executeQuery() {
+            const query = sqlInput.value.trim();
+            if (!query) return;
+
+            hideError();
+            runBtn.disabled = true;
+            runBtn.textContent = 'Running...';
+
+            try {
+                // Handle multiple statements if submitted
+                const statements = query.split(';').filter(stmt => stmt.trim() !== '');
+                let lastResult = null;
+
+                for (const stmt of statements) {
+                     lastResult = await db.query(stmt + ';');
+                }
+
+                if (!lastResult || !lastResult.fields || lastResult.fields.length === 0) {
+                    emptyState.textContent = `Command executed successfully. (0 rows returned)`;
+                    emptyState.classList.remove('hidden');
+                    resultsTable.classList.add('hidden');
+                } else if (lastResult.rows.length === 0) {
+                    renderTable(lastResult.fields, lastResult.rows);
+                    emptyState.textContent = "Query executed successfully, but returned 0 rows.";
+                    emptyState.classList.remove('hidden');
+                    resultsTable.classList.remove('hidden');
+                } else {
+                    renderTable(lastResult.fields, lastResult.rows);
+                    emptyState.classList.add('hidden');
+                    resultsTable.classList.remove('hidden');
+                }
+            } catch (err) {
+                showError("SQL Error: " + err.message);
+            } finally {
+                runBtn.disabled = false;
+                runBtn.textContent = 'Run Query (Ctrl + Enter)';
+            }
+        }
+
+        function renderTable(fields, rows) {
+            // Clear previous results
+            resultsHead.innerHTML = '';
+            resultsBody.innerHTML = '';
+
+            // Generate Headers
+            const headerRow = document.createElement('tr');
+            fields.forEach(field => {
+                const th = document.createElement('th');
+                th.textContent = field.name;
+                headerRow.appendChild(th);
+            });
+            resultsHead.appendChild(headerRow);
+
+            // Generate Rows
+            rows.forEach(row => {
+                const tr = document.createElement('tr');
+                fields.forEach(field => {
+                    const td = document.createElement('td');
+                    // Handle null values explicitly
+                    if (row[field.name] === null) {
+                        td.innerHTML = '<em>NULL</em>';
+                        td.style.color = 'var(--secondary-text-color)';
+                    } else {
+                        td.textContent = row[field.name];
+                    }
+                    tr.appendChild(td);
+                });
+                resultsBody.appendChild(tr);
+            });
+        }
+
+        // Event Listeners
+        runBtn.addEventListener('click', executeQuery);
+
+        // Allow Ctrl+Enter to run the query
+        sqlInput.addEventListener('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                if (!runBtn.disabled) executeQuery();
+            }
+        });
+
+        // Start initialization
+        initDB();
+    </script>
+</body>
+
+</html>
