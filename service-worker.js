@@ -1,6 +1,7 @@
 /* RaushanSYNC Computer Science & Data Science PWA Service Worker */
 
-const CACHE_VERSION = 'csds-v1.0.4.0.1';
+const APP_VERSION = '2026.04.14.2';
+const CACHE_VERSION = 'csds-v' + APP_VERSION;
 const CORE_CACHE = 'rs-core-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'rs-runtime-' + CACHE_VERSION;
 
@@ -70,6 +71,12 @@ self.addEventListener('activate', (event) => {
   })());
 });
 
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 /* ---------- Path classifiers ---------- */
 function isNotesOrPractice(pathname) {
   return pathname.startsWith('/notes/')
@@ -84,7 +91,7 @@ function isComponent(pathname) {
 function isStaticAsset(request, pathname) {
   if (pathname.startsWith('/assets/')) return true;
   if (request.destination) {
-    return ['style', 'script', 'image', 'font'].includes(request.destination);
+    return ['style', 'script', 'image', 'font', 'audio', 'video'].includes(request.destination);
   }
   return false;
 }
@@ -104,9 +111,13 @@ async function trimCache(cacheName, maxEntries) {
   }
 }
 
+async function matchCachedRequest(request) {
+  return caches.match(request);
+}
+
 /* ---------- Strategies ---------- */
 async function cacheFirst(request) {
-  const cached = await caches.match(request);
+  const cached = await matchCachedRequest(request);
   if (cached) return cached;
 
   try {
@@ -136,7 +147,7 @@ async function networkFirst(request) {
     }
     return response;
   } catch (error) {
-    const cached = await caches.match(request);
+    const cached = await matchCachedRequest(request);
     if (cached) return cached;
 
     if (request.destination === 'document') {
@@ -157,6 +168,7 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return;
 
   const pathname = url.pathname;
+  if (pathname === '/service-worker.js') return;
 
   if (
     isStaticAsset(request, pathname) ||

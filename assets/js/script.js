@@ -155,10 +155,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Service Worker Registration (PWA) ---
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/service-worker.js').catch((error) => {
-                console.warn('Service worker registration failed:', error);
+        window.addEventListener('load', async () => {
+            let isRefreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (isRefreshing) return;
+                isRefreshing = true;
+                window.location.reload();
             });
+
+            try {
+                const registration = await navigator.serviceWorker.register('/service-worker.js', {
+                    updateViaCache: 'none'
+                });
+
+                // Force an update check on each load so new SW/CSS deploys are picked up quickly.
+                await registration.update();
+
+                if (registration.waiting) {
+                    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                }
+
+                registration.addEventListener('updatefound', () => {
+                    const installingWorker = registration.installing;
+                    if (!installingWorker) return;
+
+                    installingWorker.addEventListener('statechange', () => {
+                        if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            installingWorker.postMessage({ type: 'SKIP_WAITING' });
+                        }
+                    });
+                });
+            } catch (error) {
+                console.warn('Service worker registration failed:', error);
+            }
         });
     }
 
