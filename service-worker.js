@@ -1,6 +1,6 @@
 /* RaushanSYNC Computer Science & Data Science PWA Service Worker */
 
-const CACHE_VERSION = 'csds-v1.0.4.0';
+const CACHE_VERSION = 'csds-v1.0.4.0.1';
 const CORE_CACHE = 'rs-core-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'rs-runtime-' + CACHE_VERSION;
 
