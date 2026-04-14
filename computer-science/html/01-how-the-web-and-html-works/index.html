@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3b82f6" id="theme-color-meta">
+
+    <title>How the Web & HTML Work — First Principles | RaushanSYNC CS & DS</title>
+
+    <meta name="description"
+        content="Understand how the web truly works from first principles — what happens when you type a URL, how DNS resolves it, what HTML really is, how browsers render pages, and the mental model every developer needs.">
+
+    <meta name="keywords"
+        content="how the web works, how html works, what is html, dom explained, browser rendering, http request response, dns lookup, html for beginners, RaushanSYNC, web fundamentals, client server model">
+
+    <meta name="author" content="Raushan Kumar">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+
+    <link rel="canonical" href="https://cs.raushansync.com/computer-science/html/01-how-the-web-and-html-works/">
+
+    <!-- Open Graph -->
+    <meta property="og:site_name" content="RaushanSYNC CS & DS">
+    <meta property="og:title" content="How the Web & HTML Work — RaushanSYNC CS & DS">
+    <meta property="og:description"
+        content="Build a deep mental model of how the web works — from DNS lookups and HTTP requests to DOM trees and browser rendering. The foundation every developer needs.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://cs.raushansync.com/computer-science/html/01-how-the-web-and-html-works/">
+    <meta property="og:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@raushansync">
+    <meta name="twitter:title" content="How the Web & HTML Work — RaushanSYNC CS & DS">
+    <meta name="twitter:description"
+        content="Understand what actually happens when you type a URL, what HTML really is, how browsers paint pixels, and the mental model that makes everything click.">
+    <meta name="twitter:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Article",
+                "headline": "How the Web & HTML Work — First Principles",
+                "description": "Understand how the web truly works from first principles — what happens when you type a URL, how DNS resolves it, what HTML really is, how browsers render pages, and the mental model every developer needs.",
+                "url": "https://cs.raushansync.com/computer-science/html/01-how-the-web-and-html-works/",
+                "author": {
+                    "@type": "Person",
+                    "name": "Raushan Kumar"
+                },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "RaushanSYNC CS & DS",
+                    "url": "https://cs.raushansync.com/"
+                }
+            },
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://cs.raushansync.com/" },
+                    { "@type": "ListItem", "position": 2, "name": "Computer Science", "item": "https://cs.raushansync.com/computer-science/" },
+                    { "@type": "ListItem", "position": 3, "name": "HTML", "item": "https://cs.raushansync.com/computer-science/html/" },
+                    { "@type": "ListItem", "position": 4, "name": "1. How the Web & HTML Work", "item": "https://cs.raushansync.com/computer-science/html/01-how-the-web-and-html-works/" }
+                ]
+            }
+        ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <style>
+        /* ── Page-local components (nothing in style.css needs changing) ── */
+
+        /* Journey timeline  */
+        .journey-step {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 0.9rem 1.1rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .journey-num {
+            flex-shrink: 0;
+            width: 2rem;
+            height: 2rem;
+            background: var(--primary-color);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .journey-content strong {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+        }
+
+        .journey-content p {
+            font-size: 0.88rem;
+            color: var(--secondary-text-color);
+            margin: 0;
+        }
+
+        .journey-arrow {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--secondary-text-color);
+            opacity: 0.5;
+            margin: 0.2rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .journey-pipeline {
+            margin: 1.5rem 0;
+        }
+
+        /* Triad cards */
+        .triad-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .triad-card {
+            border-radius: 12px;
+            padding: 1.2rem 1.3rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+            background: var(--card-background);
+        }
+
+        .triad-card.html { border-top: 4px solid #f97316; }
+        .triad-card.css  { border-top: 4px solid #3b82f6; }
+        .triad-card.js   { border-top: 4px solid #eab308; }
+
+        .triad-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .triad-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .triad-card p {
+            font-size: 0.85rem;
+            color: var(--secondary-text-color);
+            margin: 0;
+        }
+
+        .triad-label {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            margin-bottom: 0.6rem;
+        }
+
+        .triad-card.html .triad-label { background: rgba(249,115,22,0.12); color: #ea580c; }
+        .triad-card.css  .triad-label { background: rgba(59,130,246,0.12); color: #2563eb; }
+        .triad-card.js   .triad-label { background: rgba(234,179,8,0.12);  color: #a16207; }
+
+        .dark-mode .triad-card.js .triad-label { color: #fde047; }
+        .dark-mode .triad-card.js .triad-label { background: rgba(234,179,8,0.18); }
+
+        /* DOM hierarchy (reusing pg-hierarchy pattern) */
+        .dom-hier-html   { border-left: 4px solid #f97316; }
+        .dom-hier-head   { border-left: 4px solid #a855f7; }
+        .dom-hier-body   { border-left: 4px solid #3b82f6; }
+        .dom-hier-elem   { border-left: 4px solid #22d3ee; }
+        .dom-hier-text   { border-left: 4px solid #34d399; }
+
+        /* HTTP request/response diagram */
+        .http-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .http-box {
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            min-width: 170px;
+            border: 1px solid var(--border-color);
+            background: var(--card-background);
+            box-shadow: var(--card-shadow);
+            flex: 1;
+            max-width: 260px;
+            text-align: center;
+        }
+
+        .http-box.browser-box { border-top: 4px solid #3b82f6; }
+        .http-box.server-box  { border-top: 4px solid #22c55e; }
+        .http-box.dns-box     { border-top: 4px solid #a855f7; }
+
+        .http-label {
+            font-weight: 700;
+            font-size: 0.88rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .http-desc {
+            font-size: 0.78rem;
+            color: var(--secondary-text-color);
+            line-height: 1.45;
+        }
+
+        .http-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--secondary-text-color);
+            gap: 0.2rem;
+            flex-shrink: 0;
+        }
+
+        .http-arrow-line {
+            width: 48px;
+            height: 2px;
+            background: var(--border-color);
+        }
+
+        @media (max-width: 600px) {
+            .http-diagram {
+                flex-direction: column;
+                gap: 0.7rem;
+            }
+
+            .http-box {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .http-arrow {
+                flex-direction: column;
+                gap: 0.15rem;
+            }
+
+            .http-arrow-line {
+                width: 2px;
+                height: 22px;
+            }
+
+            .http-arrow span {
+                display: block;
+                text-align: center;
+                font-size: 0.72rem;
+                line-height: 1.25;
+            }
+        }
+
+        /* Misconception callout */
+        .misconception-card {
+            display: flex;
+            gap: 0.75rem;
+            align-items: flex-start;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid #f87171;
+            border-radius: 12px;
+            padding: 1rem 1.2rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .misconception-icon {
+            flex-shrink: 0;
+            font-size: 1.2rem;
+        }
+
+        .misconception-body strong {
+            display: block;
+            color: #dc2626;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .dark-mode .misconception-body strong { color: #f87171; }
+
+        .misconception-body p {
+            font-size: 0.88rem;
+            color: var(--secondary-text-color);
+            margin: 0;
+        }
+
+        .misconception-correct {
+            margin-top: 0.4rem;
+            font-size: 0.88rem;
+            color: #16a34a;
+            font-weight: 500;
+        }
+
+        .dark-mode .misconception-correct { color: #4ade80; }
+    </style>
+
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo">RaushanSYNC CS &amp; DS</a>
+            <div id="nav"></div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode">
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                    </svg>
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                    </svg>
+                </button>
+                <button class="hamburger" id="hamburger" aria-label="Open menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="notes-page practice-page">
+        <div class="notes-container">
+
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <ol>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/computer-science/">Computer Science</a></li>
+                    <li><a href="/computer-science/html/">HTML</a></li>
+                    <li aria-current="page">1. How the Web &amp; HTML Work</li>
+                </ol>
+            </nav>
+
+            <!-- Page Header -->
+            <div class="notes-header">
+                <h1>1. How the Web &amp; HTML Work</h1>
+                <p>
+                    Before you write a single tag, understand what the web actually is —
+                    from the cables under the ocean to the pixels on your screen.
+                    This is the mental model that makes everything else click.
+                </p>
+            </div>
+
+            <!-- Progress indicator -->
+            <div class="lesson-progress">
+                <span class="lesson-badge">1</span>
+                <span class="lesson-title-small">How the Web &amp; HTML Work</span>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 1 — The Internet vs The Web
+                 ═══════════════════════════════════════════ -->
+            <h2 id="internet-vs-web">1. The Internet Is Not the Web</h2>
+
+            <p>
+                Almost everyone uses these two terms interchangeably, but they are
+                genuinely different things — and confusing them leads to fuzzy thinking
+                about how everything else works.
+            </p>
+
+            <p>
+                The <strong>Internet</strong> is the physical infrastructure: the
+                cables, routers, fibre optic lines running under oceans, wireless towers,
+                and satellites that connect billions of devices together. It is a global
+                network of networks. It was born in the 1960s (ARPANET) and it carries
+                many different things — email, video calls, online gaming, and yes, the web.
+            </p>
+
+            <p>
+                The <strong>World Wide Web</strong> (the web) is one service that runs
+                <em>on top of</em> the internet. It is a system of interlinked documents
+                and resources — web pages — that you access using a browser. The web
+                was invented by Tim Berners-Lee in 1989 as a way to share research
+                documents. It is built on three technologies: URLs, HTTP, and HTML.
+            </p>
+
+            <div class="notes-box example">
+                <h3>Analogy: Roads vs Cars</h3>
+                <p>
+                    The internet is the road network — highways, streets, and lanes
+                    connecting every city and town. The web is the postal delivery system
+                    that uses those roads to carry letters (web pages) from one address
+                    (server) to another (your browser). Email is a different delivery
+                    company using the same roads. They coexist, but they are separate services.
+                </p>
+            </div>
+
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>Concept</th>
+                        <th>The Internet</th>
+                        <th>The Web</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>What it is</td>
+                        <td>Global physical network of connected devices</td>
+                        <td>A system of linked documents accessed via browsers</td>
+                    </tr>
+                    <tr>
+                        <td>Born</td>
+                        <td>1960s (ARPANET)</td>
+                        <td>1989 (Tim Berners-Lee, CERN)</td>
+                    </tr>
+                    <tr>
+                        <td>Protocol</td>
+                        <td>TCP/IP (how data travels)</td>
+                        <td>HTTP/HTTPS (how pages are requested)</td>
+                    </tr>
+                    <tr>
+                        <td>Examples</td>
+                        <td>Email (SMTP), gaming (UDP), video calls</td>
+                        <td>Websites, web apps, REST APIs</td>
+                    </tr>
+                    <tr>
+                        <td>Analogy</td>
+                        <td>The road network</td>
+                        <td>The postal delivery service using those roads</td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 2 — What Is HTML?
+                 ═══════════════════════════════════════════ -->
+            <h2 id="what-is-html">2. What HTML Actually Is</h2>
+
+            <p>
+                <strong>HTML</strong> stands for <em>HyperText Markup Language</em>.
+                Let's unpack that word by word, because each part matters.
+            </p>
+
+            <p>
+                <strong>HyperText</strong> means text that contains links — text that
+                points to other text. Click a link on Wikipedia and you jump to another
+                page. That linkability, that web of references, is hyper-text.
+                It is the original superpower of the web.
+            </p>
+
+            <p>
+                <strong>Markup</strong> means you annotate plain text with special tags
+                to give it meaning. You wrap words in tags that say "this is a heading",
+                "this is a paragraph", "this is an image". HTML does not describe
+                <em>what things look like</em> — that is CSS's job. HTML describes
+                <em>what things are</em>.
+            </p>
+
+            <p>
+                <strong>Language</strong> — but not a programming language. HTML has no
+                logic, no loops, no conditions, no algorithms. It is a
+                <em>markup language</em>: a set of instructions for describing structure.
+                You will hear people debate whether HTML is "real coding". The answer is:
+                it is a different kind of writing entirely, and it is fundamental.
+            </p>
+
+            <div class="notes-box summary">
+                <h3>The One-Sentence Mental Model</h3>
+                <p>
+                    HTML is a <strong>vocabulary of labels</strong> that you wrap around
+                    content to tell the browser — and the world — what that content
+                    <em>is</em>, not what it looks like.
+                </p>
+            </div>
+
+            <p>Here is the most minimal valid HTML page that can exist:</p>
+
+            <pre class="code-block"><code><span class="code-comment">&lt;!-- The simplest possible HTML document --&gt;</span>
+<span class="code-angle">&lt;</span><span class="code-doctype">!DOCTYPE html</span><span class="code-angle">&gt;</span>
+<span class="code-angle">&lt;</span><span class="code-tag">html</span> <span class="code-attr">lang</span>=<span class="code-value">"en"</span><span class="code-angle">&gt;</span>
+  <span class="code-angle">&lt;</span><span class="code-tag">head</span><span class="code-angle">&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">meta</span> <span class="code-attr">charset</span>=<span class="code-value">"UTF-8"</span><span class="code-angle">&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">title</span><span class="code-angle">&gt;</span><span class="code-text">My First Page</span><span class="code-angle">&lt;/</span><span class="code-tag">title</span><span class="code-angle">&gt;</span>
+  <span class="code-angle">&lt;/</span><span class="code-tag">head</span><span class="code-angle">&gt;</span>
+  <span class="code-angle">&lt;</span><span class="code-tag">body</span><span class="code-angle">&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">h1</span><span class="code-angle">&gt;</span><span class="code-text">Hello, World!</span><span class="code-angle">&lt;/</span><span class="code-tag">h1</span><span class="code-angle">&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">p</span><span class="code-angle">&gt;</span><span class="code-text">This is a paragraph of text.</span><span class="code-angle">&lt;/</span><span class="code-tag">p</span><span class="code-angle">&gt;</span>
+  <span class="code-angle">&lt;/</span><span class="code-tag">body</span><span class="code-angle">&gt;</span>
+<span class="code-angle">&lt;/</span><span class="code-tag">html</span><span class="code-angle">&gt;</span></code></pre>
+
+            <p>
+                Even in these ten lines, every tag has a job. <code>&lt;h1&gt;</code>
+                means "this is the most important heading on the page".
+                <code>&lt;p&gt;</code> means "this is a paragraph". The browser reads
+                those labels and knows — structurally, semantically — what it is dealing with.
+            </p>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 3 — The Full Journey of a Webpage
+                 ═══════════════════════════════════════════ -->
+            <h2 id="webpage-journey">3. What Happens When You Type a URL</h2>
+
+            <p>
+                You type <code>https://cs.raushansync.com/computer-science/html/</code>
+                and press Enter. Your browser shows a page in under a second.
+                That feels like magic, but it is a very precise sequence of steps.
+                Understanding this sequence will make you a dramatically better developer.
+            </p>
+
+            <!-- HTTP diagram -->
+            <div class="http-diagram" aria-label="Client-server-DNS request flow">
+                <div class="http-box browser-box">
+                    <div class="http-label">Your Browser</div>
+                    <div class="http-desc">Chrome, Firefox, Safari — the client. Sends requests, renders responses.</div>
+                </div>
+                <div class="http-arrow" aria-hidden="true">
+                    <div class="http-arrow-line"></div>
+                    <span>asks IP →</span>
+                    <span>← IP address</span>
+                </div>
+                <div class="http-box dns-box">
+                    <div class="http-label">DNS Server</div>
+                    <div class="http-desc">Translates human-readable domain names into numeric IP addresses.</div>
+                </div>
+                <div class="http-arrow" aria-hidden="true">
+                    <div class="http-arrow-line"></div>
+                    <span>GET request →</span>
+                    <span>← HTML response</span>
+                </div>
+                <div class="http-box server-box">
+                    <div class="http-label">Web Server</div>
+                    <div class="http-desc">Listens for requests. Returns files, runs code, sends back HTML.</div>
+                </div>
+            </div>
+
+            <p>Here is that journey, step by step:</p>
+
+            <div class="journey-pipeline" aria-label="Full webpage request journey">
+
+                <div class="journey-step">
+                    <div class="journey-num">1</div>
+                    <div class="journey-content">
+                        <strong>You type a URL and press Enter</strong>
+                        <p>A URL (Uniform Resource Locator) has parts: the protocol
+                           (<code>https://</code>), the domain (<code>cs.raushansync.com</code>),
+                           and the path (<code>/computer-science/html/</code>).
+                           Your browser parses these apart immediately.</p>
+                    </div>
+                </div>
+                <div class="journey-arrow" aria-hidden="true">↓</div>
+
+                <div class="journey-step">
+                    <div class="journey-num">2</div>
+                    <div class="journey-content">
+                        <strong>DNS Lookup — translating the name into an address</strong>
+                        <p>Computers speak in IP addresses (like <code>104.21.42.7</code>),
+                           not domain names. DNS (Domain Name System) is the internet's
+                           phone book. Your browser asks a DNS server: "What IP address
+                           does <code>cs.raushansync.com</code> map to?" The DNS server
+                           replies with a number. Your browser caches this for next time.</p>
+                    </div>
+                </div>
+                <div class="journey-arrow" aria-hidden="true">↓</div>
+
+                <div class="journey-step">
+                    <div class="journey-num">3</div>
+                    <div class="journey-content">
+                        <strong>TCP Connection — opening a channel</strong>
+                        <p>Your browser establishes a reliable connection to that IP address
+                           using TCP (Transmission Control Protocol). Think of it as
+                           making a phone call before you start talking. With HTTPS,
+                           there is also a TLS handshake here — both sides agree on
+                           encryption keys so no one can eavesdrop on the conversation.</p>
+                    </div>
+                </div>
+                <div class="journey-arrow" aria-hidden="true">↓</div>
+
+                <div class="journey-step">
+                    <div class="journey-num">4</div>
+                    <div class="journey-content">
+                        <strong>HTTP Request — the browser asks for a resource</strong>
+                        <p>Your browser sends an HTTP GET request across that connection.
+                           It is a text message that says something like:
+                           <em>"GET /computer-science/html/ HTTP/1.1 — Host: cs.raushansync.com"</em>.
+                           This is the actual "request" in the request-response cycle.</p>
+                    </div>
+                </div>
+                <div class="journey-arrow" aria-hidden="true">↓</div>
+
+                <div class="journey-step">
+                    <div class="journey-num">5</div>
+                    <div class="journey-content">
+                        <strong>Server Processes &amp; Responds</strong>
+                        <p>The web server receives the request, finds the right resource
+                           (an HTML file, or the output of some backend code), and sends
+                           back an HTTP response. The response has a status code
+                           (<code>200 OK</code>, <code>404 Not Found</code>, <code>301 Moved</code>)
+                           and a body — the actual HTML text.</p>
+                    </div>
+                </div>
+                <div class="journey-arrow" aria-hidden="true">↓</div>
+
+                <div class="journey-step">
+                    <div class="journey-num">6</div>
+                    <div class="journey-content">
+                        <strong>Browser Parses HTML &amp; Requests Sub-resources</strong>
+                        <p>As the browser reads the HTML, it discovers more things to fetch —
+                           CSS files, JavaScript files, images, fonts. It fires off new
+                           requests for each one, often in parallel. This is why the
+                           number of network requests matters for page speed.</p>
+                    </div>
+                </div>
+                <div class="journey-arrow" aria-hidden="true">↓</div>
+
+                <div class="journey-step">
+                    <div class="journey-num">7</div>
+                    <div class="journey-content">
+                        <strong>Browser Renders the Page</strong>
+                        <p>With HTML, CSS, and JavaScript in hand, the browser builds
+                           the page and paints it on screen. You see the result.
+                           This whole process — from pressing Enter to pixels on screen —
+                           typically takes 200–800 milliseconds on a good connection.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notes-box careful">
+                <h3>HTTP Status Codes You Will Encounter</h3>
+                <p>
+                    Every server response starts with a three-digit code.
+                    <code>200</code> means success. <code>301/302</code> means redirect.
+                    <code>404</code> means the resource was not found on the server.
+                    <code>500</code> means the server itself crashed or errored.
+                    These codes are part of the HTTP standard — every server and browser
+                    in the world understands them.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 4 — Deep Dive into HTML
+                 ═══════════════════════════════════════════ -->
+            <h2 id="html-deep-dive">4. A Deep Look at HTML</h2>
+
+            <h3>Tags, Elements, and Attributes</h3>
+            <p>
+                HTML is built from <strong>elements</strong>. An element is made of
+                an opening tag, some content, and a closing tag:
+            </p>
+
+            <pre class="code-block"><code><span class="code-comment">&lt;!-- Anatomy of an HTML element --&gt;</span>
+<span class="code-angle">&lt;</span><span class="code-tag">p</span> <span class="code-attr">class</span>=<span class="code-value">"intro"</span><span class="code-angle">&gt;</span><span class="code-text">This is a paragraph.</span><span class="code-angle">&lt;/</span><span class="code-tag">p</span><span class="code-angle">&gt;</span>
+
+<span class="code-comment">&lt;!-- Opening tag: &lt;p class="intro"&gt; --&gt;</span>
+<span class="code-comment">&lt;!-- Attribute: class="intro" (name="value") --&gt;</span>
+<span class="code-comment">&lt;!-- Content: This is a paragraph. --&gt;</span>
+<span class="code-comment">&lt;!-- Closing tag: &lt;/p&gt; --&gt;</span>
+
+<span class="code-comment">&lt;!-- Some elements are self-closing — they have no content --&gt;</span>
+<span class="code-angle">&lt;</span><span class="code-tag">img</span> <span class="code-attr">src</span>=<span class="code-value">"photo.jpg"</span> <span class="code-attr">alt</span>=<span class="code-value">"A mountain landscape"</span><span class="code-angle">&gt;</span>
+<span class="code-angle">&lt;</span><span class="code-tag">br</span><span class="code-angle">&gt;</span>
+<span class="code-angle">&lt;</span><span class="code-tag">input</span> <span class="code-attr">type</span>=<span class="code-value">"text"</span> <span class="code-attr">placeholder</span>=<span class="code-value">"Your name"</span><span class="code-angle">&gt;</span></code></pre>
+
+            <p>
+                <strong>Attributes</strong> live inside the opening tag and add extra
+                information about the element. <code>src</code> on an image tells the
+                browser where the image file lives. <code>href</code> on a link tells it
+                where to navigate. <code>class</code> and <code>id</code> let CSS and
+                JavaScript target specific elements.
+            </p>
+
+            <h3>The Document Structure — Always the Same Shape</h3>
+
+            <pre class="code-block"><code><span class="code-angle">&lt;</span><span class="code-doctype">!DOCTYPE html</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Declares HTML5 document mode --&gt;</span>
+<span class="code-angle">&lt;</span><span class="code-tag">html</span> <span class="code-attr">lang</span>=<span class="code-value">"en"</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Root element; lang helps accessibility and SEO --&gt;</span>
+
+  <span class="code-angle">&lt;</span><span class="code-tag">head</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Metadata container (not shown in page body) --&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">meta</span> <span class="code-attr">charset</span>=<span class="code-value">"UTF-8"</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Enables full Unicode text encoding --&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">meta</span> <span class="code-attr">name</span>=<span class="code-value">"viewport"</span> <span class="code-attr">content</span>=<span class="code-value">"width=device-width, initial-scale=1.0"</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Makes layout responsive on mobile --&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">title</span><span class="code-angle">&gt;</span><span class="code-text">Page Title</span><span class="code-angle">&lt;/</span><span class="code-tag">title</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Text shown in browser tab and search results --&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">link</span> <span class="code-attr">rel</span>=<span class="code-value">"stylesheet"</span> <span class="code-attr">href</span>=<span class="code-value">"style.css"</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Loads external CSS file --&gt;</span>
+  <span class="code-angle">&lt;/</span><span class="code-tag">head</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Ends metadata section --&gt;</span>
+
+  <span class="code-angle">&lt;</span><span class="code-tag">body</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Starts visible page content --&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">header</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Top area: logo, nav, intro --&gt;</span>
+      <span class="code-angle">&lt;</span><span class="code-tag">nav</span><span class="code-angle">&gt;</span><span class="code-text">...</span><span class="code-angle">&lt;/</span><span class="code-tag">nav</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Navigation links --&gt;</span>
+    <span class="code-angle">&lt;/</span><span class="code-tag">header</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Ends header area --&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">main</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Main content region of the page --&gt;</span>
+      <span class="code-angle">&lt;</span><span class="code-tag">article</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Self-contained content unit --&gt;</span>
+        <span class="code-angle">&lt;</span><span class="code-tag">h1</span><span class="code-angle">&gt;</span><span class="code-text">Main Heading</span><span class="code-angle">&lt;/</span><span class="code-tag">h1</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Primary heading for this page/section --&gt;</span>
+        <span class="code-angle">&lt;</span><span class="code-tag">p</span><span class="code-angle">&gt;</span><span class="code-text">Content paragraph...</span><span class="code-angle">&lt;/</span><span class="code-tag">p</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Regular paragraph text --&gt;</span>
+      <span class="code-angle">&lt;/</span><span class="code-tag">article</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Ends article block --&gt;</span>
+    <span class="code-angle">&lt;/</span><span class="code-tag">main</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Ends main content region --&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">footer</span><span class="code-angle">&gt;</span><span class="code-text">...</span><span class="code-angle">&lt;/</span><span class="code-tag">footer</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Bottom area: copyright/links --&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">script</span> <span class="code-attr">src</span>=<span class="code-value">"app.js"</span><span class="code-angle">&gt;&lt;/</span><span class="code-tag">script</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Loads JavaScript after HTML content --&gt;</span>
+  <span class="code-angle">&lt;/</span><span class="code-tag">body</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Ends visible page content --&gt;</span>
+
+<span class="code-angle">&lt;/</span><span class="code-tag">html</span><span class="code-angle">&gt;</span> <span class="code-comment">&lt;!-- Ends the HTML document --&gt;</span></code></pre>
+
+            <h3>Semantic HTML — Meaning Over Appearance</h3>
+            <p>
+                You could build an entire website using nothing but
+                <code>&lt;div&gt;</code> elements with different classes.
+                It would look identical to a site built with proper semantic HTML.
+                But it would be far inferior in three ways: screen readers could not
+                understand it, search engines would rank it lower, and other developers
+                would find it much harder to maintain.
+            </p>
+
+            <p>
+                <strong>Semantic HTML</strong> means using the tag whose name matches
+                the <em>purpose</em> of the content:
+            </p>
+
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>Semantic Tag</th>
+                        <th>Meaning</th>
+                        <th>Use it for</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>&lt;header&gt;</code></td>
+                        <td>Introductory content for its nearest section</td>
+                        <td>Site header, article header</td>
+                    </tr>
+                    <tr>
+                        <td><code>&lt;nav&gt;</code></td>
+                        <td>A block of navigation links</td>
+                        <td>Main menu, breadcrumbs, sidebar links</td>
+                    </tr>
+                    <tr>
+                        <td><code>&lt;main&gt;</code></td>
+                        <td>The primary content of the page</td>
+                        <td>Once per page only</td>
+                    </tr>
+                    <tr>
+                        <td><code>&lt;article&gt;</code></td>
+                        <td>Self-contained, independently shareable content</td>
+                        <td>Blog posts, news stories, product cards</td>
+                    </tr>
+                    <tr>
+                        <td><code>&lt;section&gt;</code></td>
+                        <td>A thematically grouped part of content</td>
+                        <td>Chapters, topic groups within a page</td>
+                    </tr>
+                    <tr>
+                        <td><code>&lt;aside&gt;</code></td>
+                        <td>Content tangentially related to the main content</td>
+                        <td>Sidebars, pull quotes, related links</td>
+                    </tr>
+                    <tr>
+                        <td><code>&lt;footer&gt;</code></td>
+                        <td>Closing content for its nearest section</td>
+                        <td>Copyright, contact links, sitemaps</td>
+                    </tr>
+                    <tr>
+                        <td><code>&lt;h1&gt;–&lt;h6&gt;</code></td>
+                        <td>Hierarchical headings (1 = most important)</td>
+                        <td>Document outline — use in order, do not skip levels</td>
+                    </tr>
+                    <tr>
+                        <td><code>&lt;p&gt;</code></td>
+                        <td>A paragraph of prose</td>
+                        <td>Any block of running text</td>
+                    </tr>
+                    <tr>
+                        <td><code>&lt;ul&gt;</code> / <code>&lt;ol&gt;</code></td>
+                        <td>Unordered / Ordered list</td>
+                        <td>Items where order doesn't / does matter</td>
+                    </tr>
+                    <tr>
+                        <td><code>&lt;button&gt;</code></td>
+                        <td>A clickable action trigger</td>
+                        <td>Actions that do something; never use <code>&lt;div&gt;</code> for this</td>
+                    </tr>
+                    <tr>
+                        <td><code>&lt;a&gt;</code></td>
+                        <td>A hyperlink (anchor)</td>
+                        <td>Navigation to another URL; <em>not</em> for actions</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="notes-box careful">
+                <h3>The div/span Rule</h3>
+                <p>
+                    <code>&lt;div&gt;</code> and <code>&lt;span&gt;</code> are
+                    generic, meaningless containers — use them only when no semantic
+                    tag fits. <code>&lt;div&gt;</code> is a block-level container
+                    for layout grouping. <code>&lt;span&gt;</code> is an inline (stays in the same line) container for styling a piece of text. If there is a semantic
+                    alternative, use it.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 5 — The DOM
+                 ═══════════════════════════════════════════ -->
+            <h2 id="dom">5. The DOM — HTML Comes Alive</h2>
+
+            <p>
+                When a browser reads your HTML file, it does not just display it as text.
+                It <em>parses</em> it — reads it carefully, checks for errors, and builds
+                an internal tree-shaped data structure called the
+                <strong>Document Object Model</strong>, or <strong>DOM</strong>.
+            </p>
+
+            <p>
+                The DOM is a live, in-memory representation of your HTML document.
+                Every element becomes a <strong>node</strong> in the tree. Parent elements
+                contain child elements. Sibling elements sit next to each other.
+                The browser uses the DOM to render the page, and JavaScript uses the DOM
+                to make the page interactive.
+            </p>
+
+            <p>Given this HTML:</p>
+
+            <pre class="code-block"><code><span class="code-angle">&lt;</span><span class="code-tag">html</span><span class="code-angle">&gt;</span>
+  <span class="code-angle">&lt;</span><span class="code-tag">head</span><span class="code-angle">&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">title</span><span class="code-angle">&gt;</span><span class="code-text">My Page</span><span class="code-angle">&lt;/</span><span class="code-tag">title</span><span class="code-angle">&gt;</span>
+  <span class="code-angle">&lt;/</span><span class="code-tag">head</span><span class="code-angle">&gt;</span>
+  <span class="code-angle">&lt;</span><span class="code-tag">body</span><span class="code-angle">&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">h1</span><span class="code-angle">&gt;</span><span class="code-text">Welcome</span><span class="code-angle">&lt;/</span><span class="code-tag">h1</span><span class="code-angle">&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">p</span><span class="code-angle">&gt;</span><span class="code-text">Hello, </span><span class="code-angle">&lt;</span><span class="code-tag">strong</span><span class="code-angle">&gt;</span><span class="code-text">world</span><span class="code-angle">&lt;/</span><span class="code-tag">strong</span><span class="code-angle">&gt;</span><span class="code-text">!</span><span class="code-angle">&lt;/</span><span class="code-tag">p</span><span class="code-angle">&gt;</span>
+  <span class="code-angle">&lt;/</span><span class="code-tag">body</span><span class="code-angle">&gt;</span>
+<span class="code-angle">&lt;/</span><span class="code-tag">html</span><span class="code-angle">&gt;</span></code></pre>
+
+            <p>The browser builds this DOM tree:</p>
+
+            <!-- DOM hierarchy diagram -->
+            <div class="pg-hierarchy" aria-label="DOM tree diagram for sample HTML">
+                <div class="pg-hier-level dom-hier-html">
+                    <span class="pg-hier-icon">🌐</span>
+                    <div class="pg-hier-content">
+                        <strong>html</strong>
+                        <span class="pg-hier-desc">Root node — everything lives inside this</span>
+                    </div>
+                </div>
+                <div class="pg-hier-connector" aria-hidden="true">├──</div>
+                <div class="pg-hier-level dom-hier-head">
+                    <span class="pg-hier-icon">🧠</span>
+                    <div class="pg-hier-content">
+                        <strong>head</strong>
+                        <span class="pg-hier-desc">Metadata branch → child: <code>title</code> → text node: "My Page"</span>
+                    </div>
+                </div>
+                <div class="pg-hier-connector" aria-hidden="true">└──</div>
+                <div class="pg-hier-level dom-hier-body">
+                    <span class="pg-hier-icon">📄</span>
+                    <div class="pg-hier-content">
+                        <strong>body</strong>
+                        <span class="pg-hier-desc">Visible content branch</span>
+                    </div>
+                </div>
+                <div class="pg-hier-connector" aria-hidden="true">├──</div>
+                <div class="pg-hier-level dom-hier-elem">
+                    <span class="pg-hier-icon">📌</span>
+                    <div class="pg-hier-content">
+                        <strong>h1</strong>
+                        <span class="pg-hier-desc">Element node → child text node: "Welcome"</span>
+                    </div>
+                </div>
+                <div class="pg-hier-connector" aria-hidden="true">└──</div>
+                <div class="pg-hier-level dom-hier-elem">
+                    <span class="pg-hier-icon">📌</span>
+                    <div class="pg-hier-content">
+                        <strong>p</strong>
+                        <span class="pg-hier-desc">Element node → children: text "Hello, ", element <code>strong</code> → text "world", text "!"</span>
+                    </div>
+                </div>
+                <div class="pg-hier-connector" aria-hidden="true">└──</div>
+                <div class="pg-hier-level dom-hier-text">
+                    <span class="pg-hier-icon">📝</span>
+                    <div class="pg-hier-content">
+                        <strong>Text Nodes</strong>
+                        <span class="pg-hier-desc">Leaf nodes — actual text content lives here, not in element nodes</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notes-box example">
+                <h3>The DOM Is Not Your HTML File</h3>
+                <p>
+                    The DOM is what the browser <em>builds from</em> your HTML — it is a
+                    live object in memory. If JavaScript changes the DOM
+                    (adds a button, removes a paragraph), the page updates instantly.
+                    But your original HTML file on disk stays unchanged.
+                    This is how every interactive website works.
+                </p>
+            </div>
+
+            <p>JavaScript can query and manipulate the DOM:</p>
+
+            <pre class="code-block"><code><span class="code-comment">// Find an element by its id</span>
+<span class="code-js-keyword">const</span> heading = <span class="code-js-object">document</span>.<span class="code-js-method">getElementById</span>(<span class="code-js-string">'main-title'</span>);
+
+<span class="code-comment">// Change its text content</span>
+heading.<span class="code-js-prop">textContent</span> = <span class="code-js-string">'Hello from JavaScript!'</span>;
+
+<span class="code-comment">// Create a new element and add it to the page</span>
+<span class="code-js-keyword">const</span> newPara = <span class="code-js-object">document</span>.<span class="code-js-method">createElement</span>(<span class="code-js-string">'p'</span>);
+newPara.<span class="code-js-prop">textContent</span> = <span class="code-js-string">'This paragraph was added dynamically.'</span>;
+<span class="code-js-object">document</span>.body.<span class="code-js-method">appendChild</span>(newPara);
+
+<span class="code-comment">// Listen for user interaction</span>
+<span class="code-js-object">document</span>.<span class="code-js-method">querySelector</span>(<span class="code-js-string">'button'</span>).<span class="code-js-method">addEventListener</span>(<span class="code-js-string">'click'</span>, () =&gt; {
+    <span class="code-js-func">alert</span>(<span class="code-js-string">'Button clicked!'</span>);
+});</code></pre>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 6 — Browser Rendering
+                 ═══════════════════════════════════════════ -->
+            <h2 id="browser-rendering">6. How the Browser Renders a Page</h2>
+
+            <p>
+                Getting HTML to the browser is only half the story. What the browser
+                does with it is where the real engineering happens.
+                The process is called the <strong>Critical Rendering Path</strong>.
+            </p>
+
+            <div class="journey-pipeline">
+
+                <div class="journey-step">
+                    <div class="journey-num">1</div>
+                    <div class="journey-content">
+                        <strong>Parse HTML → Build the DOM</strong>
+                        <p>The browser's HTML parser reads the raw text, byte by byte,
+                           and constructs the DOM tree you saw above. When it encounters
+                           a <code>&lt;link&gt;</code> tag pointing to CSS, or a
+                           <code>&lt;script&gt;</code> tag, it fires off new network
+                           requests to fetch those files.</p>
+                    </div>
+                </div>
+                <div class="journey-arrow" aria-hidden="true">↓</div>
+
+                <div class="journey-step">
+                    <div class="journey-num">2</div>
+                    <div class="journey-content">
+                        <strong>Parse CSS → Build the CSSOM</strong>
+                        <p>In parallel (or shortly after), the browser parses all CSS files
+                           and builds a second tree: the CSSOM (CSS Object Model).
+                           It works out which styles apply to which elements, taking into
+                           account specificity, inheritance, and cascade order.
+                           The CSSOM is a computed map of "element X gets these exact
+                           visual properties".</p>
+                    </div>
+                </div>
+                <div class="journey-arrow" aria-hidden="true">↓</div>
+
+                <div class="journey-step">
+                    <div class="journey-num">3</div>
+                    <div class="journey-content">
+                        <strong>Combine → Build the Render Tree</strong>
+                        <p>The browser merges the DOM and CSSOM into a
+                           <strong>Render Tree.</strong> This tree contains only
+                           the visible elements (anything with
+                           <code>display: none</code> is excluded), each annotated
+                           with its computed styles. Hidden elements exist in the DOM
+                           but are absent from the render tree.</p>
+                    </div>
+                </div>
+                <div class="journey-arrow" aria-hidden="true">↓</div>
+
+                <div class="journey-step">
+                    <div class="journey-num">4</div>
+                    <div class="journey-content">
+                        <strong>Layout (Reflow)</strong>
+                        <p>The browser calculates the exact position and size of every node
+                           in the render tree — where does this paragraph start, how wide is
+                           this image, how many lines does this text wrap to?
+                           This is called <em>layout</em> or <em>reflow</em>. It outputs
+                           a box geometry for every element.</p>
+                    </div>
+                </div>
+                <div class="journey-arrow" aria-hidden="true">↓</div>
+
+                <div class="journey-step">
+                    <div class="journey-num">5</div>
+                    <div class="journey-content">
+                        <strong>Paint</strong>
+                        <p>The browser converts each element into actual pixels on screen —
+                           drawing backgrounds, borders, text, shadows, images.
+                           It may split the page into multiple <em>layers</em> to handle
+                           animated elements efficiently.</p>
+                    </div>
+                </div>
+                <div class="journey-arrow" aria-hidden="true">↓</div>
+
+                <div class="journey-step">
+                    <div class="journey-num">6</div>
+                    <div class="journey-content">
+                        <strong>Composite</strong>
+                        <p>The GPU composites the layers together in the right order and
+                           sends the final image to your screen. Smooth animations work
+                           by only compositing layers rather than repainting everything —
+                           which is why CSS <code>transform</code> and <code>opacity</code>
+                           animations are fast and <code>width</code> or <code>top</code>
+                           changes are slow.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notes-box summary">
+                <h3>Why This Matters for You as a Developer</h3>
+                <p>
+                    When JavaScript changes a DOM element's size or position, the browser
+                    must redo layout and repaint — which is expensive. When it changes only
+                    colour or opacity, it can skip straight to compositing — which is cheap.
+                    This is why performance-conscious developers reach for CSS transforms
+                    for animations, and avoid JavaScript-driven layout changes inside loops.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 7 — HTML + CSS + JS Triad
+                 ═══════════════════════════════════════════ -->
+            <h2 id="triad">7. HTML, CSS, and JavaScript — The Three Roles</h2>
+
+            <p>
+                Every website you have ever visited is built from three technologies
+                working together. They have very distinct jobs, and mixing them up
+                leads to messy, unmaintainable code.
+            </p>
+
+            <div class="triad-grid">
+                <div class="triad-card html">
+                    <div class="triad-icon">🦴</div>
+                    <div class="triad-label">STRUCTURE</div>
+                    <h3>HTML — The Skeleton</h3>
+                    <p>Defines <em>what exists</em> and <em>what it is</em>.
+                       The raw content and its semantic meaning. A page without CSS
+                       or JS still works — it just looks plain.</p>
+                </div>
+                <div class="triad-card css">
+                    <div class="triad-icon">🎨</div>
+                    <div class="triad-label">PRESENTATION</div>
+                    <h3>CSS — The Appearance</h3>
+                    <p>Defines <em>what it looks like</em>. Colour, typography,
+                       layout, spacing, animation. CSS reads the DOM and applies
+                       visual rules. No CSS = unstyled but functional.</p>
+                </div>
+                <div class="triad-card js">
+                    <div class="triad-icon">⚡</div>
+                    <div class="triad-label">BEHAVIOUR</div>
+                    <h3>JavaScript — The Behaviour</h3>
+                    <p>Defines <em>what it does</em>. Responds to clicks, fetches
+                       data, updates the DOM, stores state. JS is the only one of
+                       the three that is an actual programming language.</p>
+                </div>
+            </div>
+
+            <p>Here is how they work together in code:</p>
+
+            <pre class="code-block"><code><span class="code-comment">&lt;!-- HTML: defines the structure --&gt;</span>
+<span class="code-angle">&lt;</span><span class="code-tag">button</span> <span class="code-attr">id</span>=<span class="code-value">"like-btn"</span> <span class="code-attr">class</span>=<span class="code-value">"like-button"</span><span class="code-angle">&gt;</span><span class="code-text">👍 Like</span><span class="code-angle">&lt;/</span><span class="code-tag">button</span><span class="code-angle">&gt;</span>
+<span class="code-angle">&lt;</span><span class="code-tag">span</span> <span class="code-attr">id</span>=<span class="code-value">"count"</span><span class="code-angle">&gt;</span><span class="code-text">0</span><span class="code-angle">&lt;/</span><span class="code-tag">span</span><span class="code-angle">&gt;</span> <span class="code-text">likes</span>
+
+<span class="code-comment">/* CSS: controls how it looks */</span>
+<span class="code-sql">.like-button</span> {
+    <span class="code-css-prop">background</span>: <span class="code-css-value">#3b82f6</span>;
+    <span class="code-css-prop">color</span>: <span class="code-css-value">white</span>;
+    <span class="code-css-prop">border</span>: <span class="code-css-value">none</span>;
+    <span class="code-css-prop">border-radius</span>: <span class="code-css-num">8px</span>;
+    <span class="code-css-prop">padding</span>: <span class="code-css-num">0.5rem</span> <span class="code-css-num">1rem</span>;
+    <span class="code-css-prop">cursor</span>: <span class="code-css-value">pointer</span>;
+    <span class="code-css-prop">transition</span>: <span class="code-css-value">transform</span> <span class="code-css-num">0.1s</span> <span class="code-css-value">ease</span>;
+}
+
+<span class="code-sql">.like-button:hover</span> {
+    <span class="code-css-prop">transform</span>: <span class="code-css-value">scale</span>(<span class="code-css-num">1.05</span>);
+}
+
+<span class="code-comment">// JavaScript: makes it do something</span>
+<span class="code-js-keyword">let</span> count = 0;
+<span class="code-js-object">document</span>.<span class="code-js-method">getElementById</span>(<span class="code-js-string">'like-btn'</span>).<span class="code-js-method">addEventListener</span>(<span class="code-js-string">'click'</span>, () =&gt; {
+    count++;
+    <span class="code-js-object">document</span>.<span class="code-js-method">getElementById</span>(<span class="code-js-string">'count'</span>).<span class="code-js-prop">textContent</span> = count;
+});</code></pre>
+
+            <p>
+                HTML created the button and the counter. CSS made the button look good
+                and respond on hover. JavaScript tracked the click and updated the number.
+                Each layer did only its own job — this separation is called
+                <strong>Separation of Concerns</strong>, and it is a core principle
+                of maintainable web development.
+            </p>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 8 — Common Misconceptions
+                 ═══════════════════════════════════════════ -->
+            <h2 id="misconceptions">8. Common Beginner Misconceptions</h2>
+
+            <p>
+                These are the most frequent misunderstandings that trip up people
+                learning web development. Read them carefully — correcting a wrong
+                mental model early saves weeks of confusion later.
+            </p>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"HTML is a programming language."</strong>
+                    <p>HTML has no logic, no variables, no control flow, no algorithms.
+                       It cannot compute anything. It is a <em>markup language</em> —
+                       it annotates content with structure and meaning.</p>
+                    <div class="misconception-correct">✓ HTML is a markup language. JavaScript is the programming language of the web.</div>
+                </div>
+            </div>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"The internet and the web are the same thing."</strong>
+                    <p>The internet is global physical infrastructure. The web is one service
+                       (websites) that runs on top of that infrastructure, alongside
+                       email, gaming, and video calls.</p>
+                    <div class="misconception-correct">✓ The web runs on the internet, but is not the internet.</div>
+                </div>
+            </div>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"The browser just displays my HTML file."</strong>
+                    <p>The browser parses your HTML, builds a DOM, fetches CSS and JS,
+                       constructs a render tree, performs layout, and paints pixels.
+                       The HTML file is just the starting input — the final output
+                       is the result of several complex processes.</p>
+                    <div class="misconception-correct">✓ The browser transforms HTML through a multi-stage rendering pipeline.</div>
+                </div>
+            </div>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"HTTPS just means the site is secure/trustworthy."</strong>
+                    <p>HTTPS means the <em>connection</em> between your browser and the
+                       server is encrypted — no one can intercept the data in transit.
+                       It says nothing about whether the site itself is honest,
+                       safe, or legitimate.</p>
+                    <div class="misconception-correct">✓ HTTPS encrypts the connection. A phishing site can still use HTTPS.</div>
+                </div>
+            </div>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"A &lt;div&gt; is just as good as a &lt;button&gt;."</strong>
+                    <p>A <code>&lt;div&gt;</code> styled to look like a button is
+                       not keyboard-navigable by default, not announced correctly by
+                       screen readers, and breaks accessibility for millions of users.
+                       Semantic HTML is not optional — it is an ethical responsibility.</p>
+                    <div class="misconception-correct">✓ Use the right semantic element. The visual appearance and the semantic role are different things.</div>
+                </div>
+            </div>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"Changing the DOM changes my HTML file."</strong>
+                    <p>The DOM is a live object in the browser's memory. JavaScript
+                       modifications to it are temporary and local. When you refresh,
+                       the browser re-parses the original HTML file from scratch.</p>
+                    <div class="misconception-correct">✓ The DOM and the HTML source file are two separate things.</div>
+                </div>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 9 — Mental Model Checklist
+                 ═══════════════════════════════════════════ -->
+            <h2 id="mental-model">9. Your Mental Model Checklist</h2>
+
+            <p>
+                Before moving forward, you should be able to answer each of these
+                without hesitation. Check each one off as you feel confident:
+            </p>
+
+            <div class="checklist-card">
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>The internet is global infrastructure; the web is one service that uses it.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>HTML describes <em>what content is</em>, not <em>what it looks like</em>.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>A URL has a protocol, a domain, and a path — and each part has a specific role.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>DNS translates human-readable domain names into numeric IP addresses.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>HTTP is a request-response protocol: the browser asks, the server responds.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>The DOM is a live tree structure the browser builds from HTML — not the HTML file itself.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>Semantic HTML means using tags whose name matches the purpose of the content.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>HTML = structure, CSS = appearance, JavaScript = behaviour. Each has one job.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>The browser's rendering pipeline: Parse → DOM → CSSOM → Render Tree → Layout → Paint → Composite.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>HTML is a markup language, not a programming language — it has no logic or control flow.</span>
+                </label>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 10 — Summary
+                 ═══════════════════════════════════════════ -->
+            <div class="notes-box summary" style="margin-top: 3rem;">
+                <h2 style="margin-top: 0; color: inherit;">Section Summary</h2>
+                <p>In this foundation section you learned:</p>
+                <ul>
+                    <li>The internet is physical infrastructure; the web is one service that runs on it — built on URLs, HTTP, and HTML</li>
+                    <li>HTML is a <em>markup language</em> that labels content with semantic meaning — what things <em>are</em>, not what they look like</li>
+                    <li>When you type a URL, the browser: parses it → performs a DNS lookup → opens a TCP/TLS connection → sends an HTTP GET request → receives an HTML response → fetches sub-resources → renders the page</li>
+                    <li>The browser builds a DOM (Document Object Model) — a live, tree-shaped, in-memory representation of the page that JavaScript can read and modify</li>
+                    <li>Semantic HTML uses purpose-matching tags (<code>&lt;nav&gt;</code>, <code>&lt;article&gt;</code>, <code>&lt;button&gt;</code>) rather than meaningless containers (<code>&lt;div&gt;</code>)</li>
+                    <li>The critical rendering path: Parse HTML → DOM, Parse CSS → CSSOM, Merge → Render Tree, Layout, Paint, Composite</li>
+                    <li>HTML = skeleton (structure), CSS = skin (appearance), JavaScript = brain (behaviour) — three distinct concerns</li>
+                    <li>Key misconceptions to avoid: HTML is not a programming language; HTTPS ≠ trustworthy site; DOM ≠ HTML source file</li>
+                </ul>
+            </div>
+
+            <!-- Navigation buttons -->
+            <div class="navigation-buttons" style="margin-top: 2.5rem;">
+                <a href="../index.html"
+                    class="btn"
+                    style="background: transparent; color: var(--primary-color); border: 1.5px solid var(--primary-color);">
+                    ← Back to HTML Index
+                </a>
+                <a href="./quiz.html" class="btn">
+                    Test your understanding →
+                </a>
+            </div>
+
+            <div class="notes-watermark">RaushanSYNC CS &amp; DS · How the Web &amp; HTML Work · Educational Content</div>
+
+        </div>
+    </main>
+
+    <div id="support-cta"></div>
+    <div id="footer"></div>
+
+    <script src="/assets/js/script.js"></script>
+    <script>
+        /* ── Checklist persistence ── */
+        const checkboxes = document.querySelectorAll('.checklist-check');
+        const STORAGE_KEY = 'html-web-fundamentals-checklist';
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        checkboxes.forEach((cb, i) => {
+            if (saved[i]) cb.checked = true;
+            cb.addEventListener('change', () => {
+                const state = Array.from(checkboxes).map(c => c.checked);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -26,6 +26,26 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://cs.raushansync.com/computer-science/html/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/html/01-how-the-web-and-html-works/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/html/01-how-the-web-and-html-works/quiz.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/html/practice-questions/</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://cs.raushansync.com/computer-science/python/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -118,6 +138,16 @@
   </url>
   <url>
     <loc>https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/02-lab-intermediate-sql.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/03-intermediate-sql.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/03-lab-intermediate-sql.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

@@ -534,6 +534,13 @@ main {
   }
 }
 
+@media (min-width: 641px) and (max-width: 768px) {
+  .logo {
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+
 @media (max-width: 480px) {
   :root {
     --container-padding: 0.9rem;
@@ -545,6 +552,27 @@ main {
     background: var(--card-background);
     color: var(--text-color);
     border-color: var(--border-color);
+  }
+}
+
+@media (max-width: 360px) {
+  :root {
+    --header-height: 84px;
+  }
+
+  .logo {
+    display: block;
+    height: auto;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    text-align: left;
+    line-height: 1.15;
+    font-size: clamp(1rem, 5vw, 1.1rem);
+  }
+
+  .header-actions {
+    gap: 0.5rem;
   }
 }
 
@@ -1552,6 +1580,21 @@ main {
 .code-cmd      { color: #7dd3fc; }
 .code-output   { color: #94a3b8; }
 .code-sql      { color: #c084fc; font-weight: 600; }
+.code-angle    { color: #93c5fd; }
+.code-tag      { color: #60a5fa; }
+.code-attr     { color: #fbbf24; }
+.code-value    { color: #86efac; }
+.code-doctype  { color: #f472b6; font-weight: 600; }
+.code-text     { color: #e2e8f0; }
+.code-js-keyword { color: #f472b6; font-weight: 600; }
+.code-js-object  { color: #7dd3fc; }
+.code-js-method  { color: #93c5fd; }
+.code-js-prop    { color: #fbbf24; }
+.code-js-string  { color: #86efac; }
+.code-js-func    { color: #c084fc; }
+.code-css-prop   { color: #fbbf24; }
+.code-css-value  { color: #86efac; }
+.code-css-num    { color: #7dd3fc; }
 
 kbd {
     display: inline-block;

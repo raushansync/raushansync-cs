@@ -1,6 +1,6 @@
 /* RaushanSYNC Computer Science & Data Science PWA Service Worker */
 
-const APP_VERSION = '2026.04.14.2';
+const APP_VERSION = '2026.04.15.1';
 const CACHE_VERSION = 'csds-v' + APP_VERSION;
 const CORE_CACHE = 'rs-core-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'rs-runtime-' + CACHE_VERSION;
@@ -31,6 +31,15 @@ const CORE_ASSETS = [
 
   '/computer-science/',
   '/computer-science/index.html',
+
+  '/computer-science/html/',
+  '/computer-science/html/index.html',
+  '/computer-science/html/practice-questions/',
+  '/computer-science/html/practice-questions/index.html',
+  '/computer-science/html/01-how-the-web-and-html-works/',
+  '/computer-science/html/01-how-the-web-and-html-works/index.html',
+  '/computer-science/html/01-how-the-web-and-html-works/quiz.html',
+
   '/computer-science/python/',
   '/computer-science/sql/',
   '/computer-science/sql/index.html',
@@ -39,6 +48,9 @@ const CORE_ASSETS = [
   '/computer-science/sql/03-filtering-and-conditions/',
   '/computer-science/sql/04-intermediate-sql/',
   '/computer-science/sql/04-intermediate-sql/index.html',
+  '/computer-science/sql/04-intermediate-sql/03-intermediate-sql.html',
+  '/computer-science/sql/04-intermediate-sql/03-lab-intermediate-sql.html',
+
   '/computer-science/python/01-programming-foundations/',
   '/data-science/',
   '/data-science/index.html',
