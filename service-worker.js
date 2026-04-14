@@ -1,6 +1,6 @@
 /* RaushanSYNC Computer Science & Data Science PWA Service Worker */
 
-const CACHE_VERSION = 'csds-v1.0.3.0';
+const CACHE_VERSION = 'csds-v1.0.4.0';
 const CORE_CACHE = 'rs-core-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'rs-runtime-' + CACHE_VERSION;
 
@@ -37,6 +37,7 @@ const CORE_ASSETS = [
   '/computer-science/sql/02-your-first-queries/',
   '/computer-science/sql/03-filtering-and-conditions/',
   '/computer-science/sql/04-intermediate-sql/',
+  '/computer-science/sql/04-intermediate-sql/index.html',
   '/computer-science/python/01-programming-foundations/',
   '/data-science/',
   '/data-science/index.html',

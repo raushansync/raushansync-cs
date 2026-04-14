@@ -1,4 +1,3 @@
-<!--  Change meta tags and description according to content.  -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#3b82f6" id="theme-color-meta">
 
-    <title>PostgreSQL from First Principles | RaushanSYNC CS & DS</title>
+    <title>PostgreSQL Intermediate SQL | Subqueries, Joins, Views &amp; Data Modification</title>
 
     <meta name="description"
-        content="Explore SQL concepts like filtering, conditions, and WHERE clause. Simple explanations for beginners learning SQL">
+        content="Learn PostgreSQL Intermediate SQL with nested subqueries, IN/NOT IN, SOME/ALL, EXISTS/NOT EXISTS, scalar subqueries, DELETE/INSERT/UPDATE, JOIN expressions, and views including materialized views.">
 
     <meta name="keywords"
-        content="SQL tutorial, SQL concepts, SQL basics, SQL for beginners, SQL filtering, SQL conditions, WHERE clause, SQL operators, logical operators SQL, SQL queries, database queries, SQL guide, learn SQL, SQL examples">
+        content="PostgreSQL intermediate SQL, nested subquery, subqueries in where clause, IN NOT IN SQL, SOME ALL SQL, EXISTS NOT EXISTS, UNIQUE SQL, subquery in from clause, with clause SQL, scalar subquery SQL, SQL DELETE INSERT UPDATE, update using scalar subquery, join expressions SQL, cross join, inner join, outer join, right outer join, full outer join, ON USING NATURAL join, SQL views, materialized views">
 
     <meta name="author" content="Raushan Kumar">
     <meta name="robots" content="index, follow">
@@ -23,9 +22,9 @@
 
     <!-- Open Graph -->
     <meta property="og:site_name" content="RaushanSYNC CS & DS">
-    <meta property="og:title" content="PostgreSQL Concepts: Filtering and Conditions">
+    <meta property="og:title" content="PostgreSQL Intermediate SQL: Subqueries, Joins, Views &amp; Updates">
     <meta property="og:description"
-        content="Explore SQL concepts like filtering, conditions, and WHERE clause. Simple explanations for beginners learning SQL.">
+        content="Master intermediate SQL concepts from nested subqueries to join expressions and views. Structured lessons with labs for practice.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/">
     <meta property="og:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
@@ -35,9 +34,9 @@
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@raushansync">
-    <meta name="twitter:title" content="PostgreSQL Concepts: Filtering and Conditions">
+    <meta name="twitter:title" content="PostgreSQL Intermediate SQL: Subqueries, Joins, Views &amp; Updates">
     <meta name="twitter:description"
-        content="Explore SQL concepts like filtering, conditions, and WHERE clause. Simple explanations for beginners learning SQL.">
+        content="Learn intermediate SQL with subqueries, set comparisons, data modification, joins, and views through notes and labs.">
     <meta name="twitter:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
 
     <!-- Favicon -->
@@ -48,16 +47,16 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/manifest.json">
 
-    <!-- Structured data (needed to be changed)-->
+    <!-- Structured data -->
     <script type="application/ld+json">
         {
         "@context": "https://schema.org",
         "@graph": [
             {
             "@type": "WebPage",
-            "name": "PostgreSQL — Filtering and Conditions",
-            "description": "Explore SQL concepts like filtering, conditions, and WHERE clause. Simple explanations for beginners learning SQL.",
-            "url": "https://cs.raushansync.com/computer-science/sql/03-filtering-and-conditions/",
+            "name": "PostgreSQL — Intermediate SQL",
+            "description": "Learn PostgreSQL Intermediate SQL concepts including nested subqueries, set predicates, data modification commands, join expressions, and views.",
+            "url": "https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/",
             "isPartOf": {
                 "@type": "WebSite",
                 "name": "RaushanSYNC CS & DS",
@@ -84,6 +83,42 @@
                 "position": 3,
                 "name": "SQL",
                 "item": "https://cs.raushansync.com/computer-science/sql/"
+                },
+                {
+                "@type": "ListItem",
+                "position": 4,
+                "name": "04 Intermediate SQL",
+                "item": "https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/"
+                }
+            ]
+            },
+            {
+            "@type": "ItemList",
+            "name": "Intermediate SQL Lessons",
+            "itemListElement": [
+                {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "4.1 Nested Subqueries and Data Modification",
+                "url": "https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/01-intermediate-sql.html"
+                },
+                {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "4.1 Lab",
+                "url": "https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/01-lab-intermediate-sql.html"
+                },
+                {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "4.2 Join Expressions and Views",
+                "url": "https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/02-intermediate-sql.html"
+                },
+                {
+                "@type": "ListItem",
+                "position": 4,
+                "name": "4.2 Lab",
+                "url": "https://cs.raushansync.com/computer-science/sql/04-intermediate-sql/02-lab-intermediate-sql.html"
                 }
             ]
             }
@@ -143,13 +178,14 @@
                     <li><a href="/">Home</a></li>
                     <li><a href="/computer-science/">Computer Science</a></li>
                     <li><a href="/computer-science/sql/">SQL</a></li>
-                    <li aria-current="page">04 Intermediate SQL</li>
+                    <li aria-current="page">Postgres: Intermediate SQL</li>
                 </ol>
             </nav>
             <div class="notes-header">
-                <h1>Intermediate SQL</h1>
+                <h1>PostgreSQL — Intermediate SQL</h1>
                 <p>
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Dolorem culpa magnam voluptate minima voluptatibus sint esse quidem itaque corrupti. Omnis excepturi aperiam obcaecati commodi id repudiandae? Nobis veritatis at delectus.
+                    Build intermediate SQL mastery with subqueries, set predicates, data modification statements,
+                    advanced joins, and practical view design in PostgreSQL.
                 </p>
             </div>
 
@@ -158,34 +194,61 @@
                 <span class="lesson-title-small">Intermediate SQL</span>
             </div>
 
-            <!-- Getting Started -->
-
             <section class="palette important">
-                <h2>4.1 Intermediate SQL - Nested Subqueries & Data Modification</h2>
+                <h2>4.1 Nested Subqueries, Predicates, and Data Modification</h2>
 
                 <p>
-                    Learn Commands: IN / NOT IN, SOME, ALL, EXISTS, NOT EXISTS, UNIQUE, FROM subquery, WITH subquery, Scalar subquery, DELETE, INSERT, UPDATE ... SET ... CASE.  
+                    Topics Covered: Nested subqueries, subqueries in the WHERE clause, set membership (IN and NOT IN),
+                    set comparison (SOME and ALL), tests for empty relations (EXISTS and NOT EXISTS), test for
+                    duplicate tuples (UNIQUE), subqueries in the FROM clause, the WITH clause, scalar subqueries in the
+                    SELECT clause, modification of the database, DELETE, INSERT, UPDATE, and update using scalar
+                    subqueries.
                 </p>
 
-                <a href="./01-ddl-commands.html" class="video-solution-btn">
+                <a href="./01-intermediate-sql.html" class="video-solution-btn">
                     ▶ Start Here
                 </a>
             </section>
 
             <section class="notes-box summary">
-                <h2>PostgreSQL DDL Commands: CREATE, ALTER, DROP, TRUNCATE - Lab</h2>
+                <h2>Nested Subqueries, Predicates, and Data Modification - Lab</h2>
 
                 <p>
-                    Test your understand with hands on practicals. 
+                    Practice intermediate SQL with focused exercises on subquery patterns, set predicates, CTE usage,
+                    and safe data updates using INSERT, DELETE, and UPDATE statements.
                 </p>
 
-                <a href="./01-lab-ddl-commands.html" class="video-solution-btn">
+                <a href="./01-lab-intermediate-sql.html" class="video-solution-btn">
                     ▶ Start Lab
                 </a>
             </section>
 
+            <section class="palette important">
+                <h2>4.2 JOIN Expressions and Views</h2>
 
+                <p>
+                    Topics Covered: JOIN expressions, CROSS JOIN, INNER JOIN, OUTER JOIN, RIGHT OUTER JOIN, FULL OUTER
+                    JOIN, ON vs USING vs NATURAL, views, views with computed data, views defined using other views,
+                    view expansion, updating views, and basic materialized views.
+                </p>
 
+                <a href="./02-intermediate-sql.html" class="video-solution-btn">
+                    ▶ Start Here
+                </a>
+            </section>
+
+            <section class="notes-box summary">
+                <h2>JOIN Expressions and Views - Lab</h2>
+
+                <p>
+                    Strengthen your skills with hands-on practice for join design, join conditions, and view creation
+                    and maintenance in real SQL scenarios.
+                </p>
+
+                <a href="./02-lab-intermediate-sql.html" class="video-solution-btn">
+                    ▶ Start Lab
+                </a>
+            </section>
         </div>
     </main>
 

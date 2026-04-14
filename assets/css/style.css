@@ -157,6 +157,7 @@ body {
   height: var(--header-height);
   position: relative;
   z-index: 1200;
+  flex-shrink: 0;
 }
 
 .navbar {
@@ -495,6 +496,20 @@ main {
     --container-padding: 1.1rem;
   }
 
+  .header-container {
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .logo {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: clamp(1.2rem, 5vw, 1.5rem);
+  }
+
   main {
     padding-top: calc(var(--header-height) + 30px);
   }
@@ -816,6 +831,7 @@ main {
 
 .notes-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   margin-top: 1rem;
   background-color: var(--card-background);
@@ -829,6 +845,8 @@ main {
   border: 1px solid var(--border-color);
   padding: 0.75rem 0.8rem;
   text-align: left;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .notes-table th {
@@ -1009,6 +1027,17 @@ main {
   justify-content: center;
   gap: 10px;
   margin: 20px 0;
+}
+
+@media (max-width: 640px) {
+  .navigation-buttons {
+    flex-wrap: wrap;
+  }
+
+  .navigation-buttons .btn {
+    flex: 1 1 100%;
+    text-align: center;
+  }
 }
 
 
@@ -1475,6 +1504,8 @@ main {
     background: rgba(59, 130, 246, 0.07);
     border: 1px solid rgba(59, 130, 246, 0.18);
     width: fit-content;
+    max-width: 100%;
+    flex-wrap: wrap;
 }
 
 .lesson-badge {
