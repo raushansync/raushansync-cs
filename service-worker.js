@@ -1,6 +1,6 @@
 /* RaushanSYNC Computer Science & Data Science PWA Service Worker */
 
-const APP_VERSION = '2026.04.15.1';
+const APP_VERSION = '2026.04.15.2';
 const CACHE_VERSION = 'csds-v' + APP_VERSION;
 const CORE_CACHE = 'rs-core-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'rs-runtime-' + CACHE_VERSION;
