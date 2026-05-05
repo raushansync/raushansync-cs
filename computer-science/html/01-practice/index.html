@@ -7,29 +7,29 @@
     <meta name="theme-color" content="#3b82f6" id="theme-color-meta">
     <link rel="manifest" href="/manifest.json">
 
-    <title>Quiz — How the Web &amp; HTML Work | HTML Part 1 | RaushanSYNC CS &amp; DS</title>
+    <title>Practice — How the Web &amp; HTML Work | HTML Part 1 | RaushanSYNC CS &amp; DS</title>
 
     <meta name="description"
-        content="Test your understanding of how the web works — DNS, HTTP, the DOM, browser rendering, and semantic HTML. Thought-provoking quiz for Part 1 of the HTML series.">
+        content="Test your understanding of how the web works — DNS, HTTP, the DOM, browser rendering, and semantic HTML. Thought-provoking practice for Part 1 of the HTML series.">
 
     <meta name="author" content="Raushan Kumar">
     <meta name="robots" content="index, follow">
 
-    <link rel="canonical" href="https://cs.raushansync.com/computer-science/html/01-how-the-web-and-html-works/quiz.html">
+    <link rel="canonical" href="https://cs.raushansync.com/computer-science/html/01-practice/">
 
     <!-- Open Graph -->
     <meta property="og:type" content="article">
     <meta property="og:site_name" content="RaushanSYNC CS &amp; DS">
-    <meta property="og:title" content="Quiz — How the Web &amp; HTML Work | RaushanSYNC CS &amp; DS">
+    <meta property="og:title" content="Practice — How the Web &amp; HTML Work | RaushanSYNC CS &amp; DS">
     <meta property="og:description"
         content="Test your mental model of the web — DNS lookups, the DOM, critical rendering path, semantic HTML, and common misconceptions.">
-    <meta property="og:url" content="https://cs.raushansync.com/computer-science/html/01-how-the-web-and-html-works/quiz.html">
+    <meta property="og:url" content="https://cs.raushansync.com/computer-science/html/01-practice/">
     <meta property="og:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@raushansync">
-    <meta name="twitter:title" content="Quiz — How the Web &amp; HTML Work | RaushanSYNC CS &amp; DS">
+    <meta name="twitter:title" content="Practice — How the Web &amp; HTML Work | RaushanSYNC CS &amp; DS">
     <meta name="twitter:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
 
     <!-- Favicon -->
@@ -47,8 +47,7 @@
             {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://cs.raushansync.com/"},
             {"@type": "ListItem", "position": 2, "name": "Computer Science", "item": "https://cs.raushansync.com/computer-science/"},
             {"@type": "ListItem", "position": 3, "name": "HTML", "item": "https://cs.raushansync.com/computer-science/html/"},
-            {"@type": "ListItem", "position": 4, "name": "1. How the Web & HTML Work", "item": "https://cs.raushansync.com/computer-science/html/01-how-the-web-and-html-works/"},
-            {"@type": "ListItem", "position": 5, "name": "Quiz", "item": "https://cs.raushansync.com/computer-science/html/01-how-the-web-and-html-works/quiz.html"}
+            {"@type": "ListItem", "position": 4, "name": "01 Practice", "item": "https://cs.raushansync.com/computer-science/html/01-practice/"}
         ]
     }
     </script>
@@ -59,7 +58,7 @@
     <link rel="stylesheet" href="/assets/css/style.css">
 
     <style>
-        /* ── Quiz-specific highlight states ── */
+        /* ── Practice-specific highlight states ── */
         .correct-option {
             background: rgba(34, 197, 94, 0.12) !important;
             border: 1px solid rgba(34, 197, 94, 0.4);
@@ -72,7 +71,7 @@
             border-radius: 10px;
         }
 
-        /* ── Code in quiz cards ── */
+        /* ── Code in practice cards ── */
         .quiz-card code {
             background: rgba(59, 130, 246, 0.09);
             border: 1px solid rgba(59, 130, 246, 0.18);
@@ -154,6 +153,8 @@
             }
         })();
     </script>
+    <!-- STEP 4: Practice Score Handler -->
+    <script src="/assets/js/quiz-score-handler.js"></script>
 </head>
 
 <body>
@@ -175,13 +176,6 @@
                             d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
                     </svg>
                 </button>
-                <button class="hamburger" id="hamburger" aria-label="Open menu">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                    </svg>
-                </button>
             </div>
         </div>
     </header>
@@ -190,9 +184,15 @@
         <div class="notes-container">
 
             <header class="notes-header quiz-header">
-                <h1>Part 1 — How the Web &amp; HTML Work</h1>
-                <p>HTML Series · RaushanSYNC CS &amp; DS</p>
-                <p>RaushanSYNC — Learning from First Principles.</p>
+                <div class="notes-header-left">
+                    <h1>Part 1 — How the Web &amp; HTML Work</h1>
+                    <p>HTML Series · RaushanSYNC CS &amp; DS</p>
+                    <p>RaushanSYNC — Learning from First Principles.</p>
+                </div>
+                <div class="notes-header-actions">
+                    <span class="page-header-tick-label">Mark completed</span>
+                    <div id="note-tick" data-tick-container data-tick-position="header" data-tick-type="practice"></div>
+                </div>
             </header>
 
             <!-- Breadcrumb -->
@@ -201,15 +201,14 @@
                     <li><a href="/">Home</a></li>
                     <li><a href="/computer-science/">Computer Science</a></li>
                     <li><a href="/computer-science/html/">HTML</a></li>
-                    <li><a href="/computer-science/html/01-how-the-web-and-html-works/">1. How the Web &amp; HTML Work</a></li>
-                    <li aria-current="page">Quiz</li>
+                    <li aria-current="page">01 Practice — How the Web &amp; HTML Work</li>
                 </ol>
             </nav>
 
             <!-- Lesson progress badge -->
             <div class="lesson-progress">
                 <span class="lesson-badge">1</span>
-                <span class="lesson-title-small">How the Web &amp; HTML Work — Quiz</span>
+                <span class="lesson-title-small">How the Web &amp; HTML Work — Practice</span>
             </div>
 
             <section class="palette important">
@@ -434,7 +433,7 @@
 
             <!-- ── Reflection palette ── -->
             <section class="palette important" style="margin-top: 2.5rem;">
-                <h3>After This Quiz</h3>
+                <h3>After This Practice</h3>
                 <p>
                     If any question surprised you, go back to the notes and re-read that section slowly.
                     The questions above test the exact distinctions that trip up beginners the most —
@@ -452,91 +451,202 @@
                     then what <em>exactly</em> is the "source of truth" for a web page?
                 </blockquote>
                 <p class="signature">— RaushanSYNC Learning Network</p>
-                <!-- <a href="/computer-science/html/02-html-document-structure/" class="video-solution-btn">
-                    ▶ Start Part 2 — HTML Document Structure
-                </a> -->
             </section>
-
+            
+            <div class="notes-watermark">RaushanSYNC CS &amp; DS · How the Web &amp; HTML Work · Practice</div>
             <!-- ── Navigation buttons ── -->
             <div class="navigation-buttons" style="margin-top: 2.5rem;">
-                <a href="./index.html"
+                <a href="../01-how-the-web-and-html-works/index.html"
                     class="btn"
                     style="background: transparent; color: var(--primary-color); border: 1.5px solid var(--primary-color);">
                     ← Back to Notes
                 </a>
-                <!-- <a href="/computer-science/html/02-html-document-structure/" class="btn">
-                    Next: HTML Document Structure →
-                </a> -->
             </div>
 
-            <div class="notes-watermark">RaushanSYNC CS &amp; DS · How the Web &amp; HTML Work · Quiz</div>
 
         </div>
     </main>
 
+    <div id="ai-chat-modal" class="ai-chat-modal" hidden aria-hidden="true" role="dialog" aria-modal="true"
+        aria-labelledby="ai-chat-title">
+        <div class="ai-chat-overlay" data-ai-chat-close></div>
+        <section class="ai-chat-panel">
+            <header class="ai-chat-header">
+                <h2 id="ai-chat-title">Ask AI Tutor</h2>
+                <button id="ai-chat-close" class="ai-chat-close" type="button" aria-label="Close AI chat">×</button>
+            </header>
+            <div id="ai-chat-context" class="ai-chat-context" aria-live="polite"></div>
+            <div id="ai-chat-history" class="ai-chat-history" aria-live="polite"></div>
+            <form id="ai-chat-form" class="ai-chat-input-row">
+                <label for="ai-chat-input" class="ai-chat-label">Ask a follow-up</label>
+                <textarea id="ai-chat-input" rows="2" placeholder="Ask why this answer is correct, request a hint, or ask for an example..."></textarea>
+                <button id="ai-chat-send" type="submit">Send</button>
+            </form>
+        </section>
+    </div>
     <div id="support-cta"></div>
     <div id="footer"></div>
 
-    <script src="/assets/js/script.js"></script>
+    <!-- Supabase & Auth -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4"></script>
+    <script src="/assets/js/auth-config.js"></script>
+    <script src="/assets/js/auth-guard.js"></script>
 
-    <!-- ════════════════════════════════════════
-         QUIZ LOGIC
-    ════════════════════════════════════════ -->
+    <script src="/assets/js/progress-tracker.js"></script>
+    <script src="/assets/js/tick-manager.js"></script>
+    <script src="/assets/js/script.js"></script>
+    <script src="/ai-chat.js"></script>
+    <!-- PRACTICE LOGIC -->
     <script>
-        /* ── Helpers ── */
         function setFeedback(card, isCorrect, message) {
             const feedback = card.querySelector('.quiz-feedback');
             if (!feedback) return;
+
             feedback.textContent = message;
             feedback.classList.remove('correct', 'incorrect');
             feedback.classList.add(isCorrect ? 'correct' : 'incorrect');
         }
 
         function getCorrectAnswers(card) {
-            return (card.dataset.answer || '').split(',').map(a => a.trim()).filter(Boolean);
+            const raw = card.dataset.answer || '';
+            return raw.split(',').map(a => a.trim()).filter(a => a);
         }
 
         function getSelectedAnswers(card) {
-            return Array.from(card.querySelectorAll('input:checked')).map(i => i.value);
+            const inputs = card.querySelectorAll('input');
+            const selected = [];
+
+            inputs.forEach(input => {
+                if (input.checked) {
+                    selected.push(input.value);
+                }
+            });
+
+            return selected;
         }
 
-        function arraysMatch(a, b) {
-            if (a.length !== b.length) return false;
-            return [...a].sort().every((v, i) => v === [...b].sort()[i]);
+        function arraysMatch(arr1, arr2) {
+            if (arr1.length !== arr2.length) return false;
+
+            const sorted1 = [...arr1].sort();
+            const sorted2 = [...arr2].sort();
+
+            return sorted1.every((val, index) => val === sorted2[index]);
         }
 
         function getCorrectLabels(card) {
-            return getCorrectAnswers(card).map(value => {
+            const correctValues = getCorrectAnswers(card);
+            const labels = [];
+
+            correctValues.forEach(value => {
                 const input = card.querySelector('input[value="' + value + '"]');
-                return input ? input.closest('label').textContent.trim() : value;
-            }).join(' | ');
+                if (input) {
+                    const label = input.closest('label');
+                    if (label) labels.push(label.textContent.trim());
+                }
+            });
+
+            return labels.join(' | ');
+        }
+
+        function getSelectedLabels(card) {
+            const selectedValues = getSelectedAnswers(card);
+            const labels = [];
+
+            selectedValues.forEach(value => {
+                const input = card.querySelector('input[value="' + value + '"]');
+                if (input) {
+                    const label = input.closest('label');
+                    if (label) labels.push(label.textContent.trim());
+                }
+            });
+
+            return labels;
+        }
+
+        function buildAIContext(card) {
+            const question = card.querySelector('h3')?.textContent.trim() || 'Question unavailable';
+            const selectedLabels = getSelectedLabels(card);
+            const userAnswer = selectedLabels.length > 0 ? selectedLabels.join(' | ') : 'No option selected yet.';
+            const correctAnswer = getCorrectLabels(card) || 'Correct answer not available.';
+            const explanation = (card.dataset.reason || '').trim() || 'No explanation available.';
+            const practiceTitle = document.querySelector('.notes-header h1')?.textContent.trim() || 'Practice Practice';
+
+            return {
+                practiceTitle: practiceTitle,
+                questionText: question,
+                userAnswer: userAnswer,
+                correctAnswer: correctAnswer,
+                explanation: explanation,
+                pageUrl: window.location.href
+            };
         }
 
         function clearHighlight(card) {
-            card.querySelectorAll('.quiz-option').forEach(l => {
-                l.classList.remove('correct-option', 'incorrect-option');
+            card.querySelectorAll('.quiz-option').forEach(label => {
+                label.classList.remove('correct-option', 'incorrect-option');
             });
         }
 
         function highlightCorrect(card) {
-            getCorrectAnswers(card).forEach(value => {
-                const input = card.querySelector('input[value="' + value + '"]');
-                if (input) input.closest('label').classList.add('correct-option');
-            });
-        }
+            const correctValues = getCorrectAnswers(card);
 
-        function highlightIncorrect(card) {
-            const correct = getCorrectAnswers(card);
-            getSelectedAnswers(card).forEach(value => {
-                if (!correct.includes(value)) {
-                    const input = card.querySelector('input[value="' + value + '"]');
-                    if (input) input.closest('label').classList.add('incorrect-option');
+            correctValues.forEach(value => {
+                const input = card.querySelector('input[value="' + value + '"]');
+                if (input) {
+                    const label = input.closest('label');
+                    if (label) label.classList.add('correct-option');
                 }
             });
         }
 
-        /* ── Per-card check ── */
+        function highlightIncorrectSelections(card) {
+            const selected = getSelectedAnswers(card);
+            const correct = getCorrectAnswers(card);
+
+            selected.forEach(value => {
+                if (!correct.includes(value)) {
+                    const input = card.querySelector('input[value="' + value + '"]');
+                    if (input) {
+                        const label = input.closest('label');
+                        if (label) label.classList.add('incorrect-option');
+                    }
+                }
+            });
+        }
+
+        function revealAIButton(card) {
+            const button = card.querySelector('.discuss-ai-btn');
+            if (button) {
+                button.hidden = false;
+            }
+        }
+
+        function ensureAIButtons() {
+            document.querySelectorAll('.quiz-card').forEach(card => {
+                if (card.querySelector('.discuss-ai-btn')) return;
+
+                const button = document.createElement('button');
+                button.className = 'quiz-btn discuss-ai-btn';
+                button.type = 'button';
+                button.hidden = true;
+                button.textContent = 'Ask AI';
+
+                const feedback = card.querySelector('.quiz-feedback');
+                if (feedback) {
+                    feedback.before(button);
+                    return;
+                }
+
+                const checkButton = card.querySelector('.quiz-btn');
+                if (checkButton) {
+                    checkButton.insertAdjacentElement('afterend', button);
+                }
+            });
+        }
+
         function handleCheck(card) {
+            revealAIButton(card);
             const selected = getSelectedAnswers(card);
             const correct = getCorrectAnswers(card);
             const reason = (card.dataset.reason || '').trim();
@@ -547,25 +657,48 @@
             }
 
             clearHighlight(card);
+
             const isCorrect = arraysMatch(selected, correct);
 
             if (isCorrect) {
                 highlightCorrect(card);
-                setFeedback(card, true, '✓ Correct! ' + reason);
+                setFeedback(card, true, 'Correct! Explanation: ' + reason);
             } else {
                 highlightCorrect(card);
-                highlightIncorrect(card);
-                setFeedback(card, false, '✗ Not quite. Correct answer(s): ' + getCorrectLabels(card) + '. ' + reason);
+                highlightIncorrectSelections(card);
+
+                const correctLabels = getCorrectLabels(card);
+                setFeedback(
+                    card,
+                    false,
+                    'Not quite. Correct answer(s): ' + correctLabels + '. Explanation: ' + reason
+                );
             }
         }
 
-        /* ── Attach per-card buttons ── */
+        ensureAIButtons();
+
         document.querySelectorAll('.quiz-card').forEach(card => {
-            const btn = card.querySelector('.quiz-btn');
-            if (btn) btn.addEventListener('click', () => handleCheck(card));
+            const button = card.querySelector('.quiz-btn:not(.discuss-ai-btn)');
+            if (button) {
+                button.addEventListener('click', () => handleCheck(card));
+            }
         });
 
-    </script>
+        document.querySelectorAll('.discuss-ai-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const card = button.closest('.quiz-card');
+                if (!card) return;
 
+                if (typeof window.initAIChat !== 'function') {
+                    alert('AI chat is not available right now. Please try again shortly.');
+                    return;
+                }
+
+                const context = buildAIContext(card);
+                window.initAIChat(context);
+            });
+        });
+    </script>
 </body>
 </html>

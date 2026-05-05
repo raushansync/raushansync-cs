@@ -1,5 +1,5 @@
 /* RaushanSYNC Learning Platform PWA Service Worker */
-const CACHE_VERSION = 'app-v1.1.2.1';  // Generic version for cross-site use
+const CACHE_VERSION = 'app-v1.1.2.3';  // Generic version for cross-site use
 const CORE_CACHE = 'rs-core-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'rs-runtime-' + CACHE_VERSION;
 const OFFLINE_URL = '/offline/';
@@ -52,8 +52,7 @@ const CORE_ASSETS = [
   '/class09/',
   '/class10/',
   '/class11/',
-  '/class12/',
-  '/future-content/'
+  '/class12/'
 ];
 
 self.addEventListener('install', (event) => {

@@ -86,155 +86,134 @@
     <link rel="stylesheet" href="/assets/css/style.css">
 
     <style>
-        /* ── Page-local components (nothing in style.css needs changing) ── */
+        /* Page-local CSS: shared style.css owns the notes layout. These rules only style HTML-specific learning components. */
 
-        /* Journey timeline  */
-        .journey-step {
-            display: flex;
-            gap: 1rem;
-            align-items: flex-start;
-            background: var(--card-background);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 0.9rem 1.1rem;
-            box-shadow: var(--card-shadow);
-        }
-
-        .journey-num {
-            flex-shrink: 0;
-            width: 2rem;
-            height: 2rem;
-            background: var(--primary-color);
-            color: #fff;
-            border-radius: 50%;
-            display: flex;
+        .lesson-progress {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
+            gap: 0.65rem;
+            margin: 0 0 1.6rem;
+            padding: 0.55rem 0.8rem;
+            color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.07);
+            border: 1px solid rgba(59, 130, 246, 0.16);
+            border-radius: 10px;
             font-weight: 700;
-            font-size: 0.9rem;
         }
 
-        .journey-content strong {
-            display: block;
-            margin-bottom: 0.25rem;
-            font-size: 0.95rem;
+        .lesson-badge {
+            display: inline-grid;
+            place-items: center;
+            flex: 0 0 auto;
+            width: 1.9rem;
+            height: 1.9rem;
+            color: #fff;
+            background: var(--primary-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 18px rgba(59, 130, 246, 0.2);
         }
 
-        .journey-content p {
-            font-size: 0.88rem;
-            color: var(--secondary-text-color);
-            margin: 0;
+        .lesson-title-small {
+            min-width: 0;
+            font-size: 0.92rem;
+            line-height: 1.25;
         }
 
-        .journey-arrow {
-            text-align: center;
-            font-size: 1.2rem;
-            color: var(--secondary-text-color);
-            opacity: 0.5;
-            margin: 0.2rem 0;
-            padding-left: 1.5rem;
+        .notes-container p code,
+        .notes-container li code,
+        .notes-container td code {
+            padding: 0.12rem 0.35rem;
+            color: var(--primary-color-dark);
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.14);
+            border-radius: 6px;
+            font-family: Consolas, "SFMono-Regular", "Liberation Mono", monospace;
+            font-size: 0.92em;
+            white-space: nowrap;
         }
 
-        .journey-pipeline {
-            margin: 1.5rem 0;
-        }
-
-        /* Triad cards */
-        .triad-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-        }
-
-        .triad-card {
+        .code-block {
+            margin: 1.25rem 0 1.75rem;
+            padding: 1rem;
+            overflow-x: auto;
+            color: #dbeafe;
+            background: #0f172a;
+            border: 1px solid rgba(148, 163, 184, 0.28);
             border-radius: 12px;
-            padding: 1.2rem 1.3rem;
-            border: 1px solid var(--border-color);
             box-shadow: var(--card-shadow);
-            background: var(--card-background);
+            tab-size: 2;
         }
 
-        .triad-card.html { border-top: 4px solid #f97316; }
-        .triad-card.css  { border-top: 4px solid #3b82f6; }
-        .triad-card.js   { border-top: 4px solid #eab308; }
-
-        .triad-icon {
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
+        .code-block code {
+            display: block;
+            min-width: max-content;
+            font-family: Consolas, "SFMono-Regular", "Liberation Mono", monospace;
+            font-size: 0.92rem;
+            line-height: 1.65;
+            white-space: pre;
         }
 
-        .triad-card h3 {
-            font-size: 1rem;
-            margin-bottom: 0.3rem;
+        .code-block::-webkit-scrollbar {
+            height: 0.55rem;
         }
 
-        .triad-card p {
-            font-size: 0.85rem;
-            color: var(--secondary-text-color);
-            margin: 0;
-        }
-
-        .triad-label {
-            display: inline-block;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.07em;
-            padding: 0.15rem 0.5rem;
+        .code-block::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.45);
             border-radius: 999px;
-            margin-bottom: 0.6rem;
         }
 
-        .triad-card.html .triad-label { background: rgba(249,115,22,0.12); color: #ea580c; }
-        .triad-card.css  .triad-label { background: rgba(59,130,246,0.12); color: #2563eb; }
-        .triad-card.js   .triad-label { background: rgba(234,179,8,0.12);  color: #a16207; }
+        .code-angle,
+        .code-doctype { color: #7dd3fc; }
+        .code-tag { color: #60a5fa; }
+        .code-attr,
+        .code-js-prop,
+        .code-css-prop { color: #f9a8d4; }
+        .code-value,
+        .code-js-string,
+        .code-css-value { color: #86efac; }
+        .code-text { color: #e2e8f0; }
+        .code-comment { color: #94a3b8; font-style: italic; }
+        .code-js-keyword { color: #c4b5fd; }
+        .code-js-object,
+        .code-js-method { color: #fde68a; }
+        .code-js-func { color: #86efac; }
+        .code-css-num,
+        .code-sql { color: #fca5a5; }
 
-        .dark-mode .triad-card.js .triad-label { color: #fde047; }
-        .dark-mode .triad-card.js .triad-label { background: rgba(234,179,8,0.18); }
-
-        /* DOM hierarchy (reusing pg-hierarchy pattern) */
-        .dom-hier-html   { border-left: 4px solid #f97316; }
-        .dom-hier-head   { border-left: 4px solid #a855f7; }
-        .dom-hier-body   { border-left: 4px solid #3b82f6; }
-        .dom-hier-elem   { border-left: 4px solid #22d3ee; }
-        .dom-hier-text   { border-left: 4px solid #34d399; }
-
-        /* HTTP request/response diagram */
         .http-diagram {
             display: flex;
-            align-items: center;
+            flex-wrap: wrap;
+            align-items: stretch;
             justify-content: center;
             gap: 1rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
+            margin: 2rem 0 2.25rem;
         }
 
         .http-box {
-            border-radius: 12px;
-            padding: 1rem 1.25rem;
+            flex: 1 1 175px;
             min-width: 170px;
-            border: 1px solid var(--border-color);
-            background: var(--card-background);
-            box-shadow: var(--card-shadow);
-            flex: 1;
-            max-width: 260px;
+            max-width: 230px;
+            padding: 1rem;
             text-align: center;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
         }
 
-        .http-box.browser-box { border-top: 4px solid #3b82f6; }
-        .http-box.server-box  { border-top: 4px solid #22c55e; }
-        .http-box.dns-box     { border-top: 4px solid #a855f7; }
+        .browser-box { border-top: 4px solid #3b82f6; }
+        .dns-box { border-top: 4px solid #8b5cf6; }
+        .server-box { border-top: 4px solid #22c55e; }
 
         .http-label {
+            margin-bottom: 0.35rem;
+            color: var(--text-color);
             font-weight: 700;
-            font-size: 0.88rem;
-            margin-bottom: 0.5rem;
-            color: var(--primary-color);
         }
 
         .http-desc {
-            font-size: 0.78rem;
             color: var(--secondary-text-color);
+            font-size: 0.84rem;
             line-height: 1.45;
         }
 
@@ -242,32 +221,355 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 0.75rem;
+            justify-content: center;
+            gap: 0.25rem;
+            min-width: 4.8rem;
             color: var(--secondary-text-color);
-            gap: 0.2rem;
-            flex-shrink: 0;
+            font-size: 0.76rem;
+            line-height: 1.25;
+            text-align: center;
         }
 
         .http-arrow-line {
             width: 48px;
             height: 2px;
             background: var(--border-color);
+            border-radius: 999px;
         }
 
-        @media (max-width: 600px) {
-            .http-diagram {
-                flex-direction: column;
-                gap: 0.7rem;
+        .journey-pipeline {
+            display: grid;
+            gap: 0.45rem;
+            margin: 1.5rem 0 1.8rem;
+        }
+
+        .journey-step {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.9rem;
+            align-items: flex-start;
+            padding: 0.9rem 1rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .journey-num {
+            display: inline-grid;
+            place-items: center;
+            width: 2rem;
+            height: 2rem;
+            color: #fff;
+            background: var(--primary-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .journey-content strong {
+            display: block;
+            margin-bottom: 0.25rem;
+            color: var(--text-color);
+        }
+
+        .journey-content p {
+            margin: 0;
+            color: var(--secondary-text-color);
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        .journey-arrow {
+            color: var(--secondary-text-color);
+            text-align: center;
+            opacity: 0.55;
+        }
+
+        .triad-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0 2rem;
+        }
+
+        .triad-card {
+            padding: 1.1rem 1.15rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .triad-card.html { border-top: 4px solid #f97316; }
+        .triad-card.css { border-top: 4px solid #3b82f6; }
+        .triad-card.js { border-top: 4px solid #eab308; }
+
+        .triad-icon {
+            margin-bottom: 0.45rem;
+            font-size: 1.7rem;
+            line-height: 1;
+        }
+
+        .triad-label {
+            display: inline-flex;
+            margin-bottom: 0.55rem;
+            padding: 0.24rem 0.5rem;
+            color: #fff;
+            background: var(--primary-color);
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0;
+        }
+
+        .triad-card.html .triad-label { background: #f97316; }
+        .triad-card.css .triad-label { background: #3b82f6; }
+        .triad-card.js .triad-label { color: #422006; background: #eab308; }
+
+        .triad-card h3 {
+            margin-bottom: 0.35rem;
+            font-size: 1rem;
+        }
+
+        .triad-card p {
+            margin: 0;
+            color: var(--secondary-text-color);
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        .pg-hierarchy {
+            display: grid;
+            gap: 0.45rem;
+            margin: 1.5rem 0 2rem;
+            padding: 1rem;
+            background: linear-gradient(180deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.01)), var(--card-background);
+            border: 1px solid rgba(59, 130, 246, 0.14);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .pg-hier-level {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.75rem;
+            align-items: center;
+            padding: 0.75rem 0.9rem;
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+        }
+
+        .pg-hier-icon {
+            display: inline-grid;
+            place-items: center;
+            width: 2rem;
+            height: 2rem;
+            background: rgba(59, 130, 246, 0.08);
+            border-radius: 8px;
+        }
+
+        .pg-hier-content strong,
+        .pg-hier-desc {
+            display: block;
+        }
+
+        .pg-hier-desc {
+            color: var(--secondary-text-color);
+            font-size: 0.84rem;
+            line-height: 1.4;
+        }
+
+        .pg-hier-connector {
+            width: 2px;
+            height: 14px;
+            margin-left: 1.65rem;
+            background: var(--border-color);
+            border-radius: 999px;
+        }
+
+        .dom-hier-html { border-left: 4px solid #f97316; }
+        .dom-hier-head { border-left: 4px solid #8b5cf6; }
+        .dom-hier-body { border-left: 4px solid #3b82f6; }
+        .dom-hier-elem { border-left: 4px solid #06b6d4; }
+        .dom-hier-text { border-left: 4px solid #22c55e; }
+
+        .misconception-card {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.8rem;
+            align-items: flex-start;
+            margin: 0.9rem 0;
+            padding: 1rem;
+            background: var(--card-background);
+            border: 1px solid rgba(239, 68, 68, 0.18);
+            border-left: 4px solid #ef4444;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .misconception-icon {
+            display: inline-grid;
+            place-items: center;
+            width: 2rem;
+            height: 2rem;
+            color: #991b1b;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .misconception-body strong {
+            display: block;
+            margin-bottom: 0.35rem;
+            color: var(--text-color);
+        }
+
+        .misconception-body p {
+            margin-bottom: 0.6rem;
+        }
+
+        .misconception-correct {
+            color: #15803d;
+            font-weight: 700;
+        }
+
+        .checklist-card {
+            display: grid;
+            gap: 0.7rem;
+            margin: 1.4rem 0 2rem;
+            padding: 1rem;
+            background: linear-gradient(180deg, rgba(34, 197, 94, 0.06), rgba(34, 197, 94, 0.01)), var(--card-background);
+            border: 1px solid rgba(34, 197, 94, 0.18);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .checklist-item {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.75rem;
+            align-items: flex-start;
+            padding: 0.8rem 0.9rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .checklist-check {
+            width: 1.05rem;
+            height: 1.05rem;
+            margin-top: 0.18rem;
+            accent-color: #22c55e;
+            cursor: pointer;
+        }
+
+        .checklist-item:has(.checklist-check:checked) {
+            color: #15803d;
+            background: rgba(34, 197, 94, 0.08);
+            border-color: rgba(34, 197, 94, 0.24);
+        }
+
+        .http-box,
+        .triad-card,
+        .journey-step,
+        .pg-hier-level,
+        .misconception-card {
+            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .http-box:hover,
+        .triad-card:hover,
+        .journey-step:hover,
+        .pg-hier-level:hover,
+        .misconception-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.28);
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+        }
+
+        .dark-mode .lesson-progress,
+        .dark-mode .notes-container p code,
+        .dark-mode .notes-container li code,
+        .dark-mode .notes-container td code {
+            background: rgba(96, 165, 250, 0.12);
+            border-color: rgba(96, 165, 250, 0.22);
+        }
+
+        .dark-mode .notes-container p code,
+        .dark-mode .notes-container li code,
+        .dark-mode .notes-container td code {
+            color: #93c5fd;
+        }
+
+        .dark-mode .code-block {
+            color: #dbeafe;
+            background: #020617;
+            border-color: rgba(96, 165, 250, 0.22);
+        }
+
+        .dark-mode .pg-hierarchy {
+            background: linear-gradient(180deg, rgba(96, 165, 250, 0.08), rgba(96, 165, 250, 0.02)), var(--card-background);
+        }
+
+        .dark-mode .pg-hier-level {
+            background: rgba(15, 23, 42, 0.55);
+        }
+
+        .dark-mode .misconception-icon {
+            color: #fecaca;
+            background: rgba(248, 113, 113, 0.14);
+        }
+
+        .dark-mode .misconception-correct,
+        .dark-mode .checklist-item:has(.checklist-check:checked) {
+            color: #86efac;
+        }
+
+        .dark-mode .checklist-card {
+            background: linear-gradient(180deg, rgba(34, 197, 94, 0.08), rgba(34, 197, 94, 0.02)), var(--card-background);
+        }
+
+        @media (max-width: 700px) {
+            .notes-page {
+                padding-top: calc(var(--header-height) + 20px);
+            }
+
+            .notes-header {
+                margin-bottom: 2rem;
+            }
+
+            .notes-header h1 {
+                font-size: clamp(1.45rem, 7vw, 1.85rem);
+                line-height: 1.18;
+            }
+
+            .notes-header-actions {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .lesson-progress {
+                width: 100%;
+                justify-content: flex-start;
+                margin-bottom: 1.25rem;
+            }
+
+            .http-diagram,
+            .triad-grid {
+                gap: 0.85rem;
             }
 
             .http-box {
-                max-width: 100%;
-                width: 100%;
+                max-width: none;
+                flex-basis: 100%;
             }
 
             .http-arrow {
-                flex-direction: column;
-                gap: 0.15rem;
+                flex: 1 1 100%;
+                min-width: 0;
             }
 
             .http-arrow-line {
@@ -275,56 +577,56 @@
                 height: 22px;
             }
 
-            .http-arrow span {
-                display: block;
-                text-align: center;
-                font-size: 0.72rem;
-                line-height: 1.25;
+            .journey-step,
+            .pg-hier-level,
+            .misconception-card,
+            .checklist-item {
+                grid-template-columns: auto minmax(0, 1fr);
+            }
+
+            .code-block {
+                padding: 0.85rem;
+                border-radius: 10px;
+            }
+
+            .code-block code {
+                font-size: 0.84rem;
             }
         }
 
-        /* Misconception callout */
-        .misconception-card {
-            display: flex;
-            gap: 0.75rem;
-            align-items: flex-start;
-            background: var(--card-background);
-            border: 1px solid var(--border-color);
-            border-left: 5px solid #f87171;
-            border-radius: 12px;
-            padding: 1rem 1.2rem;
-            margin-bottom: 1rem;
-            box-shadow: var(--card-shadow);
+        @media (max-width: 420px) {
+            .notes-container p code,
+            .notes-container li code,
+            .notes-container td code {
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
+
+            .journey-step,
+            .pg-hier-level,
+            .misconception-card,
+            .checklist-item {
+                padding: 0.85rem;
+            }
         }
 
-        .misconception-icon {
-            flex-shrink: 0;
-            font-size: 1.2rem;
+        @media (prefers-reduced-motion: reduce) {
+            .http-box,
+            .triad-card,
+            .journey-step,
+            .pg-hier-level,
+            .misconception-card {
+                transition: none;
+            }
+
+            .http-box:hover,
+            .triad-card:hover,
+            .journey-step:hover,
+            .pg-hier-level:hover,
+            .misconception-card:hover {
+                transform: none;
+            }
         }
-
-        .misconception-body strong {
-            display: block;
-            color: #dc2626;
-            font-size: 0.9rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .dark-mode .misconception-body strong { color: #f87171; }
-
-        .misconception-body p {
-            font-size: 0.88rem;
-            color: var(--secondary-text-color);
-            margin: 0;
-        }
-
-        .misconception-correct {
-            margin-top: 0.4rem;
-            font-size: 0.88rem;
-            color: #16a34a;
-            font-weight: 500;
-        }
-
-        .dark-mode .misconception-correct { color: #4ade80; }
     </style>
 
     <script>
@@ -356,39 +658,32 @@
                             d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
                     </svg>
                 </button>
-                <button class="hamburger" id="hamburger" aria-label="Open menu">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                    </svg>
-                </button>
             </div>
         </div>
     </header>
 
     <main class="notes-page practice-page">
         <div class="notes-container">
+            <header class="notes-header">
+                <div class="notes-header-left">
+                    <h1>Part 1: How the Web &amp; HTML Work</h1>
+                    <p>HTML from First Principles · Web Foundations</p>
+                </div>
 
-            <!-- Breadcrumb -->
+                <div class="notes-header-actions">
+                    <span class="page-header-tick-label">Mark completed</span>
+                    <div id="note-tick" data-tick-container data-tick-position="header" data-tick-type="article"></div>
+                </div>
+            </header>
+
             <nav class="breadcrumb" aria-label="Breadcrumb">
                 <ol>
                     <li><a href="/">Home</a></li>
                     <li><a href="/computer-science/">Computer Science</a></li>
                     <li><a href="/computer-science/html/">HTML</a></li>
-                    <li aria-current="page">1. How the Web &amp; HTML Work</li>
+                    <li aria-current="page">Part 1: How the Web &amp; HTML Work</li>
                 </ol>
             </nav>
-
-            <!-- Page Header -->
-            <div class="notes-header">
-                <h1>1. How the Web &amp; HTML Work</h1>
-                <p>
-                    Before you write a single tag, understand what the web actually is —
-                    from the cables under the ocean to the pixels on your screen.
-                    This is the mental model that makes everything else click.
-                </p>
-            </div>
 
             <!-- Progress indicator -->
             <div class="lesson-progress">
@@ -396,6 +691,13 @@
                 <span class="lesson-title-small">How the Web &amp; HTML Work</span>
             </div>
 
+            <div class="notes-box summary">
+                <p>
+                    Before you write a single tag, understand what the web actually is —
+                    from the cables under the ocean to the pixels on your screen.
+                    This is the mental model that makes everything else click.
+                </p>
+            </div>
 
             <!-- ═══════════════════════════════════════════
                  SECTION 1 — The Internet vs The Web
@@ -1294,19 +1596,26 @@ newPara.<span class="code-js-prop">textContent</span> = <span class="code-js-str
                     style="background: transparent; color: var(--primary-color); border: 1.5px solid var(--primary-color);">
                     ← Back to HTML Index
                 </a>
-                <a href="./quiz.html" class="btn">
+                <a href="../01-practice/" class="btn">
                     Test your understanding →
                 </a>
             </div>
-
-            <div class="notes-watermark">RaushanSYNC CS &amp; DS · How the Web &amp; HTML Work · Educational Content</div>
 
         </div>
     </main>
 
     <div id="support-cta"></div>
+    <div class="notes-watermark">
+        Source: RaushanSYNC CS &amp; DS · https://cs.raushansync.com
+        Licensed for personal, non-commercial learning only.
+    </div>
     <div id="footer"></div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4"></script>
+    <script src="/assets/js/auth-config.js"></script>
+    <script src="/assets/js/auth-guard.js"></script>
+    <script src="/assets/js/progress-tracker.js"></script>
+    <script src="/assets/js/tick-manager.js"></script>
     <script src="/assets/js/script.js"></script>
     <script>
         /* ── Checklist persistence ── */

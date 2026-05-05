@@ -9,7 +9,6 @@
         'class 12': '/class12/'
     };
 
-    const ADVANCED_LEVEL_PATH = '/future-content/';
     const QUOTE_ROTATION_INTERVAL_MS = 10000;
     const TYPEWRITER_DEFAULT_DELAY_MS = 38;
     const TYPEWRITER_PUNCTUATION_DELAY_MS = 110;
@@ -173,10 +172,6 @@
     function getLearningPath(level) {
         if (SCHOOL_LEVEL_PATHS[level]) {
             return SCHOOL_LEVEL_PATHS[level];
-        }
-
-        if (level === 'undergraduate' || level === 'postgraduate' || level === 'phd') {
-            return ADVANCED_LEVEL_PATH + '?track=' + encodeURIComponent(level);
         }
 
         return '';
@@ -349,6 +344,38 @@
         document.body.classList.remove('ai-chat-open');
     }
 
+    function openTrackChoiceModal() {
+        if (!elements.trackChoiceModal) {
+            return;
+        }
+
+        elements.trackChoiceModal.hidden = false;
+        elements.trackChoiceModal.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('ai-chat-open');
+
+        if (elements.computerScienceButton && window.matchMedia('(pointer: fine)').matches) {
+            elements.computerScienceButton.focus();
+        }
+    }
+
+    function closeTrackChoiceModal() {
+        if (!elements.trackChoiceModal) {
+            return;
+        }
+
+        elements.trackChoiceModal.hidden = true;
+        elements.trackChoiceModal.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('ai-chat-open');
+    }
+
+    function openLearningTrack(path) {
+        if (!path) {
+            return;
+        }
+
+        window.location.assign(path);
+    }
+
     function blockLearningAction() {
         openProfileHelpModal();
     }
@@ -365,6 +392,11 @@
     function startLearning() {
         if (state.trackType === 'locked') {
             blockLearningAction();
+            return;
+        }
+
+        if (state.trackType === 'advanced') {
+            openTrackChoiceModal();
             return;
         }
 
@@ -529,9 +561,42 @@
             });
         }
 
+        if (elements.trackChoiceClose) {
+            elements.trackChoiceClose.addEventListener('click', closeTrackChoiceModal);
+        }
+
+        if (elements.trackChoiceModal) {
+            elements.trackChoiceModal.addEventListener('click', (event) => {
+                const target = event.target;
+                if (target instanceof HTMLElement && target.hasAttribute('data-track-choice-close')) {
+                    closeTrackChoiceModal();
+                }
+            });
+        }
+
+        if (elements.computerScienceButton) {
+            elements.computerScienceButton.addEventListener('click', () => {
+                openLearningTrack('/computer-science');
+            });
+        }
+
+        if (elements.dataScienceButton) {
+            elements.dataScienceButton.addEventListener('click', () => {
+                openLearningTrack('/data-science');
+            });
+        }
+
         document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape' && elements.profileModal && !elements.profileModal.hidden) {
+            if (event.key !== 'Escape') {
+                return;
+            }
+
+            if (elements.profileModal && !elements.profileModal.hidden) {
                 closeProfileHelpModal();
+            }
+
+            if (elements.trackChoiceModal && !elements.trackChoiceModal.hidden) {
+                closeTrackChoiceModal();
             }
         });
 
@@ -552,6 +617,10 @@
         elements.profileModal = document.getElementById('profile-help-modal');
         elements.profileClose = document.getElementById('profile-help-close');
         elements.profileDismiss = document.getElementById('profile-help-dismiss');
+        elements.trackChoiceModal = document.getElementById('track-choice-modal');
+        elements.trackChoiceClose = document.getElementById('track-choice-close');
+        elements.computerScienceButton = document.getElementById('track-choice-computer-science');
+        elements.dataScienceButton = document.getElementById('track-choice-data-science');
     }
 
     async function initializeHomepageHero() {

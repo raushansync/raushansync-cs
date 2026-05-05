@@ -417,6 +417,10 @@ main {
   padding: calc(var(--header-height) + 40px) 0 4rem;
 }
 
+body:not(.home-page) main {
+  padding-top: calc(var(--header-height) + 24px);
+}
+
 .welcome-section {
   text-align: center;
   padding-bottom: 4rem;
@@ -566,7 +570,12 @@ main {
 .content-section h1,
 .content-section h2 {
   text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.content-section > .container > h1:first-child + .palette,
+.content-section > .container > h2:first-child + .palette {
+  margin-top: 0.75rem;
 }
 
 /* --- Card & Grid (Text Cut-off Fix) --- */
@@ -678,11 +687,6 @@ main {
 }
 
 
-.btn.disabled {
-  background-color: #9ca3af;
-  cursor: not-allowed;
-}
-
 /* Auth buttons in header */
 .auth-buttons {
   display: flex;
@@ -718,6 +722,32 @@ main {
 .btn-secondary:hover {
   background-color: var(--primary-color);
   color: #ffffff;
+}
+
+.btn.disabled,
+.btn.btn-disabled,
+.btn[disabled],
+.btn:disabled,
+.btn[aria-disabled="true"],
+.btn.disabled:hover,
+.btn.btn-disabled:hover,
+.btn[disabled]:hover,
+.btn:disabled:hover,
+.btn[aria-disabled="true"]:hover {
+  background-color: #9ca3af;
+  border-color: #9ca3af;
+  color: #ffffff;
+  cursor: not-allowed;
+  opacity: 1;
+  box-shadow: none;
+}
+
+.btn.disabled:active,
+.btn.btn-disabled:active,
+.btn[disabled]:active,
+.btn:disabled:active,
+.btn[aria-disabled="true"]:active {
+  transform: none;
 }
 
 /* Responsive: hide auth buttons on small screens */
@@ -855,7 +885,11 @@ main {
   }
 
   main {
-    padding-top: calc(var(--header-height) + 30px);
+    padding-top: calc(var(--header-height) + 22px);
+  }
+
+  body:not(.home-page) main {
+    padding-top: calc(var(--header-height) + 22px);
   }
 
   .welcome-section h1,
@@ -915,6 +949,33 @@ main {
 @media (max-width: 480px) {
   :root {
     --container-padding: 0.9rem;
+  }
+
+  .header-container {
+    gap: 0.45rem;
+  }
+
+  .logo {
+    min-width: 0;
+    max-width: calc(100vw - 126px);
+    justify-content: flex-start;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: clamp(1rem, 5vw, 1.28rem);
+  }
+
+  .header-actions {
+    gap: 0.45rem;
+    margin-left: 0.25rem;
+  }
+
+  .theme-toggle-btn,
+  .navbar-hamburger {
+    width: 40px;
+    height: 40px;
+    margin-left: 0.2rem;
+    margin-right: 0;
   }
 }
 
@@ -1562,58 +1623,16 @@ html.home-hero-reserved .home-page .welcome-section .welcome-actions {
   .profile-help-actions .btn {
     min-height: 52px;
     display: inline-flex;
-
-  html.home-hero-reserved .home-page .welcome-section .welcome-actions {
-    min-height: 20rem;
-  }
     align-items: center;
     justify-content: center;
   }
 
+  html.home-hero-reserved .home-page .welcome-section .welcome-actions {
+    min-height: 20rem;
+  }
+
   .profile-help-actions .btn-secondary {
     padding: 0.75rem 1.5rem;
-  }
-}
-
-.future-roadmap-card {
-  width: 100%;
-  max-width: none;
-  margin: 1.25rem 0 0;
-  padding: 1.85rem 2rem 2rem;
-  text-align: center;
-}
-
-.future-roadmap-card h2 {
-  margin: 0.35rem 0 0;
-  font-size: clamp(1.55rem, 2.8vw, 2.15rem);
-}
-
-.future-roadmap-card p {
-  max-width: none;
-  margin: 0.8rem auto 0;
-}
-
-.future-roadmap-actions {
-  display: flex;
-  justify-content: center;
-  gap: 0.9rem;
-  flex-wrap: wrap;
-  margin-top: 1.55rem;
-}
-
-.future-roadmap-actions .btn {
-  min-width: 210px;
-}
-
-@media (max-width: 768px) {
-  .future-roadmap-actions {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .future-roadmap-actions .btn {
-    width: 100%;
-    max-width: 280px;
   }
 }
 
@@ -3010,3 +3029,50 @@ body.ai-chat-open {
     border-color: #3b82f6;
     color: #3b82f6;
 }
+
+/* =========================================================
+   PRACTICE CARD LINK (Visual Differentiation)
+   ========================================================= */
+
+.card-grid > .card.practice-card-link {
+  background: rgba(59, 130, 246, 0.03);
+  border: 1.5px dashed rgba(59, 130, 246, 0.4);
+  box-shadow: none;
+  animation: none;
+}
+
+.card-grid > .card.practice-card-link:hover {
+  background: rgba(59, 130, 246, 0.06);
+  border-color: var(--primary-color);
+  transform: translateY(-3px);
+}
+
+.card.practice-card-link .status {
+  color: #059669; /* distinctive color for practice */
+}
+
+.card.practice-card-link .btn {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1.5px solid var(--primary-color);
+}
+
+.card.practice-card-link .btn:hover {
+  background-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.dark-mode .card-grid > .card.practice-card-link {
+  background: rgba(96, 165, 250, 0.04);
+  border: 1.5px dashed rgba(96, 165, 250, 0.3);
+}
+
+.dark-mode .card-grid > .card.practice-card-link:hover {
+  background: rgba(96, 165, 250, 0.08);
+  border-color: rgba(96, 165, 250, 0.6);
+}
+
+.dark-mode .card.practice-card-link .status {
+  color: #10b981;
+}
+
