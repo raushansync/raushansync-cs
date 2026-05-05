@@ -5,11 +5,14 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
+  "orientation": "any",
   "lang": "en",
+  "dir": "ltr",
   "background_color": "#111827",
   "theme_color": "#3b82f6",
   "description": "RaushanSYNC CS & DS teaches computing from first principles through structured lessons, concept notes, and practice—covering programming, algorithms, data structures, and data science to build real understanding and computational thinking.",
+  "categories": ["education", "computer science"],
+  "prefer_related_applications": true,
   "icons": [
     {
       "src": "/icons/icon-192.png",
@@ -25,3 +28,4 @@
     }
   ]
 }
+

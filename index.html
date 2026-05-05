@@ -6,13 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#3b82f6" id="theme-color-meta">
 
-
-    <title>RaushanSYNC CS & DS | Computer Science & Data Science from First Principles</title>
-
+    <title>RaushanSYNC CS & DS | Computer Science and Data Science from First Principles</title>
 
     <meta name="description"
         content="RaushanSYNC CS & DS is a first-principles learning platform for Computer Science and Data Science—helping learners understand computation, algorithms, data, and modeling from foundational ideas to advanced concepts.">
-
 
     <meta name="author" content="Raushan Kumar">
     <meta name="robots" content="index, follow">
@@ -23,27 +20,22 @@
 
     <!-- Open Graph -->
     <meta property="og:site_name" content="RaushanSYNC CS & DS">
-    <meta property="og:title" content="RaushanSYNC CS & DS | Computer Science & Data Science from First Principles">
-
+    <meta property="og:title" content="RaushanSYNC CS & DS | Computer Science and Data Science from First Principles">
     <meta property="og:description"
         content="RaushanSYNC CS & DS focuses on Computer Science and Data Science from first principles—emphasizing logic, algorithms, data reasoning, and conceptual clarity over tools or shortcuts.">
-
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://cs.raushansync.com/">
-    <meta property="og:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://cs.raushansync.com/">
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="RaushanSYNC CS & DS | Computer Science & Data Science from First Principles">
-
+    <meta name="twitter:title" content="RaushanSYNC CS & DS | Computer Science and Data Science from First Principles">
     <meta name="twitter:description"
         content="A first-principles learning platform for Computer Science and Data Science, focused on programming, algorithms, and data as ways of thinking—not just tools.">
     <meta name="twitter:site" content="@raushansync">
     <meta name="twitter:image" content="https://cs.raushansync.com/assets/images/og-image.jpg">
 
-    <!-- Favicons -->
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <!-- Favicon -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -56,7 +48,79 @@
 
     <!-- Stylesheet -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        (function initHomepageHeroReservation() {
+            if (!document.documentElement.classList) {
+                return;
+            }
+
+            const authStorageKeyPattern = /^(supabase\.auth\.token|sb-.*-auth-token(?:-code-verifier)?)$/;
+
+            const storageHasAuthKey = (storage) => {
+                if (!storage) {
+                    return false;
+                }
+
+                for (let index = 0; index < storage.length; index += 1) {
+                    const key = storage.key(index);
+                    if (typeof key === 'string' && authStorageKeyPattern.test(key)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            };
+
+            try {
+                if (storageHasAuthKey(window.localStorage) || storageHasAuthKey(window.sessionStorage)) {
+                    document.documentElement.classList.add('home-hero-reserved');
+                }
+            } catch (error) {
+                return;
+            }
+        })();
+    </script>
     <link rel="stylesheet" href="/assets/css/style.css">
+
+    <style>
+        .home-page .welcome-section .welcome-actions {
+            margin: 1rem 0 1rem;
+            min-height: 4.5rem;
+        }
+
+        html.home-hero-reserved .home-page .welcome-section .welcome-actions {
+            min-height: 16rem;
+        }
+
+        .welcome-section #auth-buttons-guest {
+            align-self: flex-start;
+            align-items: center;
+        }
+
+        .welcome-section #auth-buttons-guest,
+        .welcome-section #auth-buttons-user {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .home-page .welcome-section .welcome-actions {
+                min-height: 8rem;
+            }
+
+            html.home-hero-reserved .home-page .welcome-section .welcome-actions {
+                min-height: 20rem;
+            }
+
+            .welcome-section #auth-buttons-guest {
+                align-self: center;
+            }
+        }
+    </style>
+
+
+    <meta property="og:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
 
 </head>
 
@@ -79,14 +143,7 @@
                             d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
                     </svg>
                 </button>
-                <button class="hamburger" id="hamburger" aria-label="Open menu">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                    </svg>
-                </button>
-            </div>
+</div>
         </div>
     </header>
 
@@ -95,18 +152,47 @@
         <section class="welcome-section">
             <div class="container">
                 <h1>Welcome to RaushanSYNC CS & DS</h1>
+                <div class="welcome-actions">
+                    <div id="auth-buttons-guest">
+                        <a href="/signup" class="btn btn-primary">
+                            Get Started
+                        </a>
+                        <a href="/login" class="btn btn-secondary">
+                            Already have an account? Sign in
+                        </a>
+                    </div>
+
+                    <div id="auth-buttons-user" class="palette important home-learning-card">
+                        <span class="home-learning-badge" id="home-learning-badge">Your learning track</span>
+                        <h2 id="home-learning-title">Continue your software journey</h2>
+                        <p id="home-learning-copy">
+                            Your class or study track will appear here once your profile is ready.
+                        </p>
+
+                        <div class="home-learning-actions">
+                            <button type="button" id="home-start-learning" class="btn btn-primary">
+                                Start Learning
+                            </button>
+                            <button type="button" id="home-dashboard-link" class="btn btn-secondary">
+                                Dashboard
+                            </button>
+                            <button type="button" id="home-ask-ai" class="btn btn-secondary">
+                                Ask RaushanSYNC AI
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="palette important hero-palette">
                     <p>
-                        <strong>RaushanSYNC CS & DS</strong> is a structured learning platform for
-                        <strong>Computer Science</strong> and <strong>Data Science</strong>, created for learners who want
-                        to understand how computation truly works — not just learn tools, syntax, or shortcuts.
+                        <strong>RaushanSYNC CS & DS</strong> is a learning-focused platform designed to help students understand computer science and data science as powerful ways of thinking—through logic, algorithms, coding, and data-driven reasoning—rather than just memorizing syntax, tools, or exam-oriented solutions.
                     </p>
 
                     <p>
-                        From programming fundamentals and data structures to algorithms, databases,
-                        web technologies, and the mathematical foundations of data science,
-                        every topic here is taught from first principles, with clarity, depth,
-                        and long-term understanding as the goal.
+                        From early curiosity in computing to advanced concepts in higher classes and beyond,
+                        topics across <strong>Programming</strong>, <strong>Data Structures & Algorithms</strong>, <strong>Computer Systems</strong>,
+                        and <strong>Data Science</strong> are explored from first principles—through logic, problem-solving,
+                        coding practice, and real-world data analysis.
                     </p>
 
                     <blockquote class="hero-attribution">
@@ -114,69 +200,97 @@
                             <a href="https://www.raushansync.com/" target="_blank" rel="noopener noreferrer">
                                 RaushanSYNC Learning Network
                             </a>
-                        </strong>, this platform connects science naturally with mathematics and computer science,
+                            </strong>, this platform connects science naturally with mathematics and computer science,
                         encouraging curiosity, critical thinking, and deep understanding across disciplines.
                     </blockquote>
+
                 </div>
             </div>
         </section>
 
-        <section class="content-section">
-            <div class="container">
-                <h2>Structured Learning Pathways</h2>
+        <div id="profile-help-modal" class="ai-chat-modal profile-help-modal" hidden aria-hidden="true" role="dialog"
+            aria-modal="true" aria-labelledby="profile-help-title">
+            <div class="ai-chat-overlay" data-profile-help-close></div>
+            <section class="ai-chat-panel profile-help-panel">
+                <header class="ai-chat-header">
+                    <div class="ai-chat-header-copy">
+                        <h2 id="profile-help-title">Complete your profile first</h2>
+                        <p id="profile-help-subtitle" class="ai-chat-subtitle">
+                            Select your class or study track in the dashboard to unlock learning, dashboard access,
+                            and AI support.
+                        </p>
+                    </div>
+                    <button id="profile-help-close" class="ai-chat-close" type="button" aria-label="Close profile reminder">
+                        ×
+                    </button>
+                </header>
 
-
-
-                <div class="palette important">
-                    <h3>Class 11 & 12 Computer Science</h3>
-                    <p>
-                        A concept-first approach to the Class 11 and 12 Computer Science curriculum,
-                        focusing on programming fundamentals, logical thinking,
-                        data representation, and core computational ideas.
+                <div class="profile-help-body">
+                    <p class="profile-help-copy">
+                        We could not open that action because your profile still needs a class or study track.
                     </p>
-                    <span class="status">Coming Soon...</span>
+                    <p class="profile-help-copy">
+                        Open the dashboard profile editor, choose your education level, and come back to continue.
+                    </p>
                 </div>
 
-                <div class="palette important">
-                    <h3>Web Development</h3>
-                    <p>
-                        Understand how the web works — from HTML and CSS to JavaScript and modern tools —
-                        while learning to build clean, meaningful, and well-structured applications.
-                    </p>
-                    <span class="status">Coming Soon...</span>
+                <div class="profile-help-actions">
+                    <a id="profile-help-dashboard-link" href="/dashboard?edit-profile=1#profileSection" class="btn btn-primary">
+                        Open Dashboard Profile Editor
+                    </a>
+                    <button type="button" id="profile-help-dismiss" class="btn btn-secondary">
+                        Maybe later
+                    </button>
                 </div>
+            </section>
+        </div>
 
-                <div class="palette important">
-                    <h3>Data Structures & Algorithms</h3>
-                    <p>
-                        Learn how data is organized and how algorithms think.
-                        This pathway emphasizes efficiency, trade-offs,
-                        and deep problem-solving — not memorization.
-                    </p>
-                    <span class="status">Coming Soon...</span>
-                </div>
-
-                <div class="palette important">
-                    <h3>Data Science & Machine Learning</h3>
-                    <p>
-                        Explore data analysis, statistical reasoning, and machine learning foundations,
-                        with emphasis on mathematical intuition, clarity, and real-world relevance.
-                    </p>
-                    <span class="status">Coming Soon...</span>
-                </div>
-
-
-            </div>
-        </section>
+        <div id="ai-chat-modal" class="ai-chat-modal" hidden aria-hidden="true" role="dialog"
+            aria-modal="true" aria-labelledby="ai-chat-title">
+            <div class="ai-chat-overlay" data-ai-chat-close></div>
+            <section class="ai-chat-panel">
+                <header class="ai-chat-header">
+                    <div class="ai-chat-header-copy">
+                        <h2 id="ai-chat-title">RaushanSYNC AI Assistant</h2>
+                        <p id="ai-chat-subtitle" class="ai-chat-subtitle">Ask academic or non-academic questions anytime.</p>
+                    </div>
+                    <button id="ai-chat-close" class="ai-chat-close" type="button" aria-label="Close AI chat">×</button>
+                </header>
+                <div id="ai-chat-context" class="ai-chat-context" aria-live="polite"></div>
+                <div id="ai-chat-history" class="ai-chat-history" aria-live="polite"></div>
+                <form id="ai-chat-form" class="ai-chat-input-row">
+                    <label for="ai-chat-input" class="ai-chat-label">Ask RaushanSYNC AI</label>
+                    <textarea id="ai-chat-input" rows="2"
+                        placeholder="Ask anything about studies, exams, career, motivation, or productivity..."></textarea>
+                    <button id="ai-chat-send" type="submit">Send</button>
+                </form>
+            </section>
+        </div>
 
     </main>
 
     <div id="footer"></div>
 
-    <script src="/assets/js/script.js"></script>
+    <!-- Authentication Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4"></script>
+    <script src="/assets/js/auth-config.js"></script>
+    <script src="/assets/js/auth-guard.js"></script>
+
+    <script src="/ai-chat.js"></script>
+    <script src="/assets/js/homepage-hero.js"></script>
+
+    <script src="assets/js/script.js"></script>
+
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(reg => console.log('Service Worker registered successfully'))
+                .catch(err => console.error('Service Worker registration failed:', err));
+        }
+    </script>
 
 </body>
 
 
 </html>
-

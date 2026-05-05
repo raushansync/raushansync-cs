@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3b82f6" id="theme-color-meta">
+
+    <title>Class 6 Mathematics with Curiosity | RaushanSYNC Maths</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <!-- Theme handling -->
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+
+    <!-- SEO / Social -->
+    <link rel="canonical" href="https://maths.raushansync.com/class06/">
+
+    <meta name="description"
+        content="Class 6 Mathematics based on NCERT syllabus, designed for deep understanding and competitive readiness — covering numbers, integers, fractions, geometry, and reasoning for school exams, Olympiads, and future foundations.">
+
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:site_name" content="RaushanSYNC Maths">
+    <meta property="og:title"
+        content="Class 6 Mathematics (NCERT) | Boards, Olympiads & Conceptual Learning — RaushanSYNC Maths">
+    <meta property="og:description"
+        content="Learn Class 6 Mathematics as per NCERT with strong conceptual clarity — ideal for school exams, competitive readiness, and building foundations for conceptual understanding.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://maths.raushansync.com/class06/">
+
+    <meta property="og:image" content="https://maths.raushansync.com/assets/og/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Class 6 Mathematics (NCERT) | competitive readiness — RaushanSYNC Maths">
+    <meta name="twitter:description"
+        content="NCERT-based Class 6 Maths explained from first principles — build confidence for boards, Olympiads, and future competitive exams.">
+
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Class 6 Mathematics from First Principles | RaushanSYNC Maths",
+  "description": "Class 6 Mathematics concepts explained from first principles. Fully NCERT-aligned with emphasis on clarity, reasoning, and deep conceptual understanding.",
+  "url": "https://maths.raushansync.com/class06/",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "RaushanSYNC Maths",
+    "url": "https://maths.raushansync.com/"
+  },
+  "about": {
+    "@type": "EducationalOrganization",
+    "name": "RaushanSYNC Maths"
+  }
+}
+</script>
+
+</head>
+
+
+<body>
+
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo">RaushanSYNC Maths</a>
+            <div id="nav"></div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode">
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                    </svg>
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="content-section">
+            <div class="container">
+                <h1>Class 6 Mathematics — From First Principles</h1>
+                <!-- practice css used -->
+                <p class="palette important">
+                    This course is designed to go beyond rote learning. It fully covers the NCERT syllabus
+                    while strengthening core mathematical thinking through reasoning, patterns, and
+                    real-world intuition. The depth and structure are sufficient not only for school
+                    examinations but also to build a strong foundation for higher-level problem solving.
+                </p>
+
+                <div class="card-grid">
+
+                    <div class="card">
+                        <h3>Chapter 1: Patterns in Mathematics</h3>
+                        <p>
+                            Build number sense and early algebra through counting, place value,
+                            estimation, number patterns, variables, and real-life contexts.
+                        </p>
+                        <a class="btn disabled" aria-disabled="true" tabindex="-1">Coming Soon</a>
+                        <div class="btn-row">
+                            <a href="/notes/class06/01-patterns-in-mathematics/" class="btn">Notes</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice (Advanced)</a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Chapter 2: Lines and Angles</h3>
+                        <p>
+                            Learn the language of geometry — points, lines, rays, curves, regions,
+                            and angles, including measuring and comparing angles.
+                        </p>
+                        <a class="btn disabled" aria-disabled="true" tabindex="-1">Coming Soon</a>
+                        <div class="btn-row">
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Notes</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice (Advanced)</a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Chapter 3: Number Play</h3>
+                        <p>
+                            Experiment with numbers using factors, multiples, divisibility rules,
+                            and logical exploration of number properties.
+                        </p>
+                        <a class="btn disabled" aria-disabled="true" tabindex="-1">Coming Soon</a>
+                        <div class="btn-row">
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Notes</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice (Advanced)</a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Chapter 4: Data Handling and Presentation</h3>
+                        <p>
+                            Collect, organise, represent, and interpret data using tables,
+                            pictographs, bar graphs, and simple analysis.
+                        </p>
+                        <a class="btn disabled" aria-disabled="true" tabindex="-1">Coming Soon</a>
+                        <div class="btn-row">
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Notes</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice (Advanced)</a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Chapter 5: Prime Time</h3>
+                        <p>
+                            Understand prime, composite, and co-prime numbers, prime factorisation,
+                            and meaningful ideas of HCF and LCM.
+                        </p>
+                        <a class="btn disabled" aria-disabled="true" tabindex="-1">Coming Soon</a>
+                        <div class="btn-row">
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Notes</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice (Advanced)</a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Chapter 6: Perimeter and Area</h3>
+                        <p>
+                            Measure and compare shapes using perimeter and area,
+                            with an intuitive introduction to ratio through measurement.
+                        </p>
+                        <a class="btn disabled" aria-disabled="true" tabindex="-1">Coming Soon</a>
+                        <div class="btn-row">
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Notes</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice (Advanced)</a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Chapter 7: Fractions and Decimals</h3>
+                        <p>
+                            Extend number understanding using fractions and decimals,
+                            including equivalence, comparison, operations, and money applications.
+                        </p>
+                        <a class="btn disabled" aria-disabled="true" tabindex="-1">Coming Soon</a>
+                        <div class="btn-row">
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Notes</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice (Advanced)</a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Chapter 8: Playing with Constructions</h3>
+                        <p>
+                            Develop practical geometric skills by constructing line segments,
+                            angles, perpendicular bisectors, and angle bisectors.
+                        </p>
+                        <a class="btn disabled" aria-disabled="true" tabindex="-1">Coming Soon</a>
+                        <div class="btn-row">
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Notes</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice (Advanced)</a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Chapter 9: Symmetry</h3>
+                        <p>
+                            Explore symmetry through reflections, lines of symmetry,
+                            and visually balanced figures.
+                        </p>
+                        <a class="btn disabled" aria-disabled="true" tabindex="-1">Coming Soon</a>
+                        <div class="btn-row">
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Notes</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice (Advanced)</a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>Chapter 10: The Other Side of Zero</h3>
+                        <p>
+                            Understand integers using number lines, ordering, operations,
+                            and complete the structure of number systems, algebra, and ratio.
+                        </p>
+                        <a class="btn disabled" aria-disabled="true" tabindex="-1">Coming Soon</a>
+                        <div class="btn-row">
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Notes</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice</a>
+                            <a class="btn disabled" aria-disabled="true" tabindex="-1">Practice (Advanced)</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+    </main>
+    <div id="support-cta"></div>
+    <div id="footer"></div>
+
+    <!-- Supabase & Auth -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4"></script>
+    <script src="/assets/js/auth-config.js"></script>
+    <script src="/assets/js/auth-guard.js"></script>
+    <script src="/assets/js/script.js"></script>
+</body>
+
+</html>
+
+

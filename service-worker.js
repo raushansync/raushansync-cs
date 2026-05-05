@@ -1,67 +1,61 @@
-/* RaushanSYNC Computer Science & Data Science PWA Service Worker */
-
-const APP_VERSION = '2026.04.15.2';
-const CACHE_VERSION = 'csds-v' + APP_VERSION;
+/* RaushanSYNC Learning Platform PWA Service Worker */
+const CACHE_VERSION = 'app-v1.1.2.1';  // Generic version for cross-site use
 const CORE_CACHE = 'rs-core-' + CACHE_VERSION;
 const RUNTIME_CACHE = 'rs-runtime-' + CACHE_VERSION;
-
-const OFFLINE_URL = '/offline.html';
+const OFFLINE_URL = '/offline/';
 const MAX_RUNTIME_ENTRIES = 60;
 
-/* ---------- Core assets (stable + intentional) ---------- */
+const SENSITIVE_DOCUMENT_PATHS = new Set([
+  '/login',
+  '/signup',
+  '/dashboard',
+  '/password-reset',
+  '/reset-confirmation'
+]);
+
+function normalizePathname(pathname) {
+  if (typeof pathname !== 'string' || !pathname.startsWith('/')) {
+    return '/';
+  }
+
+  if (pathname.length > 1 && pathname.endsWith('/')) {
+    return pathname.slice(0, -1);
+  }
+
+  return pathname;
+}
+
+function matchesPathPrefix(pathname, prefix) {
+  return pathname === prefix || pathname.startsWith(prefix + '/');
+}
+
 const CORE_ASSETS = [
   '/',
   '/index.html',
   OFFLINE_URL,
   '/manifest.json',
-
   '/assets/css/style.css',
   '/assets/js/script.js',
-
+  '/assets/js/homepage-hero.js',
+  '/ai-chat.js',
   '/components/nav.html',
   '/components/footer.html',
   '/components/support-cta.html',
-
   '/favicon.ico',
+  '/favicon-48x48.png',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
-
   '/about/',
-  '/about/index.html',
-
-  '/computer-science/',
-  '/computer-science/index.html',
-
-  '/computer-science/html/',
-  '/computer-science/html/index.html',
-  '/computer-science/html/practice-questions/',
-  '/computer-science/html/practice-questions/index.html',
-  '/computer-science/html/01-how-the-web-and-html-works/',
-  '/computer-science/html/01-how-the-web-and-html-works/index.html',
-  '/computer-science/html/01-how-the-web-and-html-works/quiz.html',
-
-  '/computer-science/python/',
-  '/computer-science/sql/',
-  '/computer-science/sql/index.html',
-  '/computer-science/sql/01-postgresql-foundations/',
-  '/computer-science/sql/02-your-first-queries/',
-  '/computer-science/sql/03-filtering-and-conditions/',
-  '/computer-science/sql/04-intermediate-sql/',
-  '/computer-science/sql/04-intermediate-sql/index.html',
-  '/computer-science/sql/04-intermediate-sql/03-intermediate-sql.html',
-  '/computer-science/sql/04-intermediate-sql/03-lab-intermediate-sql.html',
-
-  '/computer-science/python/01-programming-foundations/',
-  '/data-science/',
-  '/data-science/index.html',
-
+  '/class06/',
+  '/class07/',
+  '/class08/',
+  '/class09/',
+  '/class10/',
   '/class11/',
-  '/class11/index.html',
   '/class12/',
-  '/class12/index.html'
+  '/future-content/'
 ];
 
-/* ---------- Install ---------- */
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CORE_CACHE);
@@ -70,7 +64,6 @@ self.addEventListener('install', (event) => {
   })());
 });
 
-/* ---------- Activate ---------- */
 self.addEventListener('activate', (event) => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
@@ -83,27 +76,31 @@ self.addEventListener('activate', (event) => {
   })());
 });
 
-self.addEventListener('message', (event) => {
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-});
+function isProtectedRoute(pathname) {
+  return matchesPathPrefix(pathname, '/practice') || matchesPathPrefix(pathname, '/practice-advanced');
+}
 
-/* ---------- Path classifiers ---------- */
+function isSensitiveDocumentPath(pathname) {
+  const normalizedPath = normalizePathname(pathname);
+  return SENSITIVE_DOCUMENT_PATHS.has(normalizedPath) || isProtectedRoute(normalizedPath);
+}
+
 function isNotesOrPractice(pathname) {
-  return pathname.startsWith('/notes/')
-    || pathname.startsWith('/questions/')
-    || pathname.startsWith('/projects/');
+  return matchesPathPrefix(pathname, '/notes')
+    || matchesPathPrefix(pathname, '/practice')
+    || matchesPathPrefix(pathname, '/practice-advanced')
+    || matchesPathPrefix(pathname, '/practice-solution')
+    || matchesPathPrefix(pathname, '/video-lessons');
 }
 
 function isComponent(pathname) {
-  return pathname.startsWith('/components/');
+  return matchesPathPrefix(pathname, '/components');
 }
 
 function isStaticAsset(request, pathname) {
   if (pathname.startsWith('/assets/')) return true;
   if (request.destination) {
-    return ['style', 'script', 'image', 'font', 'audio', 'video'].includes(request.destination);
+    return ['style', 'script', 'image', 'font'].includes(request.destination);
   }
   return false;
 }
@@ -112,7 +109,6 @@ function shouldCacheResponse(response) {
   return response && response.status === 200 && response.type === 'basic';
 }
 
-/* ---------- Cache size control ---------- */
 async function trimCache(cacheName, maxEntries) {
   const cache = await caches.open(cacheName);
   const keys = await cache.keys();
@@ -123,13 +119,8 @@ async function trimCache(cacheName, maxEntries) {
   }
 }
 
-async function matchCachedRequest(request) {
-  return caches.match(request);
-}
-
-/* ---------- Strategies ---------- */
 async function cacheFirst(request) {
-  const cached = await matchCachedRequest(request);
+  const cached = await caches.match(request);
   if (cached) return cached;
 
   try {
@@ -159,7 +150,7 @@ async function networkFirst(request) {
     }
     return response;
   } catch (error) {
-    const cached = await matchCachedRequest(request);
+    const cached = await caches.match(request);
     if (cached) return cached;
 
     if (request.destination === 'document') {
@@ -170,7 +161,22 @@ async function networkFirst(request) {
   }
 }
 
-/* ---------- Fetch routing ---------- */
+async function networkOnlyDocument(request) {
+  try {
+    return await fetch(request, { cache: 'no-store' });
+  } catch (error) {
+    // Try to serve offline page first
+    const offline = await caches.match(OFFLINE_URL);
+    if (offline) {
+      return offline;
+    }
+    
+    // Log error with context for debugging
+    console.error(`Service Worker: Failed to fetch document at ${request.url}`, error);
+    throw error;
+  }
+}
+
 self.addEventListener('fetch', (event) => {
   const { request } = event;
 
@@ -179,22 +185,24 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
 
-  const pathname = url.pathname;
-  if (pathname === '/service-worker.js') return;
+  const pathname = normalizePathname(url.pathname);
 
-  if (
-    isStaticAsset(request, pathname) ||
-    isComponent(pathname) ||
-    isNotesOrPractice(pathname)
-  ) {
-    event.respondWith(cacheFirst(request));
+  if (request.mode === 'navigate' || request.destination === 'document') {
+    if (isSensitiveDocumentPath(pathname)) {
+      event.respondWith(networkOnlyDocument(request));
+      return;
+    }
+
+    event.respondWith(networkFirst(request));
     return;
   }
 
-  if (request.mode === 'navigate' || request.destination === 'document') {
-    event.respondWith(networkFirst(request));
+  if (isStaticAsset(request, pathname) || isComponent(pathname) || isNotesOrPractice(pathname)) {
+    event.respondWith(cacheFirst(request));
     return;
   }
 
   event.respondWith(cacheFirst(request));
 });
+
+// needed to add offline urls after refactor. add screenshots in manifest.json.
