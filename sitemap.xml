@@ -26,6 +26,24 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://cs.raushansync.com/computer-science/dbms/</loc>
+    <lastmod>2026-05-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/dbms/01-introduction-dbms/</loc>
+    <lastmod>2026-05-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://cs.raushansync.com/computer-science/dbms/01-practice/</loc>
+    <lastmod>2026-05-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://cs.raushansync.com/computer-science/html/</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -41,7 +59,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://cs.raushansync.com/computer-science/html/practice-questions/</loc>
+    <loc>https://cs.raushansync.com/computer-science/html/01-practice/</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -157,4 +175,3 @@
     <priority>0.6</priority>
   </url>
 </urlset>
-<!--  Needed to be updated compltetly after refactor -->

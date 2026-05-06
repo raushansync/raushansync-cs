@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3b82f6" id="theme-color-meta">
+
+    <title>Introduction to DBMS — First Principles | RaushanSYNC CS & DS</title>
+
+    <meta name="description"
+        content="Understand why Database Management Systems exist, what problems they solve, how they evolved from file systems, and the foundational mental model every CS student needs.">
+
+    <meta name="keywords"
+        content="introduction to DBMS, why database management systems, file system vs DBMS, data redundancy, concurrency anomalies, atomicity, DBMS course, RaushanSYNC, database fundamentals">
+
+    <meta name="author" content="Raushan Kumar">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+
+    <link rel="canonical" href="https://cs.raushansync.com/computer-science/dbms/01-introduction-dbms/">
+
+    <!-- Open Graph -->
+    <meta property="og:site_name" content="RaushanSYNC CS & DS">
+    <meta property="og:title" content="Introduction to DBMS — RaushanSYNC CS & DS">
+    <meta property="og:description"
+        content="Why do DBMSs exist? What broke in file systems? Deep conceptual notes on the motivation, evolution, and foundations of Database Management Systems.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://cs.raushansync.com/computer-science/dbms/01-introduction-dbms/">
+    <meta property="og:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@raushansync">
+    <meta name="twitter:title" content="Introduction to DBMS — RaushanSYNC CS & DS">
+    <meta name="twitter:description"
+        content="Why do DBMSs exist? Deep conceptual notes on the motivation, evolution, and foundations of Database Management Systems.">
+    <meta name="twitter:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Article",
+                "headline": "Introduction to DBMS — First Principles",
+                "description": "Understand why Database Management Systems exist, what problems they solve, how they evolved from file systems, and the foundational mental model every CS student needs.",
+                "url": "https://cs.raushansync.com/computer-science/dbms/01-introduction-dbms/",
+                "author": { "@type": "Person", "name": "Raushan Kumar" },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "RaushanSYNC CS & DS",
+                    "url": "https://cs.raushansync.com/"
+                }
+            },
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Home",             "item": "https://cs.raushansync.com/" },
+                    { "@type": "ListItem", "position": 2, "name": "Computer Science", "item": "https://cs.raushansync.com/computer-science/" },
+                    { "@type": "ListItem", "position": 3, "name": "DBMS",             "item": "https://cs.raushansync.com/computer-science/dbms/" },
+                    { "@type": "ListItem", "position": 4, "name": "1. Introduction to DBMS", "item": "https://cs.raushansync.com/computer-science/dbms/01-introduction-dbms/" }
+                ]
+            }
+        ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <style>
+        /* ── Page-local styles - DBMS section components ── */
+
+        .lesson-progress {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
+            margin: 0 0 1.6rem;
+            padding: 0.55rem 0.8rem;
+            color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.07);
+            border: 1px solid rgba(59, 130, 246, 0.16);
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .lesson-badge {
+            display: inline-grid;
+            place-items: center;
+            flex: 0 0 auto;
+            width: 1.9rem;
+            height: 1.9rem;
+            color: #fff;
+            background: var(--primary-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 18px rgba(59, 130, 246, 0.2);
+        }
+
+        .lesson-title-small {
+            min-width: 0;
+            font-size: 0.92rem;
+            line-height: 1.25;
+        }
+
+        .notes-container p code,
+        .notes-container li code,
+        .notes-container td code {
+            padding: 0.12rem 0.35rem;
+            color: var(--primary-color-dark);
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.14);
+            border-radius: 6px;
+            font-family: Consolas, "SFMono-Regular", "Liberation Mono", monospace;
+            font-size: 0.92em;
+            white-space: nowrap;
+        }
+
+        .notes-table {
+            display: block;
+            max-width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ── Application domain grid ── */
+        .domain-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0 2rem;
+        }
+
+        .domain-card {
+            padding: 1.1rem 1.15rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .domain-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.28);
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+        }
+
+        .domain-card.finance  { border-top: 4px solid #22c55e; }
+        .domain-card.travel   { border-top: 4px solid #3b82f6; }
+        .domain-card.edu      { border-top: 4px solid #f97316; }
+        .domain-card.ecomm    { border-top: 4px solid #8b5cf6; }
+        .domain-card.social   { border-top: 4px solid #ec4899; }
+
+        .domain-icon {
+            margin-bottom: 0.45rem;
+            font-size: 1.65rem;
+            line-height: 1;
+        }
+
+        .domain-label {
+            display: inline-flex;
+            margin-bottom: 0.55rem;
+            padding: 0.22rem 0.5rem;
+            color: #fff;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 700;
+        }
+
+        .domain-card.finance .domain-label  { background: #22c55e; }
+        .domain-card.travel  .domain-label  { background: #3b82f6; }
+        .domain-card.edu     .domain-label  { background: #f97316; }
+        .domain-card.ecomm   .domain-label  { background: #8b5cf6; }
+        .domain-card.social  .domain-label  { color: #1e1b4b; background: #ec4899; }
+
+        .domain-card h3 {
+            margin-bottom: 0.35rem;
+            font-size: 1rem;
+        }
+
+        .domain-card ul {
+            margin: 0;
+            padding-left: 1.1rem;
+            color: var(--secondary-text-color);
+            font-size: 0.87rem;
+            line-height: 1.65;
+        }
+
+        /* ── File-system limitation pipeline ── */
+        .limitation-pipeline {
+            counter-reset: limitation;
+            display: grid;
+            gap: 0.75rem;
+            margin: 1.5rem 0 1.8rem;
+        }
+
+        .limitation-step {
+            --limit-accent: #ef4444;
+            --limit-accent-soft: rgba(239, 68, 68, 0.14);
+            counter-increment: limitation;
+            position: relative;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.85rem;
+            align-items: flex-start;
+            padding: 1rem 1.1rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--limit-accent);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .limitation-step:nth-child(2) {
+            --limit-accent: #f97316;
+            --limit-accent-soft: rgba(249, 115, 22, 0.14);
+        }
+
+        .limitation-step:nth-child(3) {
+            --limit-accent: #eab308;
+            --limit-accent-soft: rgba(234, 179, 8, 0.16);
+        }
+
+        .limitation-step:nth-child(4) {
+            --limit-accent: #14b8a6;
+            --limit-accent-soft: rgba(20, 184, 166, 0.14);
+        }
+
+        .limitation-step:nth-child(5) {
+            --limit-accent: #3b82f6;
+            --limit-accent-soft: rgba(59, 130, 246, 0.14);
+        }
+
+        .limitation-step:nth-child(6) {
+            --limit-accent: #8b5cf6;
+            --limit-accent-soft: rgba(139, 92, 246, 0.14);
+        }
+
+        .limitation-step:nth-child(7) {
+            --limit-accent: #ec4899;
+            --limit-accent-soft: rgba(236, 72, 153, 0.14);
+        }
+
+        .limitation-step::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 4.5rem;
+            background: linear-gradient(90deg, var(--limit-accent-soft), transparent);
+            pointer-events: none;
+        }
+
+        .limitation-step:hover {
+            transform: translateY(-2px);
+            border-color: color-mix(in srgb, var(--limit-accent) 36%, var(--border-color));
+            box-shadow: 0 16px 32px rgba(15, 23, 42, 0.14);
+        }
+
+        .limitation-icon {
+            position: relative;
+            display: inline-grid;
+            place-items: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            color: #fff;
+            background:
+                radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.42), transparent 30%),
+                linear-gradient(135deg, var(--limit-accent), color-mix(in srgb, var(--limit-accent) 68%, #111827));
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 10px;
+            box-shadow:
+                0 10px 22px var(--limit-accent-soft),
+                inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+            flex-shrink: 0;
+            font-size: 0;
+            isolation: isolate;
+            transform: rotate(-4deg);
+        }
+
+        .limitation-icon::before {
+            content: counter(limitation, decimal-leading-zero);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            line-height: 1;
+            transform: rotate(4deg);
+        }
+
+        .limitation-icon::after {
+            content: "";
+            position: absolute;
+            width: 0.36rem;
+            height: 0.36rem;
+            right: 0.28rem;
+            bottom: 0.28rem;
+            background: rgba(255, 255, 255, 0.78);
+            border-radius: 999px;
+            transform: rotate(4deg);
+        }
+
+        .limitation-content > strong {
+            display: block;
+            margin-bottom: 0.25rem;
+            color: var(--text-color);
+        }
+
+        .limitation-content p {
+            margin: 0;
+            color: var(--secondary-text-color);
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        /* ── DBMS solution feature grid ── */
+        .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.9rem;
+            margin: 1.25rem 0 2rem;
+        }
+
+        .solution-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.65rem;
+            padding: 0.85rem 0.9rem;
+            background: var(--card-background);
+            border: 1px solid rgba(34, 197, 94, 0.22);
+            border-left: 4px solid #22c55e;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .solution-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+        }
+
+        .solution-tick {
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+            color: #22c55e;
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        /* ── Prerequisite cards ── */
+        .prereq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0 2rem;
+        }
+
+        .prereq-card {
+            padding: 1.1rem 1.15rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .prereq-card.sets   { border-top: 4px solid #6366f1; }
+        .prereq-card.logic  { border-top: 4px solid #f59e0b; }
+        .prereq-card.ds     { border-top: 4px solid #06b6d4; }
+        .prereq-card.prog   { border-top: 4px solid #22c55e; }
+        .prereq-card.desirable { border-top: 4px solid #94a3b8; }
+
+        .prereq-card .prereq-icon { font-size: 1.6rem; margin-bottom: 0.4rem; }
+
+        .prereq-badge {
+            display: inline-flex;
+            margin-bottom: 0.55rem;
+            padding: 0.22rem 0.5rem;
+            color: #fff;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 700;
+        }
+
+        .prereq-card.sets .prereq-badge     { background: #6366f1; }
+        .prereq-card.logic .prereq-badge    { background: #f59e0b; color: #1c1917; }
+        .prereq-card.ds .prereq-badge       { background: #06b6d4; color: #082f49; }
+        .prereq-card.prog .prereq-badge     { background: #22c55e; color: #052e16; }
+        .prereq-card.desirable .prereq-badge{ background: #94a3b8; color: #1e293b; }
+
+        .prereq-card h3 { margin-bottom: 0.35rem; font-size: 1rem; }
+
+        .prereq-card ul {
+            margin: 0;
+            padding-left: 1.1rem;
+            color: var(--secondary-text-color);
+            font-size: 0.87rem;
+            line-height: 1.65;
+        }
+
+        /* ── Timeline ── */
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin: 1.25rem 0 2rem;
+        }
+
+        .timeline-phase {
+            padding: 1.1rem 1.15rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .timeline-phase.phase1 { border-top: 4px solid #3b82f6; }
+        .timeline-phase.phase2 { border-top: 4px solid #8b5cf6; }
+
+        .phase-tag {
+            display: inline-flex;
+            margin-bottom: 0.6rem;
+            padding: 0.22rem 0.55rem;
+            color: #fff;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
+        .timeline-phase.phase1 .phase-tag { background: #3b82f6; }
+        .timeline-phase.phase2 .phase-tag { background: #8b5cf6; }
+
+        .timeline-phase h3 { margin-bottom: 0.35rem; font-size: 1rem; }
+
+        .timeline-phase ul {
+            margin: 0;
+            padding-left: 1.1rem;
+            color: var(--secondary-text-color);
+            font-size: 0.87rem;
+            line-height: 1.65;
+        }
+
+        /* ── Misconception card (same as HTML page) ── */
+        .misconception-card {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.8rem;
+            align-items: flex-start;
+            margin: 0.9rem 0;
+            padding: 1rem;
+            background: var(--card-background);
+            border: 1px solid rgba(239, 68, 68, 0.18);
+            border-left: 4px solid #ef4444;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .misconception-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+        }
+
+        .misconception-icon {
+            display: inline-grid;
+            place-items: center;
+            width: 2rem;
+            height: 2rem;
+            color: #991b1b;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .misconception-body strong {
+            display: block;
+            margin-bottom: 0.35rem;
+            color: var(--text-color);
+        }
+
+        .misconception-body p { margin-bottom: 0.6rem; }
+
+        .misconception-correct {
+            color: #15803d;
+            font-weight: 700;
+        }
+
+        /* ── Checkpoint card ── */
+        .checkpoint-card {
+            display: grid;
+            gap: 0.7rem;
+            margin: 1.4rem 0 2rem;
+            padding: 1rem;
+            background: linear-gradient(180deg, rgba(99, 102, 241, 0.06), rgba(99, 102, 241, 0.01)), var(--card-background);
+            border: 1px solid rgba(99, 102, 241, 0.18);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .checkpoint-item {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.75rem;
+            align-items: flex-start;
+            padding: 0.8rem 0.9rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+        }
+
+        .checkpoint-num {
+            display: inline-grid;
+            place-items: center;
+            width: 1.6rem;
+            height: 1.6rem;
+            color: #fff;
+            background: #6366f1;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .checkpoint-item p {
+            margin: 0;
+            color: var(--secondary-text-color);
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        /* ── Mental model hierarchy ── */
+        .pg-hierarchy {
+            display: grid;
+            gap: 0.45rem;
+            margin: 1.5rem 0 2rem;
+            padding: 1rem;
+            background: linear-gradient(180deg, rgba(59, 130, 246, 0.05), rgba(59, 130, 246, 0.01)), var(--card-background);
+            border: 1px solid rgba(59, 130, 246, 0.14);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .pg-hier-level {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.75rem;
+            align-items: center;
+            padding: 0.75rem 0.9rem;
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            transition: transform 0.18s ease, border-color 0.18s ease;
+        }
+
+        .pg-hier-level:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.28);
+        }
+
+        .pg-hier-icon {
+            display: inline-grid;
+            place-items: center;
+            width: 2rem;
+            height: 2rem;
+            background: rgba(59, 130, 246, 0.08);
+            border-radius: 8px;
+        }
+
+        .pg-hier-content strong,
+        .pg-hier-desc { display: block; }
+
+        .pg-hier-desc {
+            color: var(--secondary-text-color);
+            font-size: 0.84rem;
+            line-height: 1.4;
+        }
+
+        .pg-hier-connector {
+            width: 2px;
+            height: 14px;
+            margin-left: 1.65rem;
+            background: var(--border-color);
+            border-radius: 999px;
+        }
+
+        .hier-problem  { border-left: 4px solid #ef4444; }
+        .hier-cause    { border-left: 4px solid #f97316; }
+        .hier-solution { border-left: 4px solid #22c55e; }
+        .hier-outcome  { border-left: 4px solid #3b82f6; }
+
+        /* ── Checklist ── */
+        .checklist-card {
+            display: grid;
+            gap: 0.7rem;
+            margin: 1.4rem 0 2rem;
+            padding: 1rem;
+            background: linear-gradient(180deg, rgba(34, 197, 94, 0.06), rgba(34, 197, 94, 0.01)), var(--card-background);
+            border: 1px solid rgba(34, 197, 94, 0.18);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .checklist-item {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.75rem;
+            align-items: flex-start;
+            padding: 0.8rem 0.9rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .checklist-check {
+            width: 1.05rem;
+            height: 1.05rem;
+            margin-top: 0.18rem;
+            accent-color: #22c55e;
+            cursor: pointer;
+        }
+
+        .checklist-item:has(.checklist-check:checked) {
+            color: #15803d;
+            background: rgba(34, 197, 94, 0.08);
+            border-color: rgba(34, 197, 94, 0.24);
+        }
+
+        /* ── Dark mode overrides ── */
+        .dark-mode .lesson-progress,
+        .dark-mode .notes-container p code,
+        .dark-mode .notes-container li code,
+        .dark-mode .notes-container td code {
+            background: rgba(96, 165, 250, 0.12);
+            border-color: rgba(96, 165, 250, 0.22);
+        }
+
+        .dark-mode .notes-container p code,
+        .dark-mode .notes-container li code,
+        .dark-mode .notes-container td code {
+            color: #93c5fd;
+        }
+
+        .dark-mode .misconception-icon {
+            color: #fecaca;
+            background: rgba(248, 113, 113, 0.14);
+        }
+
+        .dark-mode .misconception-correct,
+        .dark-mode .checklist-item:has(.checklist-check:checked) {
+            color: #86efac;
+        }
+
+        .dark-mode .checklist-card {
+            background: linear-gradient(180deg, rgba(34, 197, 94, 0.08), rgba(34, 197, 94, 0.02)), var(--card-background);
+        }
+
+        .dark-mode .pg-hierarchy {
+            background: linear-gradient(180deg, rgba(96, 165, 250, 0.08), rgba(96, 165, 250, 0.02)), var(--card-background);
+        }
+
+        .dark-mode .pg-hier-level {
+            background: rgba(15, 23, 42, 0.55);
+        }
+
+        .dark-mode .checkpoint-card {
+            background: linear-gradient(180deg, rgba(99, 102, 241, 0.1), rgba(99, 102, 241, 0.02)), var(--card-background);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 700px) {
+            .notes-page { padding-top: calc(var(--header-height) + 20px); }
+
+            .notes-header { margin-bottom: 2rem; }
+
+            .notes-header h1 {
+                font-size: clamp(1.45rem, 7vw, 1.85rem);
+                line-height: 1.18;
+            }
+
+            .notes-header-actions {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .lesson-progress {
+                width: 100%;
+                justify-content: flex-start;
+                margin-bottom: 1.25rem;
+            }
+
+            .domain-grid,
+            .prereq-grid,
+            .solution-grid,
+            .timeline-grid { gap: 0.85rem; }
+
+            .limitation-step,
+            .misconception-card,
+            .checklist-item,
+            .checkpoint-item {
+                grid-template-columns: auto minmax(0, 1fr);
+            }
+        }
+
+        @media (max-width: 420px) {
+            .notes-container p code,
+            .notes-container li code,
+            .notes-container td code {
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
+
+            .limitation-step,
+            .misconception-card,
+            .checklist-item,
+            .checkpoint-item {
+                padding: 0.85rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .domain-card,
+            .limitation-step,
+            .solution-item,
+            .misconception-card,
+            .pg-hier-level {
+                transition: none;
+            }
+
+            .domain-card:hover,
+            .limitation-step:hover,
+            .solution-item:hover,
+            .misconception-card:hover,
+            .pg-hier-level:hover {
+                transform: none;
+            }
+        }
+    </style>
+
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo">RaushanSYNC CS &amp; DS</a>
+            <div id="nav"></div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode">
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                    </svg>
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="notes-page practice-page">
+        <div class="notes-container">
+
+            <header class="notes-header">
+                <div class="notes-header-left">
+                    <h1>Part 1: Introduction to Database Management Systems</h1>
+                    <p>DBMS from First Principles · Why They Exist</p>
+                </div>
+                <div class="notes-header-actions">
+                    <span class="page-header-tick-label">Mark completed</span>
+                    <div id="note-tick" data-tick-container data-tick-position="header" data-tick-type="article"></div>
+                </div>
+            </header>
+
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <ol>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/computer-science/">Computer Science</a></li>
+                    <li><a href="/computer-science/dbms/">DBMS</a></li>
+                    <li aria-current="page">Part 1: Introduction to DBMS</li>
+                </ol>
+            </nav>
+
+            <!-- Progress badge -->
+            <div class="lesson-progress">
+                <span class="lesson-badge">1</span>
+                <span class="lesson-title-small">Introduction to DBMS — Why They Exist</span>
+            </div>
+
+            <div class="notes-box summary">
+                <p>
+                    Before writing a single SQL query, understand the problem that databases
+                    were built to solve. Every design decision in a DBMS traces back to a failure
+                    mode of what came before it — the file system. This section builds the
+                    foundational "why" that makes everything else make sense.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 1 — Big Picture Overview
+                 ═══════════════════════════════════════════ -->
+            <h2 id="big-picture">1. Big Picture Overview</h2>
+
+            <p>
+                This section answers a deceptively simple question: <em>why does a
+                Database Management System need to exist at all?</em> The answer requires
+                understanding what was there before it — the file system — and the specific
+                ways that approach collapsed under the weight of real-world data demands.
+            </p>
+
+            <p>
+                The progression of thinking in this section moves through three stages.
+                First, you are shown <em>where</em> data systems matter — the scale and
+                diversity of modern applications that depend on them. Second, you trace
+                the <em>history</em>: how flat file storage worked, why it was initially
+                good enough, and then why it wasn't. Third, you understand the
+                <em>specific engineering answers</em> a DBMS provides for each failure
+                mode that file systems could not handle.
+            </p>
+
+            <p>
+                Alongside the conceptual story, the section also introduces the course's
+                prerequisites and structure — giving you a map of the journey ahead and
+                the intellectual tools you'll need to take it.
+            </p>
+
+            <div class="notes-box example">
+                <h3>The Right Mental Entry Point</h3>
+                <p>
+                    Do not think of a DBMS as "a place to store tables." Think of it as
+                    a <strong>contract</strong>: the system promises to keep your data
+                    consistent, accessible, safe from corruption, and available to
+                    multiple users simultaneously — all things that a raw file system
+                    cannot promise. Every feature of a DBMS exists to fulfil one clause
+                    of that contract.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 2 — What Is a DBMS?
+                 ═══════════════════════════════════════════ -->
+            <h2 id="what-is-dbms">2. What a DBMS Actually Is</h2>
+
+            <p>
+                A <strong>Database Management System (DBMS)</strong> is a software framework
+                designed to manage interconnected data — and the programs used to access,
+                manipulate, and maintain that data — efficiently.
+            </p>
+
+            <p>
+                Notice the two-part structure of that definition. The DBMS manages not only
+                the <em>data itself</em> but also the <em>programs and mechanisms</em>
+                through which the data is accessed. This is significant: the DBMS is an
+                intermediary layer that sits between your application code and the raw stored
+                data. You never touch the storage directly — you go through the DBMS.
+            </p>
+
+            <div class="notes-box careful">
+                <h3>Why the Intermediary Matters</h3>
+                <p>
+                    When an application talks to data through a DBMS layer, the DBMS can
+                    enforce rules, manage simultaneous access, and guarantee consistency
+                    on every single operation — transparently. The application just makes
+                    a request; the DBMS handles all the complexity. If the application
+                    talked directly to files, <em>every</em> application would have to
+                    implement all of that complexity itself, and differently each time.
+                </p>
+            </div>
+
+            <p>
+                DBMSs are not niche tools for large enterprises. They are indispensable
+                for any entity — from an individual user to a multinational corporation —
+                that requires efficient, secure, and reliable data handling. The scale of
+                application below makes this concrete.
+            </p>
+
+            <!-- Domain cards -->
+            <h3>Key Application Areas</h3>
+            <p>Database systems power virtually every aspect of modern digital infrastructure:</p>
+
+            <div class="domain-grid">
+
+                <div class="domain-card finance">
+                    <div class="domain-icon">🏦</div>
+                    <div class="domain-label">FINANCIAL SERVICES</div>
+                    <h3>Banking &amp; Finance</h3>
+                    <ul>
+                        <li>Net banking &amp; UPI transactions</li>
+                        <li>Fintech apps &amp; payment gateways</li>
+                        <li>Investment &amp; trading platforms</li>
+                        <li>Credit card processing systems</li>
+                    </ul>
+                </div>
+
+                <div class="domain-card travel">
+                    <div class="domain-icon">✈️</div>
+                    <div class="domain-label">TRAVEL &amp; TRANSPORT</div>
+                    <h3>Travel &amp; Transportation</h3>
+                    <ul>
+                        <li>Airline reservation systems</li>
+                        <li>Railway booking platforms (IRCTC)</li>
+                        <li>Hotel management systems</li>
+                        <li>Ride-sharing applications</li>
+                    </ul>
+                </div>
+
+                <div class="domain-card edu">
+                    <div class="domain-icon">🎓</div>
+                    <div class="domain-label">EDUCATION</div>
+                    <h3>Education Systems</h3>
+                    <ul>
+                        <li>University ERP systems</li>
+                        <li>Student admissions &amp; registration</li>
+                        <li>Grading &amp; academic records</li>
+                        <li>Learning management systems</li>
+                    </ul>
+                </div>
+
+                <div class="domain-card ecomm">
+                    <div class="domain-icon">🛒</div>
+                    <div class="domain-label">E-COMMERCE &amp; RETAIL</div>
+                    <h3>E-Commerce &amp; Retail</h3>
+                    <ul>
+                        <li>Online retail giants (Amazon, Flipkart)</li>
+                        <li>Inventory management systems</li>
+                        <li>Order processing &amp; fulfilment</li>
+                        <li>Customer relationship management</li>
+                    </ul>
+                </div>
+
+                <div class="domain-card social">
+                    <div class="domain-icon">💬</div>
+                    <div class="domain-label">COMMUNICATION &amp; SOCIAL</div>
+                    <h3>Communication &amp; Social Media</h3>
+                    <ul>
+                        <li>Email services (Gmail, Outlook)</li>
+                        <li>Social networks (Facebook, Twitter/X)</li>
+                        <li>Messaging apps (WhatsApp, Telegram)</li>
+                        <li>Content delivery networks</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <p>
+                All of these applications rely on massive, complex database systems to store,
+                retrieve, and process billions of data transactions daily. The sheer
+                diversity of domains — from millisecond financial trades to semester-long
+                student records — signals that DBMSs are not specialised tools. They are
+                foundational infrastructure.
+            </p>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 3 — File-System Era
+                 ═══════════════════════════════════════════ -->
+            <h2 id="file-systems">3. The Evolution from File Systems to DBMS</h2>
+
+            <h3>How Data Was Stored Before DBMS</h3>
+
+            <p>
+                Before database management systems, data was primarily stored in
+                <strong>flat files</strong> — CSV files, plain text files, or other simple
+                formats held within the operating system's hierarchical file structure.
+                An application that needed customer records kept a <code>customers.csv</code>.
+                An application that tracked orders kept an <code>orders.txt</code>.
+                Each application managed its own files using its own custom code.
+            </p>
+
+            <p>
+                This approach worked acceptably for simple applications with limited data.
+                The files were easy to understand, needed no special software, and gave
+                developers direct control. But as data volumes and complexity grew,
+                this model revealed a cascade of serious, interconnected failures.
+                Understanding each failure clearly is the key to understanding why
+                each feature of a DBMS exists.
+            </p>
+
+            <!-- Limitation pipeline -->
+            <h3 id="limitations">Critical Limitations of File Systems</h3>
+
+            <div class="limitation-pipeline" aria-label="File system limitations">
+
+                <div class="limitation-step">
+                    <div class="limitation-icon" aria-hidden="true">①</div>
+                    <div class="limitation-content">
+                        <strong>Data Redundancy and Inconsistency</strong>
+                        <p>
+                            File systems have no shared storage layer. Each application or
+                            department keeps its own copy of the data it needs. A customer's
+                            address might be stored in both the orders file and the shipping
+                            file. When the customer moves and one file is updated but not the
+                            other, the two files now disagree — this is <strong>data inconsistency</strong>.
+                            The same real-world fact is represented differently in different
+                            places. Any decision based on either file is now unreliable.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="limitation-step">
+                    <div class="limitation-icon" aria-hidden="true">②</div>
+                    <div class="limitation-content">
+                        <strong>Difficulty of Data Access</strong>
+                        <p>
+                            There is no standardised, user-friendly query language in a
+                            file-based system. Accessing data requires writing custom programs
+                            or manually parsing files. Every new data requirement — "show me
+                            all orders placed in the last 30 days" — forces developers to
+                            either modify an existing program or write a new one entirely.
+                            The system is rigid; adding a new kind of question about the data
+                            is a software development project in itself.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="limitation-step">
+                    <div class="limitation-icon" aria-hidden="true">③</div>
+                    <div class="limitation-content">
+                        <strong>Data Isolation</strong>
+                        <p>
+                            When data is scattered across various files in different formats,
+                            combining information from multiple sources becomes a complex
+                            programming task. To answer a single business question that spans
+                            customers, orders, and inventory, a developer must write code to
+                            read each file, parse each different format, and manually join the
+                            data together. This work is fragile — any format change in one
+                            file breaks all programs that combine it with others.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="limitation-step">
+                    <div class="limitation-icon" aria-hidden="true">④</div>
+                    <div class="limitation-content">
+                        <strong>Integrity Problems</strong>
+                        <p>
+                            Business rules — "account balance must be greater than zero",
+                            "student age must be between 16 and 100" — are data constraints
+                            that represent real-world facts. In file systems, these rules
+                            cannot be expressed at the storage level. They must be embedded
+                            inside each application's code. This means they can be written
+                            inconsistently across different programs, forgotten in some, or
+                            deliberately bypassed. There is no single enforcer — the data can
+                            become meaningless without the application noticing.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="limitation-step">
+                    <div class="limitation-icon" aria-hidden="true">⑤</div>
+                    <div class="limitation-content">
+                        <strong>Atomicity Issues</strong>
+                        <p>
+                            Many real-world operations require <strong>atomicity</strong> —
+                            they must execute completely or not at all. A bank transfer
+                            requires deducting from Account A and crediting Account B as a
+                            single, indivisible unit. If the system fails between these two
+                            steps, the result is money disappearing or being duplicated.
+                            File systems provide no built-in mechanism to guarantee that
+                            two related file changes either both complete or both roll back.
+                            Partial execution is entirely possible and entirely undetectable.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="limitation-step">
+                    <div class="limitation-icon" aria-hidden="true">⑥</div>
+                    <div class="limitation-content">
+                        <strong>Concurrency Anomalies</strong>
+                        <p>
+                            When multiple users access and modify data simultaneously, file
+                            systems cannot properly manage the conflict. Consider two customers
+                            simultaneously trying to book the last available train seat: both
+                            check the file, both see one seat available, and both write
+                            "booked" — resulting in overbooking. Without concurrency control
+                            mechanisms, operations that should be mutually exclusive are not,
+                            and data corruption is an inevitable outcome of concurrent use.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="limitation-step">
+                    <div class="limitation-icon" aria-hidden="true">⑦</div>
+                    <div class="limitation-content">
+                        <strong>Security Challenges</strong>
+                        <p>
+                            Implementing granular access control in file systems is extremely
+                            difficult. File-level permissions are too coarse-grained for
+                            enterprise requirements. Policies like "User A can view salary
+                            data but not modify it" or "Department B can only access their
+                            own records" cannot be expressed with operating-system-level file
+                            permissions alone. Every piece of sensitive data in every file
+                            becomes an exposure risk.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="notes-box careful">
+                <h3>Why These Failures Are Interconnected</h3>
+                <p>
+                    Notice that redundancy causes inconsistency; inconsistency makes
+                    integrity problems worse; isolated data makes atomicity harder to
+                    implement; and concurrent access without a shared layer makes
+                    all of these failures catastrophic simultaneously. The file system
+                    model does not just have one flaw — it has no architectural answer
+                    to any of these challenges because it was never designed to provide one.
+                    A DBMS is the architectural answer to all of them together.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 4 — DBMS Solution
+                 ═══════════════════════════════════════════ -->
+            <h2 id="dbms-solution">4. The DBMS Solution</h2>
+
+            <p>
+                Database Management Systems were developed specifically to address the
+                limitations above. Each feature of a DBMS corresponds directly to a
+                failure mode in file systems — and understanding this correspondence
+                is the most important conceptual move in this section.
+            </p>
+
+            <div class="solution-grid" aria-label="DBMS solution features">
+
+                <div class="solution-item">
+                    <span class="solution-tick">✓</span>
+                    <span><strong>Centralised data storage</strong> with minimal redundancy — one source of truth instead of scattered copies</span>
+                </div>
+
+                <div class="solution-item">
+                    <span class="solution-tick">✓</span>
+                    <span><strong>Powerful query languages</strong> (SQL) for easy, standardised data access — no custom programs needed for new questions</span>
+                </div>
+
+                <div class="solution-item">
+                    <span class="solution-tick">✓</span>
+                    <span><strong>Integrated data with consistent schemas</strong> — all applications share a unified view; formats are defined once</span>
+                </div>
+
+                <div class="solution-item">
+                    <span class="solution-tick">✓</span>
+                    <span><strong>Built-in integrity constraint enforcement</strong> — business rules live in the data layer, not scattered across applications</span>
+                </div>
+
+                <div class="solution-item">
+                    <span class="solution-tick">✓</span>
+                    <span><strong>Transaction management ensuring atomicity</strong> — operations either complete fully or roll back entirely, with no partial states</span>
+                </div>
+
+                <div class="solution-item">
+                    <span class="solution-tick">✓</span>
+                    <span><strong>Sophisticated concurrency control</strong> — multiple users can work simultaneously without corrupting shared data</span>
+                </div>
+
+                <div class="solution-item">
+                    <span class="solution-tick">✓</span>
+                    <span><strong>Fine-grained security and access control</strong> — row-level, column-level, and operation-level permissions for every user</span>
+                </div>
+
+            </div>
+
+            <p>
+                Each item in this list is not an add-on feature — it is the precise answer
+                to one of the seven file-system failures above. The architecture of a DBMS
+                is best understood as a systematic engineering response to a systematic
+                set of engineering failures.
+            </p>
+
+            <!-- Mental model diagram -->
+            <div class="pg-hierarchy" aria-label="DBMS reasoning chain">
+                <div class="pg-hier-level hier-problem">
+                    <span class="pg-hier-icon">⚠️</span>
+                    <div class="pg-hier-content">
+                        <strong>Real-World Problem</strong>
+                        <span class="pg-hier-desc">Data must be shared, consistent, and concurrent — flat files cannot guarantee any of these</span>
+                    </div>
+                </div>
+                <div class="pg-hier-connector" aria-hidden="true"></div>
+                <div class="pg-hier-level hier-cause">
+                    <span class="pg-hier-icon">📂</span>
+                    <div class="pg-hier-content">
+                        <strong>File System Root Cause</strong>
+                        <span class="pg-hier-desc">No shared storage layer → each app owns its files → no coordination, no contracts</span>
+                    </div>
+                </div>
+                <div class="pg-hier-connector" aria-hidden="true"></div>
+                <div class="pg-hier-level hier-solution">
+                    <span class="pg-hier-icon">🗄️</span>
+                    <div class="pg-hier-content">
+                        <strong>DBMS Architectural Answer</strong>
+                        <span class="pg-hier-desc">Centralised intermediary layer that enforces schemas, transactions, constraints, security, and concurrency</span>
+                    </div>
+                </div>
+                <div class="pg-hier-connector" aria-hidden="true"></div>
+                <div class="pg-hier-level hier-outcome">
+                    <span class="pg-hier-icon">✅</span>
+                    <div class="pg-hier-content">
+                        <strong>Guaranteed Outcome</strong>
+                        <span class="pg-hier-desc">Data is consistent, accessible via SQL, integrity-constrained, atomic, concurrent-safe, and access-controlled</span>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 5 — Important Distinctions
+                 ═══════════════════════════════════════════ -->
+            <h2 id="distinctions">5. Important Distinctions and Comparisons</h2>
+
+            <table class="notes-table">
+                <thead>
+                    <tr>
+                        <th>Dimension</th>
+                        <th>File-Based System</th>
+                        <th>DBMS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Data location</strong></td>
+                        <td>Scattered across application-specific files</td>
+                        <td>Centralised in a managed repository</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data access</strong></td>
+                        <td>Custom programs per application; no standard language</td>
+                        <td>Standardised query language (SQL) usable by all</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Redundancy</strong></td>
+                        <td>High — same data copied in multiple files</td>
+                        <td>Minimal — single source of truth with referencing</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Constraints</strong></td>
+                        <td>Embedded in application code; inconsistent and bypassable</td>
+                        <td>Declared at the storage level; enforced uniformly</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Atomicity</strong></td>
+                        <td>No built-in mechanism; partial execution possible</td>
+                        <td>Transaction management guarantees all-or-nothing execution</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Concurrency</strong></td>
+                        <td>No coordination; multiple writers cause corruption</td>
+                        <td>Concurrency control mechanisms serialise conflicting access</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Security</strong></td>
+                        <td>Coarse file-level permissions only</td>
+                        <td>Fine-grained per-user, per-table, per-column permissions</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Data integration</strong></td>
+                        <td>Requires custom programs to join files</td>
+                        <td>Schemas are unified; joins expressed declaratively in queries</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Database vs Data vs DBMS</h3>
+            <p>
+                These three terms are often conflated but describe distinct things. The
+                <strong>data</strong> is the raw facts you want to store. The
+                <strong>database</strong> is the organised collection of that data — the
+                structured repository. The <strong>DBMS</strong> is the software system
+                that creates, manages, and controls access to the database. The analogy
+                is a library: the books are data, the library is the database, and the
+                librarian system (catalogue, rules, borrowing procedures) is the DBMS.
+            </p>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 6 — Misconceptions
+                 ═══════════════════════════════════════════ -->
+            <h2 id="misconceptions">6. Common Misconceptions</h2>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"HTTPS means the site is secure and trustworthy — and a database makes data safe."</strong>
+                    <p>
+                        A DBMS enforces rules on <em>access and consistency</em>, but it does
+                        not make data inherently safe from application-level logic errors,
+                        poor schema design, or badly written queries. The DBMS is a
+                        mechanism — the quality of what you build on top of it is still your
+                        responsibility.
+                    </p>
+                    <div class="misconception-correct">✓ A DBMS provides guarantees (atomicity, concurrency, integrity) — it does not replace good design.</div>
+                </div>
+            </div>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"File systems are just an older form of the same thing as databases."</strong>
+                    <p>
+                        This sounds reasonable but is architecturally wrong. File systems and
+                        DBMSs have fundamentally different contracts with the programmer. A
+                        file system provides storage and retrieval of named byte streams —
+                        that is all. A DBMS provides a structured data model, a query
+                        language, transaction semantics, and constraint enforcement.
+                        The difference is not degree — it is kind.
+                    </p>
+                    <div class="misconception-correct">✓ File systems store bytes. DBMSs manage structured, queryable data with behavioural guarantees.</div>
+                </div>
+            </div>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"Atomicity just means a transaction is small or fast."</strong>
+                    <p>
+                        The word "atomic" here is borrowed from physics — meaning
+                        indivisible, not small. An atomic transaction can involve
+                        thousands of records. The critical property is that it either
+                        commits entirely or rolls back entirely. Size and speed are
+                        irrelevant to atomicity.
+                    </p>
+                    <div class="misconception-correct">✓ Atomicity means indivisible (all-or-nothing), not small or instantaneous.</div>
+                </div>
+            </div>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"Data redundancy just means wasted storage space."</strong>
+                    <p>
+                        Wasted storage is a secondary concern. The primary danger of
+                        redundancy is <em>inconsistency</em>: when the same fact is
+                        stored in two places and updated in only one, the system now
+                        contains conflicting representations of reality. Decisions made
+                        from either copy may be wrong. Storage cost is trivial today;
+                        making decisions from corrupted data is catastrophic regardless
+                        of the era.
+                    </p>
+                    <div class="misconception-correct">✓ Redundancy's real danger is inconsistency — conflicting representations of the same truth.</div>
+                </div>
+            </div>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"Concurrency problems only happen at very large scale."</strong>
+                    <p>
+                        Concurrency anomalies occur whenever two operations access the
+                        same data simultaneously without coordination — even on a system
+                        with two users. The train-seat example (two users booking the
+                        last seat) is not a high-traffic scenario. Any system with
+                        more than one user and shared mutable state is vulnerable.
+                    </p>
+                    <div class="misconception-correct">✓ Concurrency anomalies are a structural problem present at any scale with more than one user.</div>
+                </div>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 7 — Prerequisites
+                 ═══════════════════════════════════════════ -->
+            <h2 id="prerequisites">7. Course Prerequisites</h2>
+
+            <p>
+                Understanding database management systems at depth requires certain
+                foundational knowledge. The prerequisites are not arbitrary — each one
+                maps directly to a topic that will reappear inside the course itself.
+            </p>
+
+            <div class="prereq-grid">
+
+                <div class="prereq-card sets">
+                    <div class="prereq-icon">∪</div>
+                    <div class="prereq-badge">ESSENTIAL</div>
+                    <h3>Set Theory</h3>
+                    <ul>
+                        <li>Fundamental set definitions and notation</li>
+                        <li>Subsets and supersets</li>
+                        <li>Set operations: Union (∪), Intersection (∩), Difference (−)</li>
+                        <li>Cartesian product (×)</li>
+                        <li>Binary relations, domain and range</li>
+                        <li>Function properties: injective, surjective, bijective</li>
+                        <li>Composition of functions</li>
+                    </ul>
+                </div>
+
+                <div class="prereq-card logic">
+                    <div class="prereq-icon">⊢</div>
+                    <div class="prereq-badge">ESSENTIAL</div>
+                    <h3>Logic</h3>
+                    <ul>
+                        <li><strong>Propositional:</strong> Boolean algebra, AND/OR/NOT</li>
+                        <li>Truth tables and logical equivalence</li>
+                        <li>Logical implications and conditionals</li>
+                        <li><strong>Predicate:</strong> Universal quantifier (∀) — "for all"</li>
+                        <li>Existential quantifier (∃) — "there exists"</li>
+                        <li>Quantified statements and their negations</li>
+                    </ul>
+                </div>
+
+                <div class="prereq-card ds">
+                    <div class="prereq-icon">🌲</div>
+                    <div class="prereq-badge">ESSENTIAL</div>
+                    <h3>Data Structures</h3>
+                    <ul>
+                        <li>Arrays and Linked Lists (fundamental structures)</li>
+                        <li>Binary Search Trees (BST)</li>
+                        <li>B-Trees and B+ Trees — critical for indexing</li>
+                        <li>Hashing techniques and hash tables</li>
+                    </ul>
+                </div>
+
+                <div class="prereq-card prog">
+                    <div class="prereq-icon">🐍</div>
+                    <div class="prereq-badge">ESSENTIAL</div>
+                    <h3>Programming</h3>
+                    <ul>
+                        <li>Python proficiency is <strong>required</strong> for all course assignments and projects</li>
+                    </ul>
+                </div>
+
+                <div class="prereq-card desirable">
+                    <div class="prereq-icon">⭐</div>
+                    <div class="prereq-badge">DESIRABLE</div>
+                    <h3>Beneficial Background</h3>
+                    <ul>
+                        <li><strong>Algorithms:</strong> Quick Sort, Merge Sort, searching techniques</li>
+                        <li><strong>C Programming:</strong> Low-level programming concepts</li>
+                        <li><strong>OOP:</strong> Java or C++ OOP principles</li>
+                        <li><strong>OO Analysis and Design:</strong> Design patterns and modelling</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="notes-box example">
+                <h3>Why Set Theory and Logic?</h3>
+                <p>
+                    The relational model — the dominant conceptual framework for databases —
+                    is mathematically a formalisation of set theory. A database relation
+                    <em>is</em> a set. A query <em>is</em> a set operation. SQL's
+                    <code>WHERE</code> clause is predicate logic. The prerequisites are
+                    not background decoration — they are the mathematical language in
+                    which the core concepts of relational databases are expressed.
+                </p>
+            </div>
+
+
+<!-- ═══════════════════════════════════════════
+     SECTION 8 — Course Structure
+     ═══════════════════════════════════════════ -->
+            <h2 id="course-structure">8. Course Structure and Learning Outcomes</h2>
+
+            <p>
+                The course is divided into <strong>12 parts</strong> and is structured to
+                progress from foundational application programming to advanced
+                administration and design concepts.
+            </p>
+
+            <div class="timeline-grid">
+
+                <div class="timeline-phase phase1">
+                    <div class="phase-tag">PARTS 1–8</div>
+                    <h3>Application Programming</h3>
+                    <ul>
+                        <li>Database querying and manipulation</li>
+                        <li>SQL programming and optimisation</li>
+                        <li>Database application development</li>
+                        <li>High-demand industry skills</li>
+                        <li>Hands-on projects and assignments</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-phase phase2">
+                    <div class="phase-tag">PARTS 9–12</div>
+                    <h3>Administration and Design</h3>
+                    <ul>
+                        <li>Advanced database design principles</li>
+                        <li>Normalisation and schema optimisation</li>
+                        <li>Database administration tasks</li>
+                        <li>Performance tuning and optimisation</li>
+                        <li>Specialised and advanced topics</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <h3>Learning Outcomes</h3>
+            <p>Upon successful completion, you will be able to:</p>
+
+            <div class="solution-grid">
+                <div class="solution-item"><span class="solution-tick">1.</span><span>Design efficient database schemas for real-world applications</span></div>
+                <div class="solution-item"><span class="solution-tick">2.</span><span>Write complex SQL queries for data retrieval and manipulation</span></div>
+                <div class="solution-item"><span class="solution-tick">3.</span><span>Understand transaction management and concurrency control</span></div>
+                <div class="solution-item"><span class="solution-tick">4.</span><span>Implement database security and access control mechanisms</span></div>
+                <div class="solution-item"><span class="solution-tick">5.</span><span>Optimise database performance through indexing and query optimisation</span></div>
+                <div class="solution-item"><span class="solution-tick">6.</span><span>Administer and maintain production database systems</span></div>
+                <div class="solution-item"><span class="solution-tick">7.</span><span>Apply normalisation principles to eliminate data redundancy</span></div>
+                <div class="solution-item"><span class="solution-tick">8.</span><span>Develop database-driven applications using modern programming languages</span></div>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 9 — Concept Checkpoints
+                 ═══════════════════════════════════════════ -->
+            <h2 id="checkpoints">9. Concept Checkpoints</h2>
+
+            <p>
+                These are reasoning questions — not recall questions. Work through
+                each one to verify that you understand the concept, not just the definition.
+            </p>
+
+            <div class="checkpoint-card">
+
+                <div class="checkpoint-item">
+                    <span class="checkpoint-num">Q1</span>
+                    <p>Redundancy and inconsistency are described as linked problems. What <em>exactly</em> is the
+                    logical chain that causes redundancy to produce inconsistency? Could you have redundancy
+                    without inconsistency — and if so, what would be required to maintain that?</p>
+                </div>
+
+                <div class="checkpoint-item">
+                    <span class="checkpoint-num">Q2</span>
+                    <p>Atomicity is described as "all-or-nothing" execution. Why is "partial execution"
+                    actually worse than "complete failure"? What makes a half-completed bank transfer
+                    more dangerous than a transfer that never started?</p>
+                </div>
+
+                <div class="checkpoint-item">
+                    <span class="checkpoint-num">Q3</span>
+                    <p>Integrity constraints in file systems must be embedded in application code.
+                    If every application consistently enforces the same rules, does this become
+                    equivalent to a DBMS enforcing them? What assumption must hold for this to work —
+                    and why is that assumption unreliable in practice?</p>
+                </div>
+
+                <div class="checkpoint-item">
+                    <span class="checkpoint-num">Q4</span>
+                    <p>The DBMS is described as an intermediary layer between applications and data.
+                    What does introducing this layer <em>cost</em> compared to applications accessing
+                    files directly? What does it <em>gain</em>? Is the trade-off always justified?</p>
+                </div>
+
+                <div class="checkpoint-item">
+                    <span class="checkpoint-num">Q5</span>
+                    <p>Set Theory is listed as an essential prerequisite, not a desirable one.
+                    Based on what you have read in this section — and thinking ahead — where
+                    exactly would you expect set-theoretic concepts to reappear when you
+                    start learning how database queries actually work?</p>
+                </div>
+
+                <div class="checkpoint-item">
+                    <span class="checkpoint-num">Q6</span>
+                    <p>Concurrency anomalies are illustrated with a train-seat booking example.
+                    Identify the exact step in the file-system process where the problem arises —
+                    the precise moment where the guarantee breaks. What property would a
+                    correct system need to provide at that step?</p>
+                </div>
+
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 10 — Mental Model Checklist
+                 ═══════════════════════════════════════════ -->
+            <h2 id="mental-model-checklist">10. Mental Model Checklist</h2>
+
+            <p>
+                Before moving forward, verify that you can answer each of these
+                without looking at the notes. Check each one as you feel confident:
+            </p>
+
+            <div class="checklist-card">
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>A DBMS is a software layer that mediates between applications and stored data — not just a place to hold tables.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>Data redundancy is dangerous primarily because it causes inconsistency, not just because it wastes space.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>Integrity constraints must live at the storage level — embedding them in application code is unreliable and bypassable.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>Atomicity means indivisible (all-or-nothing), not small or fast — a single transaction may involve thousands of operations.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>Concurrency anomalies can occur with any number of users greater than one; they are not a high-scale-only concern.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>File systems and databases have fundamentally different contracts — the difference is kind, not degree.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>Each DBMS feature (SQL, transactions, constraints, concurrency control, security) is a direct answer to a specific file-system failure.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>Set theory and predicate logic are prerequisites because the relational model is mathematically built on them.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>Data, database, and DBMS are three distinct concepts: the facts, the organised repository, and the managing software system.</span>
+                </label>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 11 — Section Mental Model
+                 ═══════════════════════════════════════════ -->
+            <div class="notes-box summary" style="margin-top: 3rem;">
+                <h2 style="margin-top: 0; color: inherit;">Section-Level Mental Model</h2>
+                <p>
+                    The entire section is training you to think in terms of
+                    <strong>engineering contracts</strong>. A file system offers you
+                    storage — nothing more. The moment you need two applications to share
+                    data, need to enforce a business rule, need two operations to succeed
+                    or fail together, or need two users to access data simultaneously,
+                    a file system has no contract to offer you. You are on your own.
+                </p>
+                <p>
+                    A DBMS offers a specific, enforceable contract: your data will be
+                    consistent, accessible through a standard language, constrained by
+                    rules you define, protected from partial failures, safe under concurrent
+                    access, and restricted to authorised users. Each clause of that contract
+                    maps to a mechanism inside the system.
+                </p>
+                <p>
+                    The mental model to retain: <strong>every DBMS feature is an answer to
+                    a question that file systems could not answer</strong>. When you encounter
+                    any DBMS concept — transactions, normalisation, indexing, access control —
+                    always ask: "Which of the seven file-system failures does this solve?"
+                    The answer will almost always be visible.
+                </p>
+                <ul>
+                    <li>DBMS = intermediary layer enforcing a data management contract</li>
+                    <li>File system failures: redundancy, inaccessibility, isolation, integrity, atomicity, concurrency, security</li>
+                    <li>DBMS solutions map one-to-one with those failures</li>
+                    <li>The relational model — to come — is grounded in set theory and predicate logic</li>
+                </ul>
+            </div>
+
+            <!-- Navigation
+            <div class="navigation-buttons" style="margin-top: 2.5rem;">
+                <a href="../"
+                    class="btn"
+                    style="background: transparent; color: var(--primary-color); border: 1.5px solid var(--primary-color);">
+                    ← Back to DBMS Index
+                </a>
+                <a href="../01-practice/" class="btn">
+                    Test your understanding →
+                </a>
+            </div> -->
+
+        </div>
+    </main>
+
+    <div id="support-cta"></div>
+    <div class="notes-watermark">
+        Source: RaushanSYNC CS &amp; DS · https://cs.raushansync.com
+        Licensed for personal, non-commercial learning only.
+    </div>
+    <div id="footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4"></script>
+    <script src="/assets/js/auth-config.js"></script>
+    <script src="/assets/js/auth-guard.js"></script>
+    <script src="/assets/js/progress-tracker.js"></script>
+    <script src="/assets/js/tick-manager.js"></script>
+    <script src="/assets/js/script.js"></script>
+
+    <script>
+        /* ── Checklist persistence ── */
+        const checkboxes = document.querySelectorAll('.checklist-check');
+        const STORAGE_KEY = 'dbms-introduction-checklist';
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        checkboxes.forEach((cb, i) => {
+            if (saved[i]) cb.checked = true;
+            cb.addEventListener('change', () => {
+                const state = Array.from(checkboxes).map(c => c.checked);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            });
+        });
+    </script>
+</body>
+
+</html>

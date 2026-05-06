@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3b82f6" id="theme-color-meta">
+    <link rel="manifest" href="/manifest.json">
+
+    <title>Practice — Introduction to DBMS | DBMS Part 1 | RaushanSYNC CS &amp; DS</title>
+
+    <meta name="description"
+        content="Advanced practice for DBMS Part 1 — file-system failures, atomicity, concurrency, integrity constraints, and the DBMS engineering contract. Reasoning-heavy questions from first principles.">
+
+    <meta name="author" content="Raushan Kumar">
+    <meta name="robots" content="index, follow">
+
+    <link rel="canonical" href="https://cs.raushansync.com/computer-science/dbms/01-practice/">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="RaushanSYNC CS &amp; DS">
+    <meta property="og:title" content="Practice — Introduction to DBMS | RaushanSYNC CS &amp; DS">
+    <meta property="og:description"
+        content="Reasoning-heavy advanced practice on DBMS fundamentals — file-system failures, the DBMS contract, atomicity, concurrency, and integrity constraints.">
+    <meta property="og:url" content="https://cs.raushansync.com/computer-science/dbms/01-practice/">
+    <meta property="og:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@raushansync">
+    <meta name="twitter:title" content="Practice — Introduction to DBMS | RaushanSYNC CS &amp; DS">
+    <meta name="twitter:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://cs.raushansync.com/"},
+            {"@type": "ListItem", "position": 2, "name": "Computer Science", "item": "https://cs.raushansync.com/computer-science/"},
+            {"@type": "ListItem", "position": 3, "name": "DBMS", "item": "https://cs.raushansync.com/computer-science/dbms/"},
+            {"@type": "ListItem", "position": 4, "name": "01 Practice", "item": "https://cs.raushansync.com/computer-science/dbms/01-practice/"}
+        ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <style>
+        /* ── Practice-specific highlight states ── */
+        .correct-option {
+            background: rgba(34, 197, 94, 0.12) !important;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            border-radius: 10px;
+        }
+
+        .incorrect-option {
+            background: rgba(239, 68, 68, 0.10) !important;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-radius: 10px;
+        }
+
+        /* ── Code in practice cards ── */
+        .quiz-card code {
+            background: rgba(59, 130, 246, 0.09);
+            border: 1px solid rgba(59, 130, 246, 0.18);
+            border-radius: 5px;
+            padding: 0.1em 0.4em;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+            font-size: 0.88em;
+            color: var(--primary-color);
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            display: inline;
+            vertical-align: baseline;
+        }
+
+        .dark-mode .quiz-card code {
+            background: rgba(96, 165, 250, 0.1);
+            border-color: rgba(96, 165, 250, 0.2);
+            color: #93c5fd;
+        }
+
+        .quiz-option {
+            display: block;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            line-height: 1.45;
+        }
+
+        .quiz-option input {
+            margin-right: 0.55rem;
+            vertical-align: middle;
+            transform: translateY(-1px);
+        }
+
+        /* ── Question count pill ── */
+        .question-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .question-num-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.8rem;
+            height: 1.8rem;
+            background: var(--primary-color);
+            color: #fff;
+            border-radius: 50%;
+            font-size: 0.78rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .question-type-tag {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .question-type-tag.multi {
+            background: rgba(168, 85, 247, 0.1);
+            color: #9333ea;
+            border-color: rgba(168, 85, 247, 0.25);
+        }
+
+        .question-type-tag.ar {
+            background: rgba(234, 88, 12, 0.1);
+            color: #ea580c;
+            border-color: rgba(234, 88, 12, 0.25);
+        }
+
+        .dark-mode .question-type-tag.multi {
+            color: #c084fc;
+            background: rgba(168, 85, 247, 0.15);
+        }
+
+        .dark-mode .question-type-tag.ar {
+            color: #fb923c;
+            background: rgba(234, 88, 12, 0.15);
+        }
+
+        .quiz-card h3 {
+            margin-top: 0.3rem;
+        }
+
+        /* Assertion-Reason block styling */
+        .ar-block {
+            background: rgba(59, 130, 246, 0.05);
+            border-left: 3px solid var(--primary-color);
+            border-radius: 0 8px 8px 0;
+            padding: 0.75rem 1rem;
+            margin: 0.75rem 0 1rem;
+            font-size: 0.93rem;
+            line-height: 1.6;
+        }
+
+        .ar-block p {
+            margin: 0.3rem 0;
+        }
+
+        .ar-label {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .dark-mode .ar-block {
+            background: rgba(96, 165, 250, 0.07);
+        }
+
+        /* Section divider */
+        .quiz-section-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: var(--primary-color);
+            margin: 2.2rem 0 1rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+        }
+    </style>
+
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+    <script src="/assets/js/quiz-score-handler.js"></script>
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo">RaushanSYNC CS &amp; DS</a>
+            <div id="nav"></div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode">
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                    </svg>
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="notes-page practice-page">
+        <div class="notes-container">
+
+            <header class="notes-header quiz-header">
+                <div class="notes-header-left">
+                    <h1>Part 1 — Introduction to Database Management Systems</h1>
+                    <p>DBMS Series · RaushanSYNC CS &amp; DS</p>
+                    <p>RaushanSYNC — Learning from First Principles.</p>
+                </div>
+                <div class="notes-header-actions">
+                    <span class="page-header-tick-label">Mark completed</span>
+                    <div id="note-tick" data-tick-container data-tick-position="header" data-tick-type="practice"></div>
+                </div>
+            </header>
+
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <ol>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/computer-science/">Computer Science</a></li>
+                    <li><a href="/computer-science/dbms/">DBMS</a></li>
+                    <li aria-current="page">01 Practice — Introduction to DBMS</li>
+                </ol>
+            </nav>
+
+            <!-- Lesson progress badge -->
+            <div class="lesson-progress">
+                <span class="lesson-badge">1</span>
+                <span class="lesson-title-small">Introduction to DBMS — Why They Exist · Practice</span>
+            </div>
+
+            <section class="palette important">
+                <p><strong>Instructions:</strong></p>
+                <p>Attempt every question before checking the answer. Some questions have a single correct answer; others ask you to select all that apply; others test causal reasoning in an Assertion–Reason format. Read every option carefully — plausible distractors are intentional. Understanding comes from thinking, not guessing.</p>
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 SECTION A — SINGLE CORRECT
+            ══════════════════════════════════════════ -->
+            <section>
+                <h2 class="quiz-section-title">Section A — Single Correct Answer</h2>
+
+                <!-- Q1 -->
+                <div class="quiz-card"
+                    data-answer="b"
+                    data-reason="This is data redundancy producing inconsistency — precisely the first file-system failure described in the notes. The customer's address is stored in two separate files. When only one is updated, the two files now contain conflicting representations of the same real-world fact. Any decision made from either file may now be wrong. This is not a concurrency anomaly (no simultaneous access conflict) and not an atomicity failure (no partially executed operation). It is the classic redundancy-causes-inconsistency chain described in the attachment.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">1</span>
+                        <span class="question-type-tag">SINGLE CORRECT</span>
+                    </div>
+                    <h3>A bank's file-based system stores each customer's address in both an <code>accounts.csv</code> file and a <code>loans.csv</code> file. A customer updates their address through the loans portal. The accounts file is not updated. A loan officer and an account manager now both look up the same customer and see different addresses. Which of the seven file-system failures does this scenario most precisely illustrate?</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input type="radio" name="q1" value="a"> A. Atomicity failure — the update was not executed as a single indivisible operation.</label>
+                        <label class="quiz-option"><input type="radio" name="q1" value="b"> B. Data redundancy causing inconsistency — the same real-world fact is now stored as two conflicting values across separate files.</label>
+                        <label class="quiz-option"><input type="radio" name="q1" value="c"> C. Concurrency anomaly — two users accessed the data simultaneously and one overwrote the other.</label>
+                        <label class="quiz-option"><input type="radio" name="q1" value="d"> D. Security failure — unauthorized personnel accessed data they should not have seen.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Q2 -->
+                <div class="quiz-card"
+                    data-answer="c"
+                    data-reason="The notes describe integrity problems as follows: when constraints are embedded in application code, they can be written inconsistently, forgotten in some programs, or deliberately bypassed. That is exactly what happened here — the original application enforced the salary rule, but the new application, which also writes to the same file, does not enforce it. There is no single enforcer. This is an integrity failure — a business rule that should apply universally can be bypassed by any program that does not implement it. This is not redundancy (the data is not duplicated) and not a concurrency issue (there is no simultaneous access conflict described).">
+                    <div class="question-meta">
+                        <span class="question-num-pill">2</span>
+                        <span class="question-type-tag">SINGLE CORRECT</span>
+                    </div>
+                    <h3>A company's HR application enforces the rule "employee salary must be greater than zero" inside its own code before writing to <code>employees.txt</code>. A second payroll application, added by a new developer, also writes to <code>employees.txt</code> but does not include this check. The payroll app writes a salary of <code>−5000</code>. Which file-system failure does this represent?</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input type="radio" name="q2" value="a"> A. Data isolation — combining data from multiple files requires custom programming.</label>
+                        <label class="quiz-option"><input type="radio" name="q2" value="b"> B. Data redundancy — the salary rule is duplicated across two codebases.</label>
+                        <label class="quiz-option"><input type="radio" name="q2" value="c"> C. Integrity failure — a business constraint enforced only in application code can be bypassed by any program that does not implement it, leaving no single enforcer at the storage level.</label>
+                        <label class="quiz-option"><input type="radio" name="q2" value="d"> D. Concurrency anomaly — both applications wrote to the same file simultaneously.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Q3 -->
+                <div class="quiz-card"
+                    data-answer="d"
+                    data-reason="The notes describe atomicity using exactly this kind of bank-transfer scenario. A transfer requires two operations — deduct from Account A and credit Account B — to succeed or fail as a single indivisible unit. If the system crashes between them, in a file-based system, the deduction has been written to disk but the credit has not. Money has disappeared from A without appearing in B. This partial execution is not just a loss of data — it is undetectable as wrong without an audit. A DBMS transaction either commits both changes or rolls both back. The notes state: 'File systems provide no built-in mechanism to guarantee that two related file changes either both complete or both roll back.'">
+                    <div class="question-meta">
+                        <span class="question-num-pill">3</span>
+                        <span class="question-type-tag">SINGLE CORRECT</span>
+                    </div>
+                    <h3>A file-based banking system processes a ₹10,000 transfer from Account A to Account B. Step 1 deducts ₹10,000 from Account A's record and writes it to disk. The system crashes immediately before Step 2 — crediting Account B. When the system restarts, what is the precise problem, and why is it described as more dangerous than a transfer that never started?</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input type="radio" name="q3" value="a"> A. Data isolation — the two accounts are stored in separate files, making the transfer logically impossible.</label>
+                        <label class="quiz-option"><input type="radio" name="q3" value="b"> B. Concurrency anomaly — two users attempted to access the same account at the same moment.</label>
+                        <label class="quiz-option"><input type="radio" name="q3" value="c"> C. Integrity failure — the system violated the constraint that balances must be non-negative.</label>
+                        <label class="quiz-option"><input type="radio" name="q3" value="d"> D. Atomicity failure — the system executed a partial operation with no mechanism to roll it back, leaving the data in a state that is silently incorrect rather than visibly failed.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Q4 -->
+                <div class="quiz-card"
+                    data-answer="b"
+                    data-reason="The train-seat example from the notes pinpoints the failure precisely. Both users read the file and see 1 seat. This read step is not the failure — a correct concurrent system must still allow reads. The problem occurs when both users proceed to write 'booked' without any mechanism that makes one user's write aware of the other's. The guarantee that was missing is mutual exclusion during the check-then-write sequence: the ability to read and write atomically as a single unit so no other user can observe or modify the state between those two steps. The notes describe this as 'concurrency control mechanisms that serialise conflicting access.'">
+                    <div class="question-meta">
+                        <span class="question-num-pill">4</span>
+                        <span class="question-type-tag">SINGLE CORRECT</span>
+                    </div>
+                    <h3>Two users simultaneously check a train-seat file and both see 1 seat available. User A writes "booked." User B, whose read happened before A's write completed, also writes "booked." The train is now double-booked. At which precise step in this sequence does the failure actually occur?</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input type="radio" name="q4" value="a"> A. When both users open the file for reading — reads should be serialized one at a time.</label>
+                        <label class="quiz-option"><input type="radio" name="q4" value="b"> B. When User B writes "booked" without any mechanism to check whether the state has changed since their read — the check-then-write sequence is not treated as an indivisible unit.</label>
+                        <label class="quiz-option"><input type="radio" name="q4" value="c"> C. When User A writes first — writing should not be permitted when another user has the file open.</label>
+                        <label class="quiz-option"><input type="radio" name="q4" value="d"> D. When the file is stored as a flat file — only structured DBMS storage prevents overbooking.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Q5 -->
+                <div class="quiz-card"
+                    data-answer="c"
+                    data-reason="The notes define a DBMS as an 'intermediary layer that sits between your application code and the raw stored data.' The critical implication is: you never touch the storage directly — you go through the DBMS. This intermediary position is what allows the DBMS to enforce rules, manage simultaneous access, and guarantee consistency on every single operation, transparently. If applications accessed files directly, each application would have to implement all of that complexity itself. Option A is incorrect — DBMS does not make data smaller. Option B describes a proxy or CDN, not a DBMS. Option D incorrectly locates the DBMS between CPU and memory, which is a hardware concept.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">5</span>
+                        <span class="question-type-tag">SINGLE CORRECT</span>
+                    </div>
+                    <h3>The notes describe a DBMS as an "intermediary layer." What is the architectural consequence of placing this intermediary between every application and the stored data?</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input type="radio" name="q5" value="a"> A. The DBMS compresses all data, reducing the storage footprint that each application must manage.</label>
+                        <label class="quiz-option"><input type="radio" name="q5" value="b"> B. Applications can no longer access the internet — all network requests pass through the DBMS instead.</label>
+                        <label class="quiz-option"><input type="radio" name="q5" value="c"> C. The DBMS can enforce rules, manage concurrent access, and guarantee consistency on every operation transparently — without requiring each application to implement that complexity independently.</label>
+                        <label class="quiz-option"><input type="radio" name="q5" value="d"> D. The intermediary sits between the CPU and RAM, speeding up in-memory operations for all data requests.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Q6 -->
+                <div class="quiz-card"
+                    data-answer="a"
+                    data-reason="The notes explicitly state: 'File systems and DBMSs have fundamentally different contracts with the programmer. A file system provides storage and retrieval of named byte streams — that is all. A DBMS provides a structured data model, a query language, transaction semantics, and constraint enforcement. The difference is not degree — it is kind.' Option A correctly captures this by contrasting the nature of what each system offers. Option B (speed) is not mentioned as the distinction. Option C (age) is irrelevant — the notes explicitly call this a difference of kind, not era. Option D (SQL version) conflates a specific tool with the architectural distinction.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">6</span>
+                        <span class="question-type-tag">SINGLE CORRECT</span>
+                    </div>
+                    <h3>The notes state that the difference between a file system and a DBMS is one of "kind, not degree." Which of the following pairs of descriptions most precisely captures this distinction?</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input type="radio" name="q6" value="a"> A. A file system provides storage and retrieval of named byte streams only; a DBMS provides a structured data model, a query language, transaction semantics, and constraint enforcement.</label>
+                        <label class="quiz-option"><input type="radio" name="q6" value="b"> B. A file system stores data more slowly; a DBMS stores data faster using optimized algorithms.</label>
+                        <label class="quiz-option"><input type="radio" name="q6" value="c"> C. A file system is an older technology; a DBMS is the modern evolution of the same idea.</label>
+                        <label class="quiz-option"><input type="radio" name="q6" value="d"> D. A file system cannot run SQL; a DBMS is defined as any system that supports SQL version 3 or higher.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Q7 -->
+                <div class="quiz-card"
+                    data-answer="d"
+                    data-reason="The notes directly address this scenario: 'If every application consistently enforces the same rules, does this become equivalent to a DBMS enforcing them? What assumption must hold — and why is that assumption unreliable?' The assumption is that every developer who ever writes an application accessing this data will correctly and completely implement the same constraints. The notes explain this is unreliable because constraints can be written inconsistently, forgotten, or deliberately bypassed. The moment any new application touches the data without implementing the constraint, the guarantee vanishes. A DBMS eliminates this assumption entirely by placing enforcement at the storage level — no application can bypass it.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">7</span>
+                        <span class="question-type-tag">SINGLE CORRECT</span>
+                    </div>
+                    <h3>Three applications all write to the same <code>students.txt</code> file. The first two consistently enforce the rule "age must be between 16 and 100" inside their own code. A third application, written by a new developer unfamiliar with the rule, does not enforce it and writes an age of 200. Which assumption, identified in the notes as the root of this failure, was violated?</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input type="radio" name="q7" value="a"> A. The assumption that all files would be stored in the same directory and format.</label>
+                        <label class="quiz-option"><input type="radio" name="q7" value="b"> B. The assumption that the operating system enforces data type checks on all file writes.</label>
+                        <label class="quiz-option"><input type="radio" name="q7" value="c"> C. The assumption that a single application would be responsible for all writes to a shared file.</label>
+                        <label class="quiz-option"><input type="radio" name="q7" value="d"> D. The assumption that every developer who writes an application accessing the same data will correctly and consistently implement the same constraints — an assumption the notes identify as inherently unreliable.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Q8 -->
+                <div class="quiz-card"
+                    data-answer="b"
+                    data-reason="The notes provide this analogy explicitly: 'The books are data, the library is the database, and the librarian system (catalogue, rules, borrowing procedures) is the DBMS.' The key insight is that the DBMS is not the library itself but the entire system of rules and mechanisms through which the library is managed. The data (books) is distinct from the repository (library) which is distinct from the managing software system (DBMS/librarian system). Confusing the library with the DBMS is like confusing the building with its operating procedures — they are distinct layers.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">8</span>
+                        <span class="question-type-tag">SINGLE CORRECT</span>
+                    </div>
+                    <h3>The notes use a library analogy to distinguish data, database, and DBMS. Which mapping correctly applies that analogy?</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input type="radio" name="q8" value="a"> A. Books = DBMS &nbsp;|&nbsp; Library building = Data &nbsp;|&nbsp; Librarian system = Database</label>
+                        <label class="quiz-option"><input type="radio" name="q8" value="b"> B. Books = Data &nbsp;|&nbsp; Library building = Database &nbsp;|&nbsp; Librarian system (catalogue, rules, procedures) = DBMS</label>
+                        <label class="quiz-option"><input type="radio" name="q8" value="c"> C. Books = Database &nbsp;|&nbsp; Library building = DBMS &nbsp;|&nbsp; Librarian system = Data</label>
+                        <label class="quiz-option"><input type="radio" name="q8" value="d"> D. Books = Data &nbsp;|&nbsp; Library building = DBMS &nbsp;|&nbsp; Librarian system = Database</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 SECTION B — MULTIPLE CORRECT
+            ══════════════════════════════════════════ -->
+            <section>
+                <h2 class="quiz-section-title">Section B — Select All That Apply</h2>
+
+                <!-- Q9 -->
+                <div class="quiz-card"
+                    data-answer="b,c"
+                    data-reason="The notes make this distinction explicit: 'Wasted storage is a secondary concern. The primary danger of redundancy is inconsistency: when the same fact is stored in two places and updated in only one, the system now contains conflicting representations of reality. Decisions made from either copy may be wrong. Storage cost is trivial today; making decisions from corrupted data is catastrophic.' So B is correct — inconsistency from partial updates — and C is correct — unreliable decisions from conflicting representations. Option A (wasted space) is explicitly described as secondary, not a primary danger. Option D (SQL limitations) is unrelated to redundancy — SQL does not become unavailable due to data duplication.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">9</span>
+                        <span class="question-type-tag multi">SELECT ALL THAT APPLY</span>
+                    </div>
+                    <h3>An organization stores employee records in both an HR file and a payroll file. The employee's department is changed in HR but not in payroll. Based strictly on the notes, which of the following are genuine dangers of this redundancy? Select all that apply.</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input type="checkbox" name="q9" value="a"> A. Wasted disk storage — the same record occupies space in two places, doubling storage requirements.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q9" value="b"> B. Inconsistency — the same real-world fact (the employee's department) is now represented differently in two sources.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q9" value="c"> C. Any business decision made from either file — payroll reports, department headcounts — is now potentially wrong.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q9" value="d"> D. SQL queries become unavailable — you cannot query files that contain duplicate data.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Q10 -->
+                <div class="quiz-card"
+                    data-answer="a,b,d"
+                    data-reason="The notes map each DBMS feature to a specific file-system failure. SQL (standardized query language) directly answers the 'difficulty of data access' failure — no longer do developers need custom programs for every new query. Transaction management directly answers the atomicity failure — operations either commit fully or roll back entirely. Concurrency control directly answers the concurrency anomaly — multiple users can operate simultaneously without corrupting data. Option C (binary storage format) is incorrect — the notes do not identify binary format as a DBMS response to any file-system failure. The solution to data isolation is unified schemas and declarative joins, not binary format.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">10</span>
+                        <span class="question-type-tag multi">SELECT ALL THAT APPLY</span>
+                    </div>
+                    <h3>According to the notes, a DBMS provides specific architectural answers to specific file-system failures. Which of the following feature-to-failure mappings are correct? Select all that apply.</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input type="checkbox" name="q10" value="a"> A. Standardized query language (SQL) → answers the difficulty of data access (no custom programs for every new question).</label>
+                        <label class="quiz-option"><input type="checkbox" name="q10" value="b"> B. Transaction management → answers atomicity failures (all-or-nothing execution instead of partial writes).</label>
+                        <label class="quiz-option"><input type="checkbox" name="q10" value="c"> C. Binary storage format → answers the data isolation failure (files in different formats cannot be joined).</label>
+                        <label class="quiz-option"><input type="checkbox" name="q10" value="d"> D. Concurrency control mechanisms → answers concurrency anomalies (serialising conflicting simultaneous access).</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Q11 -->
+                <div class="quiz-card"
+                    data-answer="a,b,c"
+                    data-reason="The notes state: 'The relational model is mathematically a formalisation of set theory. A database relation is a set. A query is a set operation. SQL's WHERE clause is predicate logic.' All three of A, B, and C are drawn directly from this passage. Option D is incorrect — the notes list set theory and predicate logic as essential for understanding the core relational model, which begins from the earliest parts of the course. The notes say these prerequisites 'are not background decoration — they are the mathematical language in which the core concepts of relational databases are expressed,' implying they are needed from the beginning, not deferred to advanced sections.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">11</span>
+                        <span class="question-type-tag multi">SELECT ALL THAT APPLY</span>
+                    </div>
+                    <h3>A student argues that set theory and predicate logic are only "nice to know" for this DBMS course, not genuinely necessary. Based strictly on what the notes state, which of the following arguments correctly rebut that claim? Select all that apply.</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input type="checkbox" name="q11" value="a"> A. A database relation is mathematically a set — the relational model is a formalisation of set theory.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q11" value="b"> B. A database query is a set operation — understanding queries requires understanding what set operations do.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q11" value="c"> C. SQL's WHERE clause is an expression in predicate logic — reading or writing WHERE conditions requires understanding predicates and quantifiers.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q11" value="d"> D. Set theory is only relevant in Parts 9–12, which cover advanced administration and design — it is not needed in the earlier application programming parts.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Q12 -->
+                <div class="quiz-card"
+                    data-answer="a,b,c"
+                    data-reason="The notes enumerate the DBMS contract explicitly: data will be consistent (A), accessible through a standard language, constrained by rules you define, protected from partial failures (B — atomicity), safe under concurrent access, and restricted to authorised users (C — fine-grained security). Option D is incorrect and is explicitly warned against in the notes: 'A DBMS provides guarantees (atomicity, concurrency, integrity) — it does not replace good design.' The DBMS enforces structural and access rules; it cannot guarantee that application-level business logic is correct — that remains the developer's responsibility.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">12</span>
+                        <span class="question-type-tag multi">SELECT ALL THAT APPLY</span>
+                    </div>
+                    <h3>The notes describe a DBMS as offering an "engineering contract" that a file system cannot. Which of the following are clauses of that contract as stated in the notes? Select all that apply.</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input type="checkbox" name="q12" value="a"> A. Data will be consistent — centralised storage eliminates the scattered copies that cause conflicting truths.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q12" value="b"> B. Operations are protected from partial failures — transactions either commit fully or roll back entirely.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q12" value="c"> C. Access is restricted to authorised users — fine-grained per-user, per-table, and per-operation permissions.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q12" value="d"> D. Application-level business logic will always produce correct results — the DBMS validates all code written by developers.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+            </section>
+
+            <!-- ══════════════════════════════════════════
+                 SECTION C — ASSERTION–REASON
+            ══════════════════════════════════════════ -->
+            <section>
+                <h2 class="quiz-section-title">Section C — Assertion &amp; Reason</h2>
+                <section class="palette" style="margin-bottom: 1.5rem;">
+                    <p><strong>Instructions for this section:</strong> Each question contains an Assertion (A) and a Reason (R). Choose the option that correctly describes the truth of both statements and their relationship.</p>
+                    <p>
+                        <strong>A</strong> — Both Assertion and Reason are true, and Reason is the correct explanation of Assertion.<br>
+                        <strong>B</strong> — Both Assertion and Reason are true, but Reason does not correctly explain Assertion.<br>
+                        <strong>C</strong> — Assertion is true, Reason is false.<br>
+                        <strong>D</strong> — Assertion is false, Reason is true.
+                    </p>
+                </section>
+
+                <!-- Q13 -->
+                <div class="quiz-card"
+                    data-answer="a"
+                    data-reason="Both the Assertion and the Reason are true, and the Reason is the correct explanation. The notes explicitly state: 'Concurrency anomalies occur whenever two operations access the same data simultaneously without coordination — even on a system with two users.' The Assertion directly reflects this — it is not a high-scale phenomenon. The Reason correctly identifies the structural root: the problem is simultaneous uncoordinated access to shared mutable state, which can happen with any number of users greater than one. The Reason explains WHY the Assertion is true. Options C and D are incorrect because both statements are true. Option B is incorrect because the Reason does directly explain the Assertion.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">13</span>
+                        <span class="question-type-tag ar">ASSERTION – REASON</span>
+                    </div>
+                    <div class="ar-block">
+                        <p><span class="ar-label">Assertion (A):</span> In a file-based system, concurrency anomalies can occur even when only two users are simultaneously accessing the data.</p>
+                        <p><span class="ar-label">Reason (R):</span> Concurrency anomalies arise whenever two or more operations access shared mutable data simultaneously without coordination — the total number of users in the system is irrelevant to whether the anomaly occurs.</p>
+                    </div>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input type="radio" name="q13" value="a"> A. Both A and R are true, and R is the correct explanation of A.</label>
+                        <label class="quiz-option"><input type="radio" name="q13" value="b"> B. Both A and R are true, but R does not correctly explain A.</label>
+                        <label class="quiz-option"><input type="radio" name="q13" value="c"> C. A is true, R is false.</label>
+                        <label class="quiz-option"><input type="radio" name="q13" value="d"> D. A is false, R is true.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Q14 -->
+                <div class="quiz-card"
+                    data-answer="d"
+                    data-reason="The Assertion is FALSE — the notes explicitly argue against it. The notes ask: 'If every application consistently enforces the same rules, does this become equivalent to a DBMS enforcing them? What assumption must hold — and why is that assumption unreliable in practice?' The answer given is that the assumption is inherently unreliable: any new developer, any new application, any future modification can skip or bypass the constraint. This makes code-level enforcement structurally weaker — not equivalent. The Reason is TRUE — it correctly states why a DBMS is superior: it enforces constraints at the storage level, making them impossible to bypass regardless of which application writes to the data. Since A is false and R is true, the answer is D.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">14</span>
+                        <span class="question-type-tag ar">ASSERTION – REASON</span>
+                    </div>
+                    <div class="ar-block">
+                        <p><span class="ar-label">Assertion (A):</span> If every application that accesses a shared file uniformly enforces the same integrity constraints in its own code, this is functionally equivalent to a DBMS enforcing those constraints at the storage level.</p>
+                        <p><span class="ar-label">Reason (R):</span> A DBMS enforces constraints at the storage level, making them uniformly applied regardless of which application accesses the data — no application can bypass them, and no developer can forget to implement them.</p>
+                    </div>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input type="radio" name="q14" value="a"> A. Both A and R are true, and R is the correct explanation of A.</label>
+                        <label class="quiz-option"><input type="radio" name="q14" value="b"> B. Both A and R are true, but R does not correctly explain A.</label>
+                        <label class="quiz-option"><input type="radio" name="q14" value="c"> C. A is true, R is false.</label>
+                        <label class="quiz-option"><input type="radio" name="q14" value="d"> D. A is false, R is true.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Q15 -->
+                <div class="quiz-card"
+                    data-answer="c"
+                    data-reason="The Assertion is FALSE — this is a common misconception explicitly corrected by the notes: 'Atomicity just means a transaction is small or fast. The word atomic here is borrowed from physics — meaning indivisible, not small. An atomic transaction can involve thousands of records. Size and speed are irrelevant to atomicity.' The Reason is TRUE — it correctly defines atomicity: an atomic operation either commits entirely or rolls back entirely, regardless of how many records it touches or how long it takes. Since the Assertion is the exact misconception the notes flag, and the Reason correctly states the definition, the answer is C (A is false, R is true).">
+                    <div class="question-meta">
+                        <span class="question-num-pill">15</span>
+                        <span class="question-type-tag ar">ASSERTION – REASON</span>
+                    </div>
+                    <div class="ar-block">
+                        <p><span class="ar-label">Assertion (A):</span> Atomicity in DBMS transaction management ensures that each transaction is small in scope and executes instantaneously — it refers to operations that happen in a single, fast step.</p>
+                        <p><span class="ar-label">Reason (R):</span> Atomicity means indivisible — a transaction may involve thousands of records and take considerable time, but it must either commit entirely or roll back entirely; size and execution speed are irrelevant to whether a transaction is atomic.</p>
+                    </div>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input type="radio" name="q15" value="a"> A. Both A and R are true, and R is the correct explanation of A.</label>
+                        <label class="quiz-option"><input type="radio" name="q15" value="b"> B. Both A and R are true, but R does not correctly explain A.</label>
+                        <label class="quiz-option"><input type="radio" name="q15" value="c"> C. A is false, R is true.</label>
+                        <label class="quiz-option"><input type="radio" name="q15" value="d"> D. Both A and R are false.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+            </section>
+
+            <!-- ── Reflection palette ── -->
+            <section class="palette important" style="margin-top: 2.5rem;">
+                <h3>After This Practice</h3>
+                <p>
+                    If any question surprised you, return to the notes and re-read that section from scratch.
+                    The questions above target the most persistent misconceptions in DBMS fundamentals —
+                    particularly the redundancy–inconsistency chain, atomicity as indivisibility not speed,
+                    the unreliability of code-level constraint enforcement, and the meaning of "kind, not degree."
+                </p>
+                <ul>
+                    <li>Redundancy's real danger is inconsistency — conflicting truths, not wasted bytes.</li>
+                    <li>Partial execution is worse than complete failure — it is silently wrong, not visibly failed.</li>
+                    <li>A constraint in application code has exactly one enforcer: the developer who wrote it. Anyone else can bypass it.</li>
+                    <li>Atomic means indivisible — a transaction spanning 10,000 rows is still atomic if it commits or rolls back as one unit.</li>
+                    <li>Concurrency anomalies are structural, not scale-dependent — two users and shared mutable state is enough.</li>
+                    <li>A DBMS is an engineering contract. Every feature is one clause of that contract, answering one specific failure mode.</li>
+                </ul>
+                <blockquote>
+                    If a DBMS enforces constraints, manages concurrent access, and guarantees atomicity — all transparently, without the application asking —<br>
+                    then what exactly does the application developer's responsibility begin and end with?
+                </blockquote>
+                <p class="signature">— RaushanSYNC Learning Network</p>
+            </section>
+
+            <div class="notes-watermark">RaushanSYNC CS &amp; DS · Introduction to DBMS · Practice</div>
+
+            <!-- ── Navigation buttons ── -->
+            <!-- <div class="navigation-buttons" style="margin-top: 2.5rem;">
+                <a href="../01-introduction-to-dbms/"
+                    class="btn"
+                    style="background: transparent; color: var(--primary-color); border: 1.5px solid var(--primary-color);">
+                    ← Back to Notes
+                </a>
+            </div> -->
+
+        </div>
+    </main>
+
+    <div id="ai-chat-modal" class="ai-chat-modal" hidden aria-hidden="true" role="dialog" aria-modal="true"
+        aria-labelledby="ai-chat-title">
+        <div class="ai-chat-overlay" data-ai-chat-close></div>
+        <section class="ai-chat-panel">
+            <header class="ai-chat-header">
+                <h2 id="ai-chat-title">Ask AI Tutor</h2>
+                <button id="ai-chat-close" class="ai-chat-close" type="button" aria-label="Close AI chat">×</button>
+            </header>
+            <div id="ai-chat-context" class="ai-chat-context" aria-live="polite"></div>
+            <div id="ai-chat-history" class="ai-chat-history" aria-live="polite"></div>
+            <form id="ai-chat-form" class="ai-chat-input-row">
+                <label for="ai-chat-input" class="ai-chat-label">Ask a follow-up</label>
+                <textarea id="ai-chat-input" rows="2" placeholder="Ask why this answer is correct, request a hint, or ask for an example..."></textarea>
+                <button id="ai-chat-send" type="submit">Send</button>
+            </form>
+        </section>
+    </div>
+
+    <div id="support-cta"></div>
+    <div id="footer"></div>
+
+    <!-- Supabase & Auth -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4"></script>
+    <script src="/assets/js/auth-config.js"></script>
+    <script src="/assets/js/auth-guard.js"></script>
+
+    <script src="/assets/js/progress-tracker.js"></script>
+    <script src="/assets/js/tick-manager.js"></script>
+    <script src="/assets/js/script.js"></script>
+    <script src="/ai-chat.js"></script>
+
+    <!-- ── PRACTICE LOGIC ── -->
+    <script>
+        function setFeedback(card, isCorrect, message) {
+            const feedback = card.querySelector('.quiz-feedback');
+            if (!feedback) return;
+            feedback.textContent = message;
+            feedback.classList.remove('correct', 'incorrect');
+            feedback.classList.add(isCorrect ? 'correct' : 'incorrect');
+        }
+
+        function getCorrectAnswers(card) {
+            const raw = card.dataset.answer || '';
+            return raw.split(',').map(a => a.trim()).filter(a => a);
+        }
+
+        function getSelectedAnswers(card) {
+            const inputs = card.querySelectorAll('input');
+            const selected = [];
+            inputs.forEach(input => {
+                if (input.checked) selected.push(input.value);
+            });
+            return selected;
+        }
+
+        function arraysMatch(arr1, arr2) {
+            if (arr1.length !== arr2.length) return false;
+            const s1 = [...arr1].sort();
+            const s2 = [...arr2].sort();
+            return s1.every((v, i) => v === s2[i]);
+        }
+
+        function getCorrectLabels(card) {
+            const correctValues = getCorrectAnswers(card);
+            return correctValues.map(value => {
+                const input = card.querySelector('input[value="' + value + '"]');
+                return input ? input.closest('label').textContent.trim() : value;
+            }).join(' | ');
+        }
+
+        function getSelectedLabels(card) {
+            return getSelectedAnswers(card).map(value => {
+                const input = card.querySelector('input[value="' + value + '"]');
+                return input ? input.closest('label').textContent.trim() : value;
+            });
+        }
+
+        function buildAIContext(card) {
+            const question = card.querySelector('h3')?.textContent.trim() ||
+                             card.querySelector('.ar-block')?.textContent.trim() ||
+                             'Question unavailable';
+            const selectedLabels = getSelectedLabels(card);
+            const userAnswer = selectedLabels.length > 0 ? selectedLabels.join(' | ') : 'No option selected yet.';
+            const correctAnswer = getCorrectLabels(card) || 'Correct answer not available.';
+            const explanation = (card.dataset.reason || '').trim() || 'No explanation available.';
+            const practiceTitle = document.querySelector('.notes-header h1')?.textContent.trim() || 'Practice';
+            return { practiceTitle, questionText: question, userAnswer, correctAnswer, explanation, pageUrl: window.location.href };
+        }
+
+        function clearHighlight(card) {
+            card.querySelectorAll('.quiz-option').forEach(label => {
+                label.classList.remove('correct-option', 'incorrect-option');
+            });
+        }
+
+        function highlightCorrect(card) {
+            getCorrectAnswers(card).forEach(value => {
+                const input = card.querySelector('input[value="' + value + '"]');
+                if (input) input.closest('label').classList.add('correct-option');
+            });
+        }
+
+        function highlightIncorrectSelections(card) {
+            const correct = getCorrectAnswers(card);
+            getSelectedAnswers(card).forEach(value => {
+                if (!correct.includes(value)) {
+                    const input = card.querySelector('input[value="' + value + '"]');
+                    if (input) input.closest('label').classList.add('incorrect-option');
+                }
+            });
+        }
+
+        function revealAIButton(card) {
+            const btn = card.querySelector('.discuss-ai-btn');
+            if (btn) btn.hidden = false;
+        }
+
+        function ensureAIButtons() {
+            document.querySelectorAll('.quiz-card').forEach(card => {
+                if (card.querySelector('.discuss-ai-btn')) return;
+                const button = document.createElement('button');
+                button.className = 'quiz-btn discuss-ai-btn';
+                button.type = 'button';
+                button.hidden = true;
+                button.textContent = 'Ask AI';
+                const feedback = card.querySelector('.quiz-feedback');
+                if (feedback) { feedback.before(button); return; }
+                const checkButton = card.querySelector('.quiz-btn');
+                if (checkButton) checkButton.insertAdjacentElement('afterend', button);
+            });
+        }
+
+        function handleCheck(card) {
+            revealAIButton(card);
+            const selected = getSelectedAnswers(card);
+            const correct = getCorrectAnswers(card);
+            const reason = (card.dataset.reason || '').trim();
+
+            if (selected.length === 0) {
+                setFeedback(card, false, 'Please choose at least one option.');
+                return;
+            }
+
+            clearHighlight(card);
+            const isCorrect = arraysMatch(selected, correct);
+
+            if (isCorrect) {
+                highlightCorrect(card);
+                setFeedback(card, true, 'Correct! Explanation: ' + reason);
+            } else {
+                highlightCorrect(card);
+                highlightIncorrectSelections(card);
+                setFeedback(card, false,
+                    'Not quite. Correct answer(s): ' + getCorrectLabels(card) + '. Explanation: ' + reason);
+            }
+        }
+
+        ensureAIButtons();
+
+        document.querySelectorAll('.quiz-card').forEach(card => {
+            const button = card.querySelector('.quiz-btn:not(.discuss-ai-btn)');
+            if (button) button.addEventListener('click', () => handleCheck(card));
+        });
+
+        document.querySelectorAll('.discuss-ai-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const card = button.closest('.quiz-card');
+                if (!card) return;
+                if (typeof window.initAIChat !== 'function') {
+                    alert('AI chat is not available right now. Please try again shortly.');
+                    return;
+                }
+                window.initAIChat(buildAIContext(card));
+            });
+        });
+    </script>
+</body>
+</html>

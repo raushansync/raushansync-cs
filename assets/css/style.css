@@ -1269,7 +1269,9 @@ body:not(.home-page) main {
   border-left-color: #f07c78;
 }
 
-.notes-box h2 {
+/* notes box h2 and h3 margin amplifying issue fixed. -- remaining to add in maths and science. */
+.notes-box h2,
+.notes-box h3 {
   margin-top: 0;
 }
 
@@ -1430,6 +1432,10 @@ body:not(.home-page) main {
 /* Improve answer readability */
 .notes-box p {
   margin-bottom: 0.6rem;
+}
+
+.notes-box p:last-child {
+  margin-bottom: 0;
 }
 
 /* Tighter list spacing inside answers */
