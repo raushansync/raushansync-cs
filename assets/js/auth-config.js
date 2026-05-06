@@ -21,7 +21,7 @@
         normalizedPathname === '/login' ||
         normalizedPathname === '/signup' ||
         normalizedPathname === '/dashboard' ||
-        (normalizedPathname.includes('/practice') && !normalizedPathname.includes('/practice-solution'));
+        normalizedPathname.includes('practice');
 
     if (shouldHideDuringAuth) {
         document.documentElement.classList.add('auth-pending');
@@ -112,7 +112,7 @@ function matchesProtectedPath(pathname, prefix) {
 function isProtectedPath(pathname = window.location.pathname) {
     const normalizedPath = normalizePathname(pathname);
 
-    if (normalizedPath.includes('/practice') && !normalizedPath.includes('/practice-solution')) {
+    if (normalizedPath.includes('practice')) {
         return true;
     }
     return PROTECTED_PATH_PREFIXES.some((prefix) => matchesProtectedPath(normalizedPath, prefix));
@@ -619,7 +619,7 @@ window.isAuthenticated = async function () {
 
 window.isProtectedPath = function (pathname = window.location.pathname) {
     const normalizedPath = normalizePathname(pathname);
-    if (normalizedPath.includes('/practice') && !normalizedPath.includes('/practice-solution')) {
+    if (normalizedPath.includes('practice')) {
         return true;
     }
     return PROTECTED_PATH_PREFIXES.some((prefix) => matchesProtectedPath(normalizedPath, prefix));
