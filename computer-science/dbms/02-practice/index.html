@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="#3b82f6" id="theme-color-meta" name="theme-color" />
+    <link href="/manifest.json" rel="manifest" />
+    <title>Practice — Evolution of Data Management | DBMS Part 1.2 | RaushanSYNC CS &amp; DS</title>
+    <meta
+        content="Advanced practice for DBMS Part 1.2 — evolution of data management, physical bookkeeping, spreadsheet limitations, RDBMS parameters, Ted Codd, and the transition between data eras. Reasoning-heavy questions from first principles."
+        name="description" />
+    <meta content="Raushan Kumar" name="author" />
+    <meta content="index, follow" name="robots" />
+    <link href="https://cs.raushansync.com/computer-science/dbms/02-practice/" rel="canonical" />
+    <!-- Open Graph -->
+    <meta content="article" property="og:type" />
+    <meta content="RaushanSYNC CS &amp; DS" property="og:site_name" />
+    <meta content="Practice — Evolution of Data Management | RaushanSYNC CS &amp; DS" property="og:title" />
+    <meta
+        content="Reasoning-heavy advanced practice on the evolution of data management — physical bookkeeping, spreadsheet failures, RDBMS parameters, Ted Codd, and era transitions."
+        property="og:description" />
+    <meta content="https://cs.raushansync.com/computer-science/dbms/02-practice/" property="og:url" />
+    <meta content="https://cs.raushansync.com/assets/og/og-image.jpg" property="og:image" />
+    <!-- Twitter -->
+    <meta content="summary_large_image" name="twitter:card" />
+    <meta content="@raushansync" name="twitter:site" />
+    <meta content="Practice — Evolution of Data Management | RaushanSYNC CS &amp; DS" name="twitter:title" />
+    <meta content="https://cs.raushansync.com/assets/og/og-image.jpg" name="twitter:image" />
+    <!-- Favicon -->
+    <link href="/favicon.ico" rel="icon" type="image/x-icon" />
+    <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180" />
+    <link href="/favicon-48x48.png" rel="icon" sizes="48x48" type="image/png" />
+    <link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png" />
+    <link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png" />
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://cs.raushansync.com/"},
+            {"@type": "ListItem", "position": 2, "name": "Computer Science", "item": "https://cs.raushansync.com/computer-science/"},
+            {"@type": "ListItem", "position": 3, "name": "DBMS", "item": "https://cs.raushansync.com/computer-science/dbms/"},
+            {"@type": "ListItem", "position": 4, "name": "1.2 Practice", "item": "https://cs.raushansync.com/computer-science/dbms/02-practice/"}
+        ]
+    }
+    </script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="/assets/css/style.css" rel="stylesheet" />
+    <style>
+        /* ── Practice-specific highlight states ── */
+        .correct-option {
+            background: rgba(34, 197, 94, 0.12) !important;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            border-radius: 10px;
+        }
+
+        .incorrect-option {
+            background: rgba(239, 68, 68, 0.10) !important;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-radius: 10px;
+        }
+
+        /* ── Code in practice cards ── */
+        .quiz-card code {
+            background: rgba(59, 130, 246, 0.09);
+            border: 1px solid rgba(59, 130, 246, 0.18);
+            border-radius: 5px;
+            padding: 0.1em 0.4em;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+            font-size: 0.88em;
+            color: var(--primary-color);
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            display: inline;
+            vertical-align: baseline;
+        }
+
+        .dark-mode .quiz-card code {
+            background: rgba(96, 165, 250, 0.1);
+            border-color: rgba(96, 165, 250, 0.2);
+            color: #93c5fd;
+        }
+
+        .quiz-option {
+            display: block;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            line-height: 1.45;
+        }
+
+        .quiz-option input {
+            margin-right: 0.55rem;
+            vertical-align: middle;
+            transform: translateY(-1px);
+        }
+
+        /* ── Question count pill ── */
+        .question-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .question-num-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.8rem;
+            height: 1.8rem;
+            background: var(--primary-color);
+            color: #fff;
+            border-radius: 50%;
+            font-size: 0.78rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .question-type-tag {
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            padding: 0.15rem 0.5rem;
+            border-radius: 999px;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-color);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .question-type-tag.multi {
+            background: rgba(168, 85, 247, 0.1);
+            color: #9333ea;
+            border-color: rgba(168, 85, 247, 0.25);
+        }
+
+        .question-type-tag.ar {
+            background: rgba(234, 88, 12, 0.1);
+            color: #ea580c;
+            border-color: rgba(234, 88, 12, 0.25);
+        }
+
+        .dark-mode .question-type-tag.multi {
+            color: #c084fc;
+            background: rgba(168, 85, 247, 0.15);
+        }
+
+        .dark-mode .question-type-tag.ar {
+            color: #fb923c;
+            background: rgba(234, 88, 12, 0.15);
+        }
+
+        .quiz-card h3 {
+            margin-top: 0.3rem;
+        }
+
+        /* Assertion-Reason block styling */
+        .ar-block {
+            background: rgba(59, 130, 246, 0.05);
+            border-left: 3px solid var(--primary-color);
+            border-radius: 0 8px 8px 0;
+            padding: 0.75rem 1rem;
+            margin: 0.75rem 0 1rem;
+            font-size: 0.93rem;
+            line-height: 1.6;
+        }
+
+        .ar-block p {
+            margin: 0.3rem 0;
+        }
+
+        .ar-label {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .dark-mode .ar-block {
+            background: rgba(96, 165, 250, 0.07);
+        }
+
+        /* Section divider */
+        .quiz-section-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: var(--primary-color);
+            margin: 2.2rem 0 1rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 2px solid rgba(59, 130, 246, 0.2);
+        }
+    </style>
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+    <script src="/assets/js/quiz-score-handler.js"></script>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a class="logo" href="/">RaushanSYNC CS &amp; DS</a>
+            <div id="nav"></div>
+            <div class="header-actions">
+                <button aria-label="Toggle dark mode" class="theme-toggle-btn" id="theme-toggle">
+                    <svg class="icon-moon" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                    <svg class="icon-sun" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"
+                            stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+    <main class="notes-page practice-page">
+        <div class="notes-container">
+            <header class="notes-header quiz-header">
+                <div class="notes-header-left">
+                    <h1>Part 1.2 — Evolution of Data Management &amp; History of DBMS</h1>
+                    <p>DBMS Series · RaushanSYNC CS &amp; DS</p>
+                    <p>RaushanSYNC — Learning from First Principles.</p>
+                </div>
+                <div class="notes-header-actions">
+                    <span class="page-header-tick-label">Mark completed</span>
+                    <div data-tick-container="" data-tick-position="header" data-tick-type="practice" id="note-tick">
+                    </div>
+                </div>
+            </header>
+            <!-- Breadcrumb -->
+            <nav aria-label="Breadcrumb" class="breadcrumb">
+                <ol>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/computer-science/">Computer Science</a></li>
+                    <li><a href="/computer-science/dbms/">DBMS</a></li>
+                    <li aria-current="page">1.2 Practice — Evolution of Data Management</li>
+                </ol>
+            </nav>
+            <!-- Lesson progress badge -->
+            <div class="lesson-progress">
+                <span class="lesson-badge">1.2</span>
+                <span class="lesson-title-small">Evolution of Data Management &amp; History of DBMS — Practice</span>
+            </div>
+            <section class="palette important">
+                <p><strong>Instructions:</strong></p>
+                <p>Attempt every question before checking the answer. Some questions have a single correct answer;
+                    others ask you to select all that apply; others test causal reasoning in an Assertion–Reason format.
+                    Read every option carefully — plausible distractors are intentional. Understanding comes from
+                    thinking, not guessing.</p>
+            </section>
+            <!-- ══════════════════════════════════════════
+                 SECTION A — SINGLE CORRECT
+            ══════════════════════════════════════════ -->
+            <section>
+                <h2 class="quiz-section-title">Section A — Single Correct Answer</h2>
+                <!-- Q1 -->
+                <div class="quiz-card" data-answer="b"
+                    data-reason="Physical bookkeeping has a hard architectural ceiling: it can function for small local operations, but it collapses under real-time global scale. The key issue is not staffing, but the system's inability to coordinate millions of simultaneous records quickly and reliably. Durability can be improved with copies and better storage, security can be tightened with access controls, and retrieval can be reorganized — but scalability is a structural limit. No amount of clerks turns a non-digital ledger into a real-time global coordination engine.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">1</span>
+                        <span class="question-type-tag">SINGLE CORRECT</span>
+                    </div>
+                    <h3>A government ministry is designing a national vaccination tracking program for 1.4 billion
+                        citizens. An administrator argues that a physical ledger system could work if they hired enough
+                        clerks and built enough filing rooms — it would simply be a very large-scale version of what has
+                        always worked. One failure mode of physical systems cannot be solved by adding more human
+                        resources. Which failure mode is this, and why does it remain unsolvable regardless of staffing?
+                    </h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input name="q1" type="radio" value="a" /> A. Durability — physical
+                            media is fragile and no number of clerks can prevent fire, flooding, or paper decay from
+                            destroying records.</label>
+                        <label class="quiz-option"><input name="q1" type="radio" value="b" /> B. Scalability — physical
+                            systems have a hard architectural ceiling where real-time coordination of millions of
+                            simultaneous records is structurally impossible, regardless of how many people are
+                            employed.</label>
+                        <label class="quiz-option"><input name="q1" type="radio" value="c" /> C. Security — physical
+                            locks provide only binary access and no number of personnel can implement granular
+                            per-record access control on paper.</label>
+                        <label class="quiz-option"><input name="q1" type="radio" value="d" /> D. Retrieval — manual
+                            search becomes slower as more clerks are added because they interfere with one another's
+                            filing and cross-referencing work.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+                <!-- Q2 -->
+                <div class="quiz-card" data-answer="c"
+                    data-reason="Machine-readable encoding is not just a visual or storage-format change. It allows counting machines to automatically process and aggregate records, which removes the human from the computation loop. That is the architectural leap: data no longer exists only for people to read; it can be directly consumed by machines for automatic processing. This is the first bridge from record-keeping to automated data processing.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">2</span>
+                        <span class="question-type-tag">SINGLE CORRECT</span>
+                    </div>
+                    <h3>Herman Hollerith's punch card system is described as a "conceptual bridge" because it encoded
+                        data for machine reading rather than human reading. A student argues: "This is just a formatting
+                        difference — the data is the same either way; it is just represented differently." What does
+                        that distinction mean architecturally?</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input name="q2" type="radio" value="a" /> A. Machine-readable data
+                            is physically more compact than handwritten ledger entries, making storage rooms smaller and
+                            filing faster.</label>
+                        <label class="quiz-option"><input name="q2" type="radio" value="b" /> B. Machine-readable punch
+                            cards are made from sturdier material than paper ledgers, solving the durability failure of
+                            the physical era.</label>
+                        <label class="quiz-option"><input name="q2" type="radio" value="c" /> C. Machine-readable
+                            encoding allows counting machines to automatically process and aggregate records — removing
+                            the human bottleneck from computation itself, not just from storage, which is the first
+                            bridge to automated data processing.</label>
+                        <label class="quiz-option"><input name="q2" type="radio" value="d" /> D. Machine-readable data
+                            ensures arithmetic accuracy because mechanical counting machines cannot make the same errors
+                            a human clerk would when adding ledger entries.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+                <!-- Q3 -->
+                <div class="quiz-card" data-answer="b"
+                    data-reason="Solving durability does not solve consistency, atomicity, or concurrency. Those are separate architectural guarantees, and a spreadsheet does not provide them. A cloud backup can preserve a broken or contradictory file perfectly. The move from spreadsheets to a DBMS is about the data-management contract: the relational system adds guarantees that the flat-file model cannot supply, not just better storage safety.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">3</span>
+                        <span class="question-type-tag">SINGLE CORRECT</span>
+                    </div>
+                    <h3>A student argues: "Spreadsheets solved the most dangerous failure of physical systems —
+                        durability — through cloud backups and digital redundancy. Since the core danger of physical
+                        bookkeeping was that records could be permanently destroyed, and spreadsheets eliminate that
+                        danger, spreadsheets represent a fundamentally trustworthy upgrade. The remaining issues are
+                        minor inconveniences." Which response most precisely identifies the flaw in this argument?</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input name="q2b" type="radio" value="a" /> A. The argument's premise
+                            is wrong — cloud backups can fail too, so spreadsheets did not actually solve the durability
+                            problem.</label>
+                        <label class="quiz-option"><input name="q2b" type="radio" value="b" /> B. Solving durability
+                            does not solve consistency, atomicity, or concurrency — these are structurally separate
+                            failures that require different architectural solutions. The move from spreadsheets to DBMS
+                            is not about durability at all; it is about the data management contract the flat-file model
+                            cannot provide.</label>
+                        <label class="quiz-option"><input name="q2b" type="radio" value="c" /> C. Spreadsheets actually
+                            worsened retrieval compared to physical systems because digital search algorithms are less
+                            reliable than trained human filing clerks.</label>
+                        <label class="quiz-option"><input name="q2b" type="radio" value="d" /> D. The five core needs —
+                            storage, retrieval, transactions, audit, and archival — are DBMS features, not universal
+                            requirements, so measuring spreadsheets against them is inappropriate.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+                <!-- Q4 -->
+                <div class="quiz-card"
+                    data-answer="c"
+                    data-reason="This is a consistency failure. The same real-world fact — the patient's blood type — ends up stored as two conflicting values across different copies of the data. That means the system is no longer in a valid state, because different parts of the same system now disagree about the same fact. This is different from atomicity, which would involve a single multi-step update failing halfway through, and different from durability, which would involve a committed update being lost.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">4</span>
+                        <span class="question-type-tag">SINGLE CORRECT</span>
+                    </div>
+                    <h3>A hospital's spreadsheet-based patient management system records each patient's blood type in both a <code>surgery_schedule.xlsx</code> sheet and a <code>medication_allergies.xlsx</code> sheet. During an emergency, a nurse updates a patient's blood type in the surgery sheet after receiving new lab results, but the allergies sheet is not updated. Hours later, a pharmacist cross-references the allergies sheet and administers a medication based on the old, incorrect blood type. Based on the six DBMS parameters used in this question set, which parameter did the spreadsheet system most critically fail to guarantee?</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input type="radio" name="q4" value="a"> A. Atomicity — the blood type update was not executed as a single indivisible operation spanning both sheets simultaneously.</label>
+                        <label class="quiz-option"><input type="radio" name="q4" value="b"> B. Efficiency — the system wasted retrieval time by requiring clinicians to check two separate sheets for one patient's information.</label>
+                        <label class="quiz-option"><input type="radio" name="q4" value="c"> C. Consistency — the system allowed the same real-world fact to exist as two conflicting values across its stored representations, leaving the system in an invalid state.</label>
+                        <label class="quiz-option"><input type="radio" name="q4" value="d"> D. Durability — the new blood type committed to the surgery sheet was not permanently propagated to all storage locations.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+                <!-- Q5 -->
+                <div class="quiz-card" data-answer="d"
+                    data-reason="NoSQL systems were created to extend the database ecosystem for use cases such as unstructured data and extreme horizontal scale. They did not replace relational databases. For transactional business data, relational systems remain the dominant architecture, and SQL, transactions, and relational design still matter. The flaw in the CTO's reasoning is treating NoSQL as a universal replacement rather than a complementary tool.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">5</span>
+                        <span class="question-type-tag">SINGLE CORRECT</span>
+                    </div>
+                    <h3>A startup CTO announces: "We've migrated everything to MongoDB — a modern NoSQL system. The
+                        relational model is a 1970s relic. Our engineers no longer need to understand SQL, transactions,
+                        or the relational architecture." Which of the following most precisely identifies why this
+                        reasoning is flawed?</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input name="q5" type="radio" value="a" /> A. MongoDB is inherently
+                            less secure than relational databases and should not be used for any production data
+                            regardless of the use case.</label>
+                        <label class="quiz-option"><input name="q5" type="radio" value="b" /> B. NoSQL systems are less
+                            mature than RDBMS and will eventually be replaced by a future generation of the relational
+                            model once they are made more scalable.</label>
+                        <label class="quiz-option"><input name="q5" type="radio" value="c" /> C. NoSQL databases cannot
+                            handle concurrent access, making any multi-user system built on them inherently
+                            unreliable.</label>
+                        <label class="quiz-option"><input name="q5" type="radio" value="d" /> D. NoSQL extended the
+                            ecosystem for unstructured data and extreme horizontal scale but did not replace RDBMS — the
+                            vast majority of transactional business data continues to live in relational systems, and
+                            the relational architecture remains the foundation of industry data practice.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </section>
+            <!-- ══════════════════════════════════════════
+                 SECTION B — MULTIPLE CORRECT
+            ══════════════════════════════════════════ -->
+            <section>
+                <h2 class="quiz-section-title">Section B — Select All That Apply</h2>
+                <!-- Q6 -->
+                <div class="quiz-card" data-answer="a,c,d,e"
+                    data-reason="A spreadsheet under heavy concurrent use runs into several structural failures. Scalability breaks down because spreadsheets are not built for large, simultaneous, constantly changing workloads. Consistency fails because one cell can be changed while other copies of the same fact remain outdated. Atomicity fails because multi-cell updates can leave partial states if the application crashes. Security also fails because basic password protection does not provide fine-grained access control by user, table, column, or operation. Durability is not the main failure here, since cloud backup and auto-save can preserve the file.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">6</span>
+                        <span class="question-type-tag multi">SELECT ALL THAT APPLY</span>
+                    </div>
+                    <h3>A logistics company stores all shipment records in a shared Excel file accessed simultaneously
+                        by 50 warehouse workers. Each shipment record spans multiple cells: tracking ID, status,
+                        destination, assigned handler, and estimated arrival. Workers constantly update statuses, and
+                        the file is saved to a cloud backup service. Based on the six DBMS parameters used in this
+                        question set, which parameters does this spreadsheet-based system structurally fail to satisfy?
+                        Select all that apply.</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input name="q6" type="checkbox" value="a" /> A. Scalability — strict
+                            row limits and performance degradation under concurrent access from 50 simultaneous users
+                            continuously adding and modifying records.</label>
+                        <label class="quiz-option"><input name="q6" type="checkbox" value="b" /> B. Durability — cloud
+                            backup services cannot guarantee that committed data survives server failures, so this
+                            parameter is not satisfied.</label>
+                        <label class="quiz-option"><input name="q6" type="checkbox" value="c" /> C. Consistency —
+                            updating a shipment status in one cell does not automatically propagate to all other cells
+                            referencing that shipment's state, creating conflicting representations of the same
+                            real-world fact.</label>
+                        <label class="quiz-option"><input name="q6" type="checkbox" value="d" /> D. Atomicity — updating
+                            a single shipment event requires writing to multiple cells; if the application crashes
+                            between writes, the partial state cannot be automatically rolled back, leaving the data
+                            silently incorrect.</label>
+                        <label class="quiz-option"><input name="q6" type="checkbox" value="e" /> E. Security — basic
+                            password protection cannot enforce granular per-worker, per-shipment-type, or per-operation
+                            access control that different worker roles require.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+                <!-- Q7 -->
+                <div class="quiz-card" data-answer="a,b,c"
+                    data-reason="Codd developed the relational model while working at IBM in the early 1970s. He represented data as sets of tuples organized into relations, with independence from physical storage layout. He also defined BCNF, a normalization technique that goes beyond 3NF to handle cases where 3NF still allows redundancy and anomalies. The claim that his model instantly replaced all navigational systems is incorrect, and the claim about SQL's WHERE clause is not stated here.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">7</span>
+                        <span class="question-type-tag multi">SELECT ALL THAT APPLY</span>
+                    </div>
+                    <h3>A student is preparing a short profile of Ted Codd's intellectual contributions for a seminar.
+                        Which of the following statements are accurate and can be included without misrepresentation?
+                        Select all that apply.</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input name="q7" type="checkbox" value="a" /> A. Codd developed the
+                            relational model while working at IBM in the early 1970s.</label>
+                        <label class="quiz-option"><input name="q7" type="checkbox" value="b" /> B. Codd's model
+                            represented data as sets of tuples organised into relations — a framework designed to be
+                            independent of the physical storage layout, unlike the navigational models it
+                            replaced.</label>
+                        <label class="quiz-option"><input name="q7" type="checkbox" value="c" /> C. Codd defined BCNF, a
+                            normalization technique that goes beyond 3NF to address cases where 3NF conditions are
+                            satisfied but certain redundancy and update anomaly problems still remain.</label>
+                        <label class="quiz-option"><input name="q7" type="checkbox" value="d" /> D. Codd's relational
+                            model immediately replaced all navigational database systems upon its publication in the
+                            early 1970s, which is why the 1970s timeline entry shows the SQL boom.</label>
+                        <label class="quiz-option"><input name="q7" type="checkbox" value="e" /> E. Codd proved that
+                            SQL's WHERE clause is a direct instantiation of predicate logic, which is why the relational
+                            model is credited as the first formal mathematical framework in computing history.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+                <!-- Q8 -->
+                <div class="quiz-card" data-answer="a,c,d"
+                    data-reason="The constants are the universal needs of record-keeping and the recurring transition pattern. Storage, retrieval, transactions, audit, and archival remain fundamental requirements in every era. The same cycle also repeats: a working system faces new demands, specific failures appear, and a new system is built as a direct response. The six DBMS parameters are also permanent evaluation criteria. What changes are the technologies and architectures used to satisfy those needs, not the needs themselves.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">8</span>
+                        <span class="question-type-tag multi">SELECT ALL THAT APPLY</span>
+                    </div>
+                    <h3>The entire history of data management can be viewed as a single evolutionary design problem.
+                        Which statements about what remains constant across all four eras — from physical bookkeeping
+                        through the cloud era — are correct? Select all that apply.</h3>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input name="q8" type="checkbox" value="a" /> A. The five core needs
+                            — storage, retrieval, transactions, audit, and archival — are universal requirements of
+                            record-keeping that exist in every era, from ledgers to cloud databases.</label>
+                        <label class="quiz-option"><input name="q8" type="checkbox" value="b" /> B. The specific
+                            technologies used to satisfy each core need — magnetic tape, spreadsheets, SQL engines —
+                            remain consistent across eras; only their implementation details differ.</label>
+                        <label class="quiz-option"><input name="q8" type="checkbox" value="c" /> C. The transition
+                            pattern itself is a constant: every era exhibits the same cycle of a working system meeting
+                            new demands, producing specific failures, and being replaced by a system built as direct
+                            answers to those failures.</label>
+                        <label class="quiz-option"><input name="q8" type="checkbox" value="d" /> D. The six DBMS
+                            parameters — durability, scalability, security, consistency, atomicity, efficiency — serve
+                            as the permanent evaluation criteria against which every era of data management is
+                            measured.</label>
+                        <label class="quiz-option"><input name="q8" type="checkbox" value="e" /> E. The relational model
+                            is a constant foundation across all four eras — NoSQL and cloud systems are built directly
+                            on the relational architecture, extending it rather than departing from it.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </section>
+            <!-- ══════════════════════════════════════════
+                 SECTION C — ASSERTION–REASON
+            ══════════════════════════════════════════ -->
+            <section>
+                <h2 class="quiz-section-title">Section C — Assertion &amp; Reason</h2>
+                <section class="palette" style="margin-bottom: 1.5rem;">
+                    <p><strong>Instructions for this section:</strong> Each question contains an Assertion (A) and a
+                        Reason (R). Choose the option that correctly describes the truth of both statements and their
+                        relationship.</p>
+                    <p>
+                        <strong>A</strong> — Both Assertion and Reason are true, and Reason is the correct explanation
+                        of Assertion.<br />
+                        <strong>B</strong> — Both Assertion and Reason are true, but Reason does not correctly explain
+                        Assertion.<br />
+                        <strong>C</strong> — Assertion is true, Reason is false.<br />
+                        <strong>D</strong> — Assertion is false, Reason is true.
+                    </p>
+                </section>
+                <!-- Q9 -->
+                <div class="quiz-card" data-answer="a"
+                    data-reason="Both statements are true, and the reason correctly explains the assertion. BCNF is stricter than 3NF because there are schema structures where 3NF still permits update anomalies. BCNF exists to close that gap by imposing a tighter constraint on functional dependencies.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">9</span>
+                        <span class="question-type-tag ar">ASSERTION – REASON</span>
+                    </div>
+                    <div class="ar-block">
+                        <p><span class="ar-label">Assertion (A):</span> BCNF (Boyce-Codd Normal Form) represents a more
+                            rigorous standard of normalisation than 3NF because it is designed to eliminate redundancy
+                            and update anomalies that 3NF is not always capable of eliminating on its own.</p>
+                        <p><span class="ar-label">Reason (R):</span> There exist schema structures in which all 3NF
+                            conditions are technically satisfied, yet certain functional dependency relationships still
+                            permit update anomalies — situations where a valid update in one place creates inconsistency
+                            elsewhere — and BCNF addresses precisely these cases by imposing a stricter constraint.</p>
+                    </div>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input name="q9" type="radio" value="a" /> A. Both A and R are true,
+                            and R is the correct explanation of A.</label>
+                        <label class="quiz-option"><input name="q9" type="radio" value="b" /> B. Both A and R are true,
+                            but R does not correctly explain A.</label>
+                        <label class="quiz-option"><input name="q9" type="radio" value="c" /> C. A is true, R is
+                            false.</label>
+                        <label class="quiz-option"><input name="q9" type="radio" value="d" /> D. A is false, R is
+                            true.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+                <!-- Q10 -->
+                <div class="quiz-card" data-answer="d"
+                    data-reason="The assertion is false and the reason is true. The move from physical bookkeeping to electronic systems is a qualitative change: it makes durability software-managed and retrieval algorithmic. The move from spreadsheets to DBMS is a different advance: it adds data-management guarantees such as consistency, atomicity, concurrency, and constraint enforcement. Those are different axes of improvement, not the same improvement repeated.">
+                    <div class="question-meta">
+                        <span class="question-num-pill">10</span>
+                        <span class="question-type-tag ar">ASSERTION – REASON</span>
+                    </div>
+                    <div class="ar-block">
+                        <p><span class="ar-label">Assertion (A):</span> The transition from physical bookkeeping to
+                            spreadsheets and the transition from spreadsheets to a relational DBMS are fundamentally the
+                            same kind of improvement — each makes the preceding system faster, more reliable, and better
+                            at the same tasks, in a continuous progression along a single axis of improvement.</p>
+                        <p><span class="ar-label">Reason (R):</span> The physical-to-electronic transition is a
+                            qualitative change — it changes the nature of what is possible by making durability a
+                            software concern and retrieval algorithmic rather than manual; the spreadsheet-to-DBMS
+                            transition is a different kind of advance — it changes the data management contract by
+                            adding consistency, atomicity, concurrency guarantees, and constraint enforcement that the
+                            flat-file model is structurally incapable of providing. These are different axes of
+                            improvement, not the same axis repeated.</p>
+                    </div>
+                    <div class="quiz-options">
+                        <label class="quiz-option"><input name="q10" type="radio" value="a" /> A. Both A and R are true,
+                            and R is the correct explanation of A.</label>
+                        <label class="quiz-option"><input name="q10" type="radio" value="b" /> B. Both A and R are true,
+                            but R does not correctly explain A.</label>
+                        <label class="quiz-option"><input name="q10" type="radio" value="c" /> C. A is true, R is
+                            false.</label>
+                        <label class="quiz-option"><input name="q10" type="radio" value="d" /> D. A is false, R is
+                            true.</label>
+                    </div>
+                    <button class="quiz-btn" type="button">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </section>
+            <!-- ── Reflection palette ── -->
+            <section class="palette important" style="margin-top: 2.5rem;">
+                <h3>After This Practice</h3>
+                <p>
+                    If any question surprised you, compare the options against the scenario itself and the core ideas
+                    behind it.
+                    The questions above target the most persistent misconceptions in data management history —
+                    particularly the hard-ceiling nature of scalability failure, what machine-readable data actually
+                    enables,
+                    why solving durability does not solve consistency, and the precise difference between the two kinds
+                    of
+                    advances that the three main eras represent.
+                </p>
+                <ul>
+                    <li>Scalability failure is architectural, not a staffing problem — no number of clerks can make
+                        physical systems coordinate real-time global data.</li>
+                    <li>Machine-readable encoding removes the human from the computation loop — this is a conceptual
+                        leap, not a formatting choice.</li>
+                    <li>Durability and consistency are separate axes — solving one does not touch the other. A
+                        spreadsheet can be perfectly backed up and still be inconsistent.</li>
+                    <li>The two major transitions are different kinds of improvements: physical-to-electronic changes
+                        what is possible; spreadsheet-to-DBMS changes the engineering contract.</li>
+                    <li>NoSQL extended the ecosystem — it did not replace the relational architecture. These coexist for
+                        different problem classes.</li>
+                    <li>BCNF exists because 3NF is not always sufficient — understanding why requires understanding what
+                        kinds of anomalies 3NF can still permit.</li>
+                    <li>The six DBMS parameters are permanent requirements, not era-specific features. Every system is
+                        evaluated against all six, simultaneously.</li>
+                </ul>
+                <blockquote>
+                    If the five core needs have existed since the ledger era and the six DBMS parameters are permanent
+                    —<br />
+                    what exactly did each era add, and what did each era leave unsolved?
+                </blockquote>
+                <p class="signature">— RaushanSYNC Learning Network</p>
+            </section>
+            <div class="notes-watermark">RaushanSYNC CS &amp; DS · Evolution of Data Management · Practice</div>
+        </div>
+    </main>
+    <div aria-hidden="true" aria-labelledby="ai-chat-title" aria-modal="true" class="ai-chat-modal" hidden=""
+        id="ai-chat-modal" role="dialog">
+        <div class="ai-chat-overlay" data-ai-chat-close=""></div>
+        <section class="ai-chat-panel">
+            <header class="ai-chat-header">
+                <h2 id="ai-chat-title">Ask AI Tutor</h2>
+                <button aria-label="Close AI chat" class="ai-chat-close" id="ai-chat-close" type="button">×</button>
+            </header>
+            <div aria-live="polite" class="ai-chat-context" id="ai-chat-context"></div>
+            <div aria-live="polite" class="ai-chat-history" id="ai-chat-history"></div>
+            <form class="ai-chat-input-row" id="ai-chat-form">
+                <label class="ai-chat-label" for="ai-chat-input">Ask a follow-up</label>
+                <textarea id="ai-chat-input"
+                    placeholder="Ask why this answer is correct, request a hint, or ask for an example..."
+                    rows="2"></textarea>
+                <button id="ai-chat-send" type="submit">Send</button>
+            </form>
+        </section>
+    </div>
+    <div id="support-cta"></div>
+    <div id="footer"></div>
+    <!-- Supabase & Auth -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4"></script>
+    <script src="/assets/js/auth-config.js"></script>
+    <script src="/assets/js/auth-guard.js"></script>
+    <script src="/assets/js/progress-tracker.js"></script>
+    <script src="/assets/js/tick-manager.js"></script>
+    <script src="/assets/js/script.js"></script>
+    <script src="/ai-chat.js"></script>
+    <!-- ── PRACTICE LOGIC ── -->
+    <script>
+        function setFeedback(card, isCorrect, message) {
+            const feedback = card.querySelector('.quiz-feedback');
+            if (!feedback) return;
+            feedback.textContent = message;
+            feedback.classList.remove('correct', 'incorrect');
+            feedback.classList.add(isCorrect ? 'correct' : 'incorrect');
+        }
+
+        function getCorrectAnswers(card) {
+            const raw = card.dataset.answer || '';
+            return raw.split(',').map(a => a.trim()).filter(a => a);
+        }
+
+        function getSelectedAnswers(card) {
+            const inputs = card.querySelectorAll('input');
+            const selected = [];
+            inputs.forEach(input => {
+                if (input.checked) selected.push(input.value);
+            });
+            return selected;
+        }
+
+        function arraysMatch(arr1, arr2) {
+            if (arr1.length !== arr2.length) return false;
+            const s1 = [...arr1].sort();
+            const s2 = [...arr2].sort();
+            return s1.every((v, i) => v === s2[i]);
+        }
+
+        function getCorrectLabels(card) {
+            const correctValues = getCorrectAnswers(card);
+            return correctValues.map(value => {
+                const input = card.querySelector('input[value="' + value + '"]');
+                return input ? input.closest('label').textContent.trim() : value;
+            }).join(' | ');
+        }
+
+        function getSelectedLabels(card) {
+            return getSelectedAnswers(card).map(value => {
+                const input = card.querySelector('input[value="' + value + '"]');
+                return input ? input.closest('label').textContent.trim() : value;
+            });
+        }
+
+        function buildAIContext(card) {
+            const question = card.querySelector('h3')?.textContent.trim() ||
+                card.querySelector('.ar-block')?.textContent.trim() ||
+                'Question unavailable';
+            const selectedLabels = getSelectedLabels(card);
+            const userAnswer = selectedLabels.length > 0 ? selectedLabels.join(' | ') : 'No option selected yet.';
+            const correctAnswer = getCorrectLabels(card) || 'Correct answer not available.';
+            const explanation = (card.dataset.reason || '').trim() || 'No explanation available.';
+            const practiceTitle = document.querySelector('.practice sheet-header h1')?.textContent.trim() || 'Practice';
+            return { practiceTitle, questionText: question, userAnswer, correctAnswer, explanation, pageUrl: window.location.href };
+        }
+
+        function clearHighlight(card) {
+            card.querySelectorAll('.quiz-option').forEach(label => {
+                label.classList.remove('correct-option', 'incorrect-option');
+            });
+        }
+
+        function highlightCorrect(card) {
+            getCorrectAnswers(card).forEach(value => {
+                const input = card.querySelector('input[value="' + value + '"]');
+                if (input) input.closest('label').classList.add('correct-option');
+            });
+        }
+
+        function highlightIncorrectSelections(card) {
+            const correct = getCorrectAnswers(card);
+            getSelectedAnswers(card).forEach(value => {
+                if (!correct.includes(value)) {
+                    const input = card.querySelector('input[value="' + value + '"]');
+                    if (input) input.closest('label').classList.add('incorrect-option');
+                }
+            });
+        }
+
+        function revealAIButton(card) {
+            const btn = card.querySelector('.discuss-ai-btn');
+            if (btn) btn.hidden = false;
+        }
+
+        function ensureAIButtons() {
+            document.querySelectorAll('.quiz-card').forEach(card => {
+                if (card.querySelector('.discuss-ai-btn')) return;
+                const button = document.createElement('button');
+                button.className = 'quiz-btn discuss-ai-btn';
+                button.type = 'button';
+                button.hidden = true;
+                button.textContent = 'Ask AI';
+                const feedback = card.querySelector('.quiz-feedback');
+                if (feedback) { feedback.before(button); return; }
+                const checkButton = card.querySelector('.quiz-btn');
+                if (checkButton) checkButton.insertAdjacentElement('afterend', button);
+            });
+        }
+
+        function handleCheck(card) {
+            revealAIButton(card);
+            const selected = getSelectedAnswers(card);
+            const correct = getCorrectAnswers(card);
+            const reason = (card.dataset.reason || '').trim();
+
+            if (selected.length === 0) {
+                setFeedback(card, false, 'Please choose at least one option.');
+                return;
+            }
+
+            clearHighlight(card);
+            const isCorrect = arraysMatch(selected, correct);
+
+            if (isCorrect) {
+                highlightCorrect(card);
+                setFeedback(card, true, 'Correct! Explanation: ' + reason);
+            } else {
+                highlightCorrect(card);
+                highlightIncorrectSelections(card);
+                setFeedback(card, false,
+                    'Not quite. Correct answer(s): ' + getCorrectLabels(card) + '. Explanation: ' + reason);
+            }
+        }
+
+        ensureAIButtons();
+
+        document.querySelectorAll('.quiz-card').forEach(card => {
+            const button = card.querySelector('.quiz-btn:not(.discuss-ai-btn)');
+            if (button) button.addEventListener('click', () => handleCheck(card));
+        });
+
+        document.querySelectorAll('.discuss-ai-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const card = button.closest('.quiz-card');
+                if (!card) return;
+                if (typeof window.initAIChat !== 'function') {
+                    alert('AI chat is not available right now. Please try again shortly.');
+                    return;
+                }
+                window.initAIChat(buildAIContext(card));
+            });
+        });
+    </script>
+</body>
+
+</html>
