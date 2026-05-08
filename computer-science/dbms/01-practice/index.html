@@ -163,6 +163,8 @@
 
         .quiz-card h3 {
             margin-top: 0.3rem;
+            width: 100%;
+            max-width: none;
         }
 
         /* Assertion-Reason block styling */
@@ -174,10 +176,14 @@
             margin: 0.75rem 0 1rem;
             font-size: 0.93rem;
             line-height: 1.6;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .ar-block p {
             margin: 0.3rem 0;
+            width: 100%;
+            max-width: none;
         }
 
         .ar-label {
@@ -281,268 +287,256 @@
                 <!-- Q1 -->
                 <div class="quiz-card"
                     data-answer="b"
-                    data-reason="This is data redundancy producing inconsistency — precisely the first file-system failure described in the notes. The customer's address is stored in two separate files. When only one is updated, the two files now contain conflicting representations of the same real-world fact. Any decision made from either file may now be wrong. This is not a concurrency anomaly (no simultaneous access conflict) and not an atomicity failure (no partially executed operation). It is the classic redundancy-causes-inconsistency chain described in the attachment.">
+                    data-reason="A DBMS is a software layer between application code and stored data. Its purpose is to manage data efficiently and transparently, not merely to save files or replace the OS.">
                     <div class="question-meta">
                         <span class="question-num-pill">1</span>
-                        <span class="question-type-tag">SINGLE CORRECT</span>
+                        <span class="question-type-tag ">SINGLE CORRECT</span>
                     </div>
-                    <h3>A bank's file-based system stores each customer's address in both an <code>accounts.csv</code> file and a <code>loans.csv</code> file. A customer updates their address through the loans portal. The accounts file is not updated. A loan officer and an account manager now both look up the same customer and see different addresses. Which of the seven file-system failures does this scenario most precisely illustrate?</h3>
+                    <h3>An application needs to store, retrieve, update, and protect shared data without handling raw disk files directly. What is the main job of a DBMS in this situation?</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input type="radio" name="q1" value="a"> A. Atomicity failure — the update was not executed as a single indivisible operation.</label>
-                        <label class="quiz-option"><input type="radio" name="q1" value="b"> B. Data redundancy causing inconsistency — the same real-world fact is now stored as two conflicting values across separate files.</label>
-                        <label class="quiz-option"><input type="radio" name="q1" value="c"> C. Concurrency anomaly — two users accessed the data simultaneously and one overwrote the other.</label>
-                        <label class="quiz-option"><input type="radio" name="q1" value="d"> D. Security failure — unauthorized personnel accessed data they should not have seen.</label>
+                        <label class="quiz-option"><input type="radio" name="q1" value="a"> A. To store only plain text files.</label>
+                        <label class="quiz-option"><input type="radio" name="q1" value="b"> B. To manage data through a software layer that sits between applications and the stored data.</label>
+                        <label class="quiz-option"><input type="radio" name="q1" value="c"> C. To replace the operating system.</label>
+                        <label class="quiz-option"><input type="radio" name="q1" value="d"> D. To make every file smaller automatically.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
+
 
                 <!-- Q2 -->
                 <div class="quiz-card"
                     data-answer="c"
-                    data-reason="The notes describe integrity problems as follows: when constraints are embedded in application code, they can be written inconsistently, forgotten in some programs, or deliberately bypassed. That is exactly what happened here — the original application enforced the salary rule, but the new application, which also writes to the same file, does not enforce it. There is no single enforcer. This is an integrity failure — a business rule that should apply universally can be bypassed by any program that does not implement it. This is not redundancy (the data is not duplicated) and not a concurrency issue (there is no simultaneous access conflict described).">
+                    data-reason="Flat files can work for simple cases, but growing systems often face redundant copies, inconsistent values, difficult access, integrity problems, partial updates, simultaneous-user conflicts, and security challenges.">
                     <div class="question-meta">
                         <span class="question-num-pill">2</span>
-                        <span class="question-type-tag">SINGLE CORRECT</span>
+                        <span class="question-type-tag ">SINGLE CORRECT</span>
                     </div>
-                    <h3>A company's HR application enforces the rule "employee salary must be greater than zero" inside its own code before writing to <code>employees.txt</code>. A second payroll application, added by a new developer, also writes to <code>employees.txt</code> but does not include this check. The payroll app writes a salary of <code>−5000</code>. Which file-system failure does this represent?</h3>
+                    <h3>A small office first stores customer data in separate files. Later, many employees and programs update those files. Why can this file-based approach become a problem?</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input type="radio" name="q2" value="a"> A. Data isolation — combining data from multiple files requires custom programming.</label>
-                        <label class="quiz-option"><input type="radio" name="q2" value="b"> B. Data redundancy — the salary rule is duplicated across two codebases.</label>
-                        <label class="quiz-option"><input type="radio" name="q2" value="c"> C. Integrity failure — a business constraint enforced only in application code can be bypassed by any program that does not implement it, leaving no single enforcer at the storage level.</label>
-                        <label class="quiz-option"><input type="radio" name="q2" value="d"> D. Concurrency anomaly — both applications wrote to the same file simultaneously.</label>
+                        <label class="quiz-option"><input type="radio" name="q2" value="a"> A. They store too many images.</label>
+                        <label class="quiz-option"><input type="radio" name="q2" value="b"> B. They never allow any data to be saved.</label>
+                        <label class="quiz-option"><input type="radio" name="q2" value="c"> C. They can create redundant copies, inconsistent values, and hard-to-manage updates.</label>
+                        <label class="quiz-option"><input type="radio" name="q2" value="d"> D. They automatically enforce every business rule.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
+
 
                 <!-- Q3 -->
                 <div class="quiz-card"
                     data-answer="d"
-                    data-reason="The notes describe atomicity using exactly this kind of bank-transfer scenario. A transfer requires two operations — deduct from Account A and credit Account B — to succeed or fail as a single indivisible unit. If the system crashes between them, in a file-based system, the deduction has been written to disk but the credit has not. Money has disappeared from A without appearing in B. This partial execution is not just a loss of data — it is undetectable as wrong without an audit. A DBMS transaction either commits both changes or rolls both back. The notes state: 'File systems provide no built-in mechanism to guarantee that two related file changes either both complete or both roll back.'">
+                    data-reason="Atomicity means all-or-nothing execution. Related steps in one transaction must either complete together or be rolled back together.">
                     <div class="question-meta">
                         <span class="question-num-pill">3</span>
-                        <span class="question-type-tag">SINGLE CORRECT</span>
+                        <span class="question-type-tag ">SINGLE CORRECT</span>
                     </div>
-                    <h3>A file-based banking system processes a ₹10,000 transfer from Account A to Account B. Step 1 deducts ₹10,000 from Account A's record and writes it to disk. The system crashes immediately before Step 2 — crediting Account B. When the system restarts, what is the precise problem, and why is it described as more dangerous than a transfer that never started?</h3>
+                    <h3>A bank transfer must debit one account and credit another as one unit. What DBMS property does this describe?</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input type="radio" name="q3" value="a"> A. Data isolation — the two accounts are stored in separate files, making the transfer logically impossible.</label>
-                        <label class="quiz-option"><input type="radio" name="q3" value="b"> B. Concurrency anomaly — two users attempted to access the same account at the same moment.</label>
-                        <label class="quiz-option"><input type="radio" name="q3" value="c"> C. Integrity failure — the system violated the constraint that balances must be non-negative.</label>
-                        <label class="quiz-option"><input type="radio" name="q3" value="d"> D. Atomicity failure — the system executed a partial operation with no mechanism to roll it back, leaving the data in a state that is silently incorrect rather than visibly failed.</label>
+                        <label class="quiz-option"><input type="radio" name="q3" value="a"> A. Indexing.</label>
+                        <label class="quiz-option"><input type="radio" name="q3" value="b"> B. Normalization.</label>
+                        <label class="quiz-option"><input type="radio" name="q3" value="c"> C. Backup.</label>
+                        <label class="quiz-option"><input type="radio" name="q3" value="d"> D. Atomicity.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
+
 
                 <!-- Q4 -->
                 <div class="quiz-card"
                     data-answer="b"
-                    data-reason="The train-seat example from the notes pinpoints the failure precisely. Both users read the file and see 1 seat. This read step is not the failure — a correct concurrent system must still allow reads. The problem occurs when both users proceed to write 'booked' without any mechanism that makes one user's write aware of the other's. The guarantee that was missing is mutual exclusion during the check-then-write sequence: the ability to read and write atomically as a single unit so no other user can observe or modify the state between those two steps. The notes describe this as 'concurrency control mechanisms that serialise conflicting access.'">
+                    data-reason="When shared data is updated simultaneously without coordination, concurrency anomalies can happen, even with only two users.">
                     <div class="question-meta">
                         <span class="question-num-pill">4</span>
-                        <span class="question-type-tag">SINGLE CORRECT</span>
+                        <span class="question-type-tag ">SINGLE CORRECT</span>
                     </div>
-                    <h3>Two users simultaneously check a train-seat file and both see 1 seat available. User A writes "booked." User B, whose read happened before A's write completed, also writes "booked." The train is now double-booked. At which precise step in this sequence does the failure actually occur?</h3>
+                    <h3>Two users book the last train seat at the same time and both end up seeing success. What kind of problem is this?</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input type="radio" name="q4" value="a"> A. When both users open the file for reading — reads should be serialized one at a time.</label>
-                        <label class="quiz-option"><input type="radio" name="q4" value="b"> B. When User B writes "booked" without any mechanism to check whether the state has changed since their read — the check-then-write sequence is not treated as an indivisible unit.</label>
-                        <label class="quiz-option"><input type="radio" name="q4" value="c"> C. When User A writes first — writing should not be permitted when another user has the file open.</label>
-                        <label class="quiz-option"><input type="radio" name="q4" value="d"> D. When the file is stored as a flat file — only structured DBMS storage prevents overbooking.</label>
+                        <label class="quiz-option"><input type="radio" name="q4" value="a"> A. A backup problem.</label>
+                        <label class="quiz-option"><input type="radio" name="q4" value="b"> B. A concurrency anomaly.</label>
+                        <label class="quiz-option"><input type="radio" name="q4" value="c"> C. A file compression issue.</label>
+                        <label class="quiz-option"><input type="radio" name="q4" value="d"> D. A naming problem.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
+
 
                 <!-- Q5 -->
                 <div class="quiz-card"
                     data-answer="c"
-                    data-reason="The notes define a DBMS as an 'intermediary layer that sits between your application code and the raw stored data.' The critical implication is: you never touch the storage directly — you go through the DBMS. This intermediary position is what allows the DBMS to enforce rules, manage simultaneous access, and guarantee consistency on every single operation, transparently. If applications accessed files directly, each application would have to implement all of that complexity itself. Option A is incorrect — DBMS does not make data smaller. Option B describes a proxy or CDN, not a DBMS. Option D incorrectly locates the DBMS between CPU and memory, which is a hardware concept.">
+                    data-reason="The DBMS sits between applications and stored data. That position lets it enforce rules, handle concurrency, and guarantee consistency without each application doing everything itself.">
                     <div class="question-meta">
                         <span class="question-num-pill">5</span>
-                        <span class="question-type-tag">SINGLE CORRECT</span>
+                        <span class="question-type-tag ">SINGLE CORRECT</span>
                     </div>
-                    <h3>The notes describe a DBMS as an "intermediary layer." What is the architectural consequence of placing this intermediary between every application and the stored data?</h3>
+                    <h3>A payroll app asks the DBMS to read and update employee records instead of editing disk files by itself. What does it mean to call the DBMS an intermediary layer?</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input type="radio" name="q5" value="a"> A. The DBMS compresses all data, reducing the storage footprint that each application must manage.</label>
-                        <label class="quiz-option"><input type="radio" name="q5" value="b"> B. Applications can no longer access the internet — all network requests pass through the DBMS instead.</label>
-                        <label class="quiz-option"><input type="radio" name="q5" value="c"> C. The DBMS can enforce rules, manage concurrent access, and guarantee consistency on every operation transparently — without requiring each application to implement that complexity independently.</label>
-                        <label class="quiz-option"><input type="radio" name="q5" value="d"> D. The intermediary sits between the CPU and RAM, speeding up in-memory operations for all data requests.</label>
+                        <label class="quiz-option"><input type="radio" name="q5" value="a"> A. It works only after the data is deleted.</label>
+                        <label class="quiz-option"><input type="radio" name="q5" value="b"> B. It is the same thing as a folder on disk.</label>
+                        <label class="quiz-option"><input type="radio" name="q5" value="c"> C. Applications use the DBMS instead of touching raw storage directly.</label>
+                        <label class="quiz-option"><input type="radio" name="q5" value="d"> D. It is a part of the CPU.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
+
 
                 <!-- Q6 -->
                 <div class="quiz-card"
                     data-answer="a"
-                    data-reason="The notes explicitly state: 'File systems and DBMSs have fundamentally different contracts with the programmer. A file system provides storage and retrieval of named byte streams — that is all. A DBMS provides a structured data model, a query language, transaction semantics, and constraint enforcement. The difference is not degree — it is kind.' Option A correctly captures this by contrasting the nature of what each system offers. Option B (speed) is not mentioned as the distinction. Option C (age) is irrelevant — the notes explicitly call this a difference of kind, not era. Option D (SQL version) conflates a specific tool with the architectural distinction.">
+                    data-reason="The difference is architectural. A file system stores bytes, while a DBMS adds structured data handling, queries, transactions, and constraint enforcement.">
                     <div class="question-meta">
                         <span class="question-num-pill">6</span>
-                        <span class="question-type-tag">SINGLE CORRECT</span>
+                        <span class="question-type-tag ">SINGLE CORRECT</span>
                     </div>
-                    <h3>The notes state that the difference between a file system and a DBMS is one of "kind, not degree." Which of the following pairs of descriptions most precisely captures this distinction?</h3>
+                    <h3>A developer says, "A DBMS is just a faster file system." Which response best shows that a DBMS is different in kind, not just degree?</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input type="radio" name="q6" value="a"> A. A file system provides storage and retrieval of named byte streams only; a DBMS provides a structured data model, a query language, transaction semantics, and constraint enforcement.</label>
-                        <label class="quiz-option"><input type="radio" name="q6" value="b"> B. A file system stores data more slowly; a DBMS stores data faster using optimized algorithms.</label>
-                        <label class="quiz-option"><input type="radio" name="q6" value="c"> C. A file system is an older technology; a DBMS is the modern evolution of the same idea.</label>
-                        <label class="quiz-option"><input type="radio" name="q6" value="d"> D. A file system cannot run SQL; a DBMS is defined as any system that supports SQL version 3 or higher.</label>
+                        <label class="quiz-option"><input type="radio" name="q6" value="a"> A. A file system stores named byte streams; a DBMS manages structured, queryable data with rules and transaction support.</label>
+                        <label class="quiz-option"><input type="radio" name="q6" value="b"> B. A DBMS is just a faster file system.</label>
+                        <label class="quiz-option"><input type="radio" name="q6" value="c"> C. A file system and a DBMS are identical except for age.</label>
+                        <label class="quiz-option"><input type="radio" name="q6" value="d"> D. Any system that supports SQL is only a file system.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
+
 
                 <!-- Q7 -->
                 <div class="quiz-card"
                     data-answer="d"
-                    data-reason="The notes directly address this scenario: 'If every application consistently enforces the same rules, does this become equivalent to a DBMS enforcing them? What assumption must hold — and why is that assumption unreliable?' The assumption is that every developer who ever writes an application accessing this data will correctly and completely implement the same constraints. The notes explain this is unreliable because constraints can be written inconsistently, forgotten, or deliberately bypassed. The moment any new application touches the data without implementing the constraint, the guarantee vanishes. A DBMS eliminates this assumption entirely by placing enforcement at the storage level — no application can bypass it.">
+                    data-reason="Rules written only in application code can be inconsistent, forgotten, or bypassed. A DBMS enforces them at the storage level for every application.">
                     <div class="question-meta">
                         <span class="question-num-pill">7</span>
-                        <span class="question-type-tag">SINGLE CORRECT</span>
+                        <span class="question-type-tag ">SINGLE CORRECT</span>
                     </div>
-                    <h3>Three applications all write to the same <code>students.txt</code> file. The first two consistently enforce the rule "age must be between 16 and 100" inside their own code. A third application, written by a new developer unfamiliar with the rule, does not enforce it and writes an age of 200. Which assumption, identified in the notes as the root of this failure, was violated?</h3>
+                    <h3>A company rule says every order must have a valid customer ID, but each app is responsible for checking this rule in its own code. Why is this kind of constraint checking unreliable?</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input type="radio" name="q7" value="a"> A. The assumption that all files would be stored in the same directory and format.</label>
-                        <label class="quiz-option"><input type="radio" name="q7" value="b"> B. The assumption that the operating system enforces data type checks on all file writes.</label>
-                        <label class="quiz-option"><input type="radio" name="q7" value="c"> C. The assumption that a single application would be responsible for all writes to a shared file.</label>
-                        <label class="quiz-option"><input type="radio" name="q7" value="d"> D. The assumption that every developer who writes an application accessing the same data will correctly and consistently implement the same constraints — an assumption the notes identify as inherently unreliable.</label>
+                        <label class="quiz-option"><input type="radio" name="q7" value="a"> A. Because only one person can write code.</label>
+                        <label class="quiz-option"><input type="radio" name="q7" value="b"> B. Because files cannot be opened twice.</label>
+                        <label class="quiz-option"><input type="radio" name="q7" value="c"> C. Because the operating system always deletes the rule.</label>
+                        <label class="quiz-option"><input type="radio" name="q7" value="d"> D. Because any new program or developer can forget it or bypass it.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
+
 
                 <!-- Q8 -->
                 <div class="quiz-card"
                     data-answer="b"
-                    data-reason="The notes provide this analogy explicitly: 'The books are data, the library is the database, and the librarian system (catalogue, rules, borrowing procedures) is the DBMS.' The key insight is that the DBMS is not the library itself but the entire system of rules and mechanisms through which the library is managed. The data (books) is distinct from the repository (library) which is distinct from the managing software system (DBMS/librarian system). Confusing the library with the DBMS is like confusing the building with its operating procedures — they are distinct layers.">
+                    data-reason="In this analogy, books are the stored data, the library building is the organized collection or database, and the librarian system is the DBMS because it organizes and controls access.">
                     <div class="question-meta">
                         <span class="question-num-pill">8</span>
-                        <span class="question-type-tag">SINGLE CORRECT</span>
+                        <span class="question-type-tag ">SINGLE CORRECT</span>
                     </div>
-                    <h3>The notes use a library analogy to distinguish data, database, and DBMS. Which mapping correctly applies that analogy?</h3>
+                    <h3>Imagine a library where books are the stored information, the building holds the collection, and the librarian system organizes borrowing and access. In this analogy, what maps correctly to what?</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input type="radio" name="q8" value="a"> A. Books = DBMS &nbsp;|&nbsp; Library building = Data &nbsp;|&nbsp; Librarian system = Database</label>
-                        <label class="quiz-option"><input type="radio" name="q8" value="b"> B. Books = Data &nbsp;|&nbsp; Library building = Database &nbsp;|&nbsp; Librarian system (catalogue, rules, procedures) = DBMS</label>
-                        <label class="quiz-option"><input type="radio" name="q8" value="c"> C. Books = Database &nbsp;|&nbsp; Library building = DBMS &nbsp;|&nbsp; Librarian system = Data</label>
-                        <label class="quiz-option"><input type="radio" name="q8" value="d"> D. Books = Data &nbsp;|&nbsp; Library building = DBMS &nbsp;|&nbsp; Librarian system = Database</label>
+                        <label class="quiz-option"><input type="radio" name="q8" value="a"> A. Books = DBMS, building = data, librarian system = database.</label>
+                        <label class="quiz-option"><input type="radio" name="q8" value="b"> B. Books = data, library building = database, librarian system = DBMS.</label>
+                        <label class="quiz-option"><input type="radio" name="q8" value="c"> C. Books = database, building = DBMS, librarian system = data.</label>
+                        <label class="quiz-option"><input type="radio" name="q8" value="d"> D. Books = files, building = CPU, librarian system = RAM.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
 
-            </section>
-
-            <!-- ══════════════════════════════════════════
-                 SECTION B — MULTIPLE CORRECT
-            ══════════════════════════════════════════ -->
-            <section>
-                <h2 class="quiz-section-title">Section B — Select All That Apply</h2>
 
                 <!-- Q9 -->
                 <div class="quiz-card"
                     data-answer="b,c"
-                    data-reason="The notes make this distinction explicit: 'Wasted storage is a secondary concern. The primary danger of redundancy is inconsistency: when the same fact is stored in two places and updated in only one, the system now contains conflicting representations of reality. Decisions made from either copy may be wrong. Storage cost is trivial today; making decisions from corrupted data is catastrophic.' So B is correct — inconsistency from partial updates — and C is correct — unreliable decisions from conflicting representations. Option A (wasted space) is explicitly described as secondary, not a primary danger. Option D (SQL limitations) is unrelated to redundancy — SQL does not become unavailable due to data duplication.">
+                    data-reason="The main danger of redundancy is inconsistency. When the same fact is copied into multiple files and only one copy is updated, decisions can be based on the wrong version.">
                     <div class="question-meta">
                         <span class="question-num-pill">9</span>
-                        <span class="question-type-tag multi">SELECT ALL THAT APPLY</span>
+                        <span class="question-type-tag ">SELECT ALL THAT APPLY</span>
                     </div>
-                    <h3>An organization stores employee records in both an HR file and a payroll file. The employee's department is changed in HR but not in payroll. Based strictly on the notes, which of the following are genuine dangers of this redundancy? Select all that apply.</h3>
+                    <h3>A customer's phone number is stored in both a billing file and a delivery file. The billing file is updated, but the delivery file still has the old number. What are the real dangers of storing the same fact in more than one file?</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input type="checkbox" name="q9" value="a"> A. Wasted disk storage — the same record occupies space in two places, doubling storage requirements.</label>
-                        <label class="quiz-option"><input type="checkbox" name="q9" value="b"> B. Inconsistency — the same real-world fact (the employee's department) is now represented differently in two sources.</label>
-                        <label class="quiz-option"><input type="checkbox" name="q9" value="c"> C. Any business decision made from either file — payroll reports, department headcounts — is now potentially wrong.</label>
-                        <label class="quiz-option"><input type="checkbox" name="q9" value="d"> D. SQL queries become unavailable — you cannot query files that contain duplicate data.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q9" value="a"> A. It always doubles the price of the computer.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q9" value="b"> B. The copies can disagree after one is updated.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q9" value="c"> C. Decisions made from the wrong copy can become incorrect.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q9" value="d"> D. It makes SQL stop working.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
+
 
                 <!-- Q10 -->
                 <div class="quiz-card"
                     data-answer="a,b,d"
-                    data-reason="The notes map each DBMS feature to a specific file-system failure. SQL (standardized query language) directly answers the 'difficulty of data access' failure — no longer do developers need custom programs for every new query. Transaction management directly answers the atomicity failure — operations either commit fully or roll back entirely. Concurrency control directly answers the concurrency anomaly — multiple users can operate simultaneously without corrupting data. Option C (binary storage format) is incorrect — the notes do not identify binary format as a DBMS response to any file-system failure. The solution to data isolation is unified schemas and declarative joins, not binary format.">
+                    data-reason="SQL helps users ask for data without manually scanning files, transactions support all-or-nothing updates, and concurrency control coordinates simultaneous access.">
                     <div class="question-meta">
                         <span class="question-num-pill">10</span>
-                        <span class="question-type-tag multi">SELECT ALL THAT APPLY</span>
+                        <span class="question-type-tag ">SELECT ALL THAT APPLY</span>
                     </div>
-                    <h3>According to the notes, a DBMS provides specific architectural answers to specific file-system failures. Which of the following feature-to-failure mappings are correct? Select all that apply.</h3>
+                    <h3>A file-based system struggles with manual data searches, partially completed updates, and multiple users changing the same data at once. Which DBMS feature correctly answers which problem?</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input type="checkbox" name="q10" value="a"> A. Standardized query language (SQL) → answers the difficulty of data access (no custom programs for every new question).</label>
-                        <label class="quiz-option"><input type="checkbox" name="q10" value="b"> B. Transaction management → answers atomicity failures (all-or-nothing execution instead of partial writes).</label>
-                        <label class="quiz-option"><input type="checkbox" name="q10" value="c"> C. Binary storage format → answers the data isolation failure (files in different formats cannot be joined).</label>
-                        <label class="quiz-option"><input type="checkbox" name="q10" value="d"> D. Concurrency control mechanisms → answers concurrency anomalies (serialising conflicting simultaneous access).</label>
+                        <label class="quiz-option"><input type="checkbox" name="q10" value="a"> A. SQL helps with difficult data access.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q10" value="b"> B. Transactions help with atomicity.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q10" value="c"> C. Binary files solve concurrency problems.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q10" value="d"> D. Concurrency control helps with simultaneous access.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
+
 
                 <!-- Q11 -->
                 <div class="quiz-card"
                     data-answer="a,b,c"
-                    data-reason="The notes state: 'The relational model is mathematically a formalisation of set theory. A database relation is a set. A query is a set operation. SQL's WHERE clause is predicate logic.' All three of A, B, and C are drawn directly from this passage. Option D is incorrect — the notes list set theory and predicate logic as essential for understanding the core relational model, which begins from the earliest parts of the course. The notes say these prerequisites 'are not background decoration — they are the mathematical language in which the core concepts of relational databases are expressed,' implying they are needed from the beginning, not deferred to advanced sections.">
+                    data-reason="Relational databases are built on set-theoretic and logical ideas: relations can be treated as sets, queries combine sets, and conditions are expressed using predicate logic.">
                     <div class="question-meta">
                         <span class="question-num-pill">11</span>
-                        <span class="question-type-tag multi">SELECT ALL THAT APPLY</span>
+                        <span class="question-type-tag ">SELECT ALL THAT APPLY</span>
                     </div>
-                    <h3>A student argues that set theory and predicate logic are only "nice to know" for this DBMS course, not genuinely necessary. Based strictly on what the notes state, which of the following arguments correctly rebut that claim? Select all that apply.</h3>
+                    <h3>In a relational database, tables are treated mathematically as relations, queries combine groups of rows, and filters test conditions such as <code>age &gt; 18</code>. Why are set theory and logic useful here?</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input type="checkbox" name="q11" value="a"> A. A database relation is mathematically a set — the relational model is a formalisation of set theory.</label>
-                        <label class="quiz-option"><input type="checkbox" name="q11" value="b"> B. A database query is a set operation — understanding queries requires understanding what set operations do.</label>
-                        <label class="quiz-option"><input type="checkbox" name="q11" value="c"> C. SQL's WHERE clause is an expression in predicate logic — reading or writing WHERE conditions requires understanding predicates and quantifiers.</label>
-                        <label class="quiz-option"><input type="checkbox" name="q11" value="d"> D. Set theory is only relevant in Parts 9–12, which cover advanced administration and design — it is not needed in the earlier application programming parts.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q11" value="a"> A. Relations are treated as sets.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q11" value="b"> B. Queries use set operations.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q11" value="c"> C. WHERE conditions use predicate logic.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q11" value="d"> D. They are unrelated to how relational databases work.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
+
 
                 <!-- Q12 -->
                 <div class="quiz-card"
                     data-answer="a,b,c"
-                    data-reason="The notes enumerate the DBMS contract explicitly: data will be consistent (A), accessible through a standard language, constrained by rules you define, protected from partial failures (B — atomicity), safe under concurrent access, and restricted to authorised users (C — fine-grained security). Option D is incorrect and is explicitly warned against in the notes: 'A DBMS provides guarantees (atomicity, concurrency, integrity) — it does not replace good design.' The DBMS enforces structural and access rules; it cannot guarantee that application-level business logic is correct — that remains the developer's responsibility.">
+                    data-reason="A DBMS is expected to help maintain consistency, atomicity, concurrency control, and security. It does not guarantee that every line of application logic is correct.">
                     <div class="question-meta">
                         <span class="question-num-pill">12</span>
-                        <span class="question-type-tag multi">SELECT ALL THAT APPLY</span>
+                        <span class="question-type-tag ">SELECT ALL THAT APPLY</span>
                     </div>
-                    <h3>The notes describe a DBMS as offering an "engineering contract" that a file system cannot. Which of the following are clauses of that contract as stated in the notes? Select all that apply.</h3>
+                    <h3>An organization uses a DBMS because it expects certain guarantees from the data-management layer. Which items belong to that DBMS engineering contract?</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input type="checkbox" name="q12" value="a"> A. Data will be consistent — centralised storage eliminates the scattered copies that cause conflicting truths.</label>
-                        <label class="quiz-option"><input type="checkbox" name="q12" value="b"> B. Operations are protected from partial failures — transactions either commit fully or roll back entirely.</label>
-                        <label class="quiz-option"><input type="checkbox" name="q12" value="c"> C. Access is restricted to authorised users — fine-grained per-user, per-table, and per-operation permissions.</label>
-                        <label class="quiz-option"><input type="checkbox" name="q12" value="d"> D. Application-level business logic will always produce correct results — the DBMS validates all code written by developers.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q12" value="a"> A. Consistent data.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q12" value="b"> B. All-or-nothing operations.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q12" value="c"> C. Controlled access for users.</label>
+                        <label class="quiz-option"><input type="checkbox" name="q12" value="d"> D. Perfect application logic every time.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
 
-            </section>
-
-            <!-- ══════════════════════════════════════════
-                 SECTION C — ASSERTION–REASON
-            ══════════════════════════════════════════ -->
-            <section>
-                <h2 class="quiz-section-title">Section C — Assertion &amp; Reason</h2>
-                <section class="palette" style="margin-bottom: 1.5rem;">
-                    <p><strong>Instructions for this section:</strong> Each question contains an Assertion (A) and a Reason (R). Choose the option that correctly describes the truth of both statements and their relationship.</p>
-                    <p>
-                        <strong>A</strong> — Both Assertion and Reason are true, and Reason is the correct explanation of Assertion.<br>
-                        <strong>B</strong> — Both Assertion and Reason are true, but Reason does not correctly explain Assertion.<br>
-                        <strong>C</strong> — Assertion is true, Reason is false.<br>
-                        <strong>D</strong> — Assertion is false, Reason is true.
-                    </p>
-                </section>
 
                 <!-- Q13 -->
                 <div class="quiz-card"
                     data-answer="a"
-                    data-reason="Both the Assertion and the Reason are true, and the Reason is the correct explanation. The notes explicitly state: 'Concurrency anomalies occur whenever two operations access the same data simultaneously without coordination — even on a system with two users.' The Assertion directly reflects this — it is not a high-scale phenomenon. The Reason correctly identifies the structural root: the problem is simultaneous uncoordinated access to shared mutable state, which can happen with any number of users greater than one. The Reason explains WHY the Assertion is true. Options C and D are incorrect because both statements are true. Option B is incorrect because the Reason does directly explain the Assertion.">
+                    data-reason="Concurrency problems can happen even with only two users because the issue is simultaneous uncoordinated access to shared data.">
                     <div class="question-meta">
                         <span class="question-num-pill">13</span>
                         <span class="question-type-tag ar">ASSERTION – REASON</span>
                     </div>
                     <div class="ar-block">
-                        <p><span class="ar-label">Assertion (A):</span> In a file-based system, concurrency anomalies can occur even when only two users are simultaneously accessing the data.</p>
-                        <p><span class="ar-label">Reason (R):</span> Concurrency anomalies arise whenever two or more operations access shared mutable data simultaneously without coordination — the total number of users in the system is irrelevant to whether the anomaly occurs.</p>
+                        <p><span class="ar-label">Assertion (A):</span> Concurrency anomalies can occur even when only two users are accessing the same data at the same time.</p>
+                        <p><span class="ar-label">Reason (R):</span> Concurrency problems appear whenever shared mutable data is accessed simultaneously without coordination, so the number of users can be as small as two.</p>
                     </div>
+                    <h3>Choose the option that best describes the Assertion and Reason.</h3>
                     <div class="quiz-options">
                         <label class="quiz-option"><input type="radio" name="q13" value="a"> A. Both A and R are true, and R is the correct explanation of A.</label>
                         <label class="quiz-option"><input type="radio" name="q13" value="b"> B. Both A and R are true, but R does not correctly explain A.</label>
@@ -553,18 +547,20 @@
                     <div class="quiz-feedback"></div>
                 </div>
 
+
                 <!-- Q14 -->
                 <div class="quiz-card"
                     data-answer="d"
-                    data-reason="The Assertion is FALSE — the notes explicitly argue against it. The notes ask: 'If every application consistently enforces the same rules, does this become equivalent to a DBMS enforcing them? What assumption must hold — and why is that assumption unreliable in practice?' The answer given is that the assumption is inherently unreliable: any new developer, any new application, any future modification can skip or bypass the constraint. This makes code-level enforcement structurally weaker — not equivalent. The Reason is TRUE — it correctly states why a DBMS is superior: it enforces constraints at the storage level, making them impossible to bypass regardless of which application writes to the data. Since A is false and R is true, the answer is D.">
+                    data-reason="Code-level constraint checking is unreliable because any program can skip it, while a DBMS enforces constraints at the storage level for all applications.">
                     <div class="question-meta">
                         <span class="question-num-pill">14</span>
                         <span class="question-type-tag ar">ASSERTION – REASON</span>
                     </div>
                     <div class="ar-block">
-                        <p><span class="ar-label">Assertion (A):</span> If every application that accesses a shared file uniformly enforces the same integrity constraints in its own code, this is functionally equivalent to a DBMS enforcing those constraints at the storage level.</p>
-                        <p><span class="ar-label">Reason (R):</span> A DBMS enforces constraints at the storage level, making them uniformly applied regardless of which application accesses the data — no application can bypass them, and no developer can forget to implement them.</p>
+                        <p><span class="ar-label">Assertion (A):</span> If every application enforces the same integrity rules in its own code, that is functionally equivalent to DBMS enforcement.</p>
+                        <p><span class="ar-label">Reason (R):</span> A DBMS enforces constraints at the storage level, so every application must follow them.</p>
                     </div>
+                    <h3>Choose the option that best describes the Assertion and Reason.</h3>
                     <div class="quiz-options">
                         <label class="quiz-option"><input type="radio" name="q14" value="a"> A. Both A and R are true, and R is the correct explanation of A.</label>
                         <label class="quiz-option"><input type="radio" name="q14" value="b"> B. Both A and R are true, but R does not correctly explain A.</label>
@@ -575,18 +571,20 @@
                     <div class="quiz-feedback"></div>
                 </div>
 
+
                 <!-- Q15 -->
                 <div class="quiz-card"
                     data-answer="c"
-                    data-reason="The Assertion is FALSE — this is a common misconception explicitly corrected by the notes: 'Atomicity just means a transaction is small or fast. The word atomic here is borrowed from physics — meaning indivisible, not small. An atomic transaction can involve thousands of records. Size and speed are irrelevant to atomicity.' The Reason is TRUE — it correctly defines atomicity: an atomic operation either commits entirely or rolls back entirely, regardless of how many records it touches or how long it takes. Since the Assertion is the exact misconception the notes flag, and the Reason correctly states the definition, the answer is C (A is false, R is true).">
+                    data-reason="Atomicity means indivisible, not small or fast. A transaction can take time and still be atomic if it commits fully or rolls back fully.">
                     <div class="question-meta">
                         <span class="question-num-pill">15</span>
                         <span class="question-type-tag ar">ASSERTION – REASON</span>
                     </div>
                     <div class="ar-block">
-                        <p><span class="ar-label">Assertion (A):</span> Atomicity in DBMS transaction management ensures that each transaction is small in scope and executes instantaneously — it refers to operations that happen in a single, fast step.</p>
-                        <p><span class="ar-label">Reason (R):</span> Atomicity means indivisible — a transaction may involve thousands of records and take considerable time, but it must either commit entirely or roll back entirely; size and execution speed are irrelevant to whether a transaction is atomic.</p>
+                        <p><span class="ar-label">Assertion (A):</span> Atomicity means a transaction is small and finishes instantly.</p>
+                        <p><span class="ar-label">Reason (R):</span> Atomicity means all-or-nothing: a transaction may be large and slow, but it must commit fully or roll back fully.</p>
                     </div>
+                    <h3>Choose the option that best describes the Assertion and Reason.</h3>
                     <div class="quiz-options">
                         <label class="quiz-option"><input type="radio" name="q15" value="a"> A. Both A and R are true, and R is the correct explanation of A.</label>
                         <label class="quiz-option"><input type="radio" name="q15" value="b"> B. Both A and R are true, but R does not correctly explain A.</label>
@@ -597,13 +595,12 @@
                     <div class="quiz-feedback"></div>
                 </div>
 
-            </section>
 
             <!-- ── Reflection palette ── -->
             <section class="palette important" style="margin-top: 2.5rem;">
                 <h3>After This Practice</h3>
                 <p>
-                    If any question surprised you, return to the notes and re-read that section from scratch.
+                    If any question surprised you, review the underlying idea and try to explain it with a new example.
                     The questions above target the most persistent misconceptions in DBMS fundamentals —
                     particularly the redundancy–inconsistency chain, atomicity as indivisibility not speed,
                     the unreliability of code-level constraint enforcement, and the meaning of "kind, not degree."

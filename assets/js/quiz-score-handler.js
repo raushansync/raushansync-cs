@@ -72,10 +72,15 @@ window.QuizScoreHandler = (() => {
             <p class="score-note">Your score has been saved to your progress dashboard.</p>
         `;
 
-        // Insert after the last quiz card
-        const lastCard = document.querySelector('.quiz-card:last-of-type');
-        if (lastCard) {
+        // Insert after the actual last quiz card. Avoid :last-of-type because
+        // pages may have other divs, such as watermarks, after the quiz cards.
+        const quizCards = document.querySelectorAll('.quiz-card');
+        const lastCard = quizCards[quizCards.length - 1];
+        if (lastCard && lastCard.parentElement) {
             lastCard.parentElement.insertBefore(scoreCard, lastCard.nextSibling);
+        } else {
+            const container = document.querySelector('.notes-container') || document.body;
+            container.appendChild(scoreCard);
         }
 
         // Save score and mark completed together (atomic operation)

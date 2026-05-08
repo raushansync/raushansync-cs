@@ -157,6 +157,8 @@
 
         .quiz-card h3 {
             margin-top: 0.3rem;
+            width: 100%;
+            max-width: none;
         }
 
         /* Assertion-Reason block styling */
@@ -168,10 +170,14 @@
             margin: 0.75rem 0 1rem;
             font-size: 0.93rem;
             line-height: 1.6;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .ar-block p {
             margin: 0.3rem 0;
+            width: 100%;
+            max-width: none;
         }
 
         .ar-label {
@@ -271,91 +277,69 @@
                 <h2 class="quiz-section-title">Section A — Single Correct Answer</h2>
                 <!-- Q1 -->
                 <div class="quiz-card" data-answer="b"
-                    data-reason="Physical bookkeeping has a hard architectural ceiling: it can function for small local operations, but it collapses under real-time global scale. The key issue is not staffing, but the system's inability to coordinate millions of simultaneous records quickly and reliably. Durability can be improved with copies and better storage, security can be tightened with access controls, and retrieval can be reorganized — but scalability is a structural limit. No amount of clerks turns a non-digital ledger into a real-time global coordination engine.">
+                    data-reason="The main failure is scalability. A paper ledger can work for a small office, but it cannot coordinate huge numbers of records quickly across many places at the same time. Hiring more clerks helps only a little; it does not turn paper records into a real-time national system.">
                     <div class="question-meta">
                         <span class="question-num-pill">1</span>
                         <span class="question-type-tag">SINGLE CORRECT</span>
                     </div>
-                    <h3>A government ministry is designing a national vaccination tracking program for 1.4 billion
-                        citizens. An administrator argues that a physical ledger system could work if they hired enough
-                        clerks and built enough filing rooms — it would simply be a very large-scale version of what has
-                        always worked. One failure mode of physical systems cannot be solved by adding more human
-                        resources. Which failure mode is this, and why does it remain unsolvable regardless of staffing?
+                    <h3>A country wants to track vaccination records for millions of citizens in real time. Someone says,
+                        "Use paper ledgers and hire more clerks." Which problem still cannot be solved well by adding
+                        more clerks?
                     </h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input name="q1" type="radio" value="a" /> A. Durability — physical
-                            media is fragile and no number of clerks can prevent fire, flooding, or paper decay from
-                            destroying records.</label>
-                        <label class="quiz-option"><input name="q1" type="radio" value="b" /> B. Scalability — physical
-                            systems have a hard architectural ceiling where real-time coordination of millions of
-                            simultaneous records is structurally impossible, regardless of how many people are
-                            employed.</label>
-                        <label class="quiz-option"><input name="q1" type="radio" value="c" /> C. Security — physical
-                            locks provide only binary access and no number of personnel can implement granular
-                            per-record access control on paper.</label>
-                        <label class="quiz-option"><input name="q1" type="radio" value="d" /> D. Retrieval — manual
-                            search becomes slower as more clerks are added because they interfere with one another's
-                            filing and cross-referencing work.</label>
+                        <label class="quiz-option"><input name="q1" type="radio" value="a" /> A. Durability — paper can
+                            be damaged by fire, water, or age.</label>
+                        <label class="quiz-option"><input name="q1" type="radio" value="b" /> B. Scalability — paper
+                            records cannot coordinate millions of live updates quickly and reliably.</label>
+                        <label class="quiz-option"><input name="q1" type="radio" value="c" /> C. Security — paper files
+                            can be locked in a cupboard.</label>
+                        <label class="quiz-option"><input name="q1" type="radio" value="d" /> D. Retrieval — clerks can
+                            search files one by one.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
                 <!-- Q2 -->
                 <div class="quiz-card" data-answer="c"
-                    data-reason="Machine-readable encoding is not just a visual or storage-format change. It allows counting machines to automatically process and aggregate records, which removes the human from the computation loop. That is the architectural leap: data no longer exists only for people to read; it can be directly consumed by machines for automatic processing. This is the first bridge from record-keeping to automated data processing.">
+                    data-reason="Machine-readable data changes who can process the data. Once information is encoded for a machine, the machine can count, sort, and combine records automatically instead of waiting for a person to read and calculate everything.">
                     <div class="question-meta">
                         <span class="question-num-pill">2</span>
                         <span class="question-type-tag">SINGLE CORRECT</span>
                     </div>
-                    <h3>Herman Hollerith's punch card system is described as a "conceptual bridge" because it encoded
-                        data for machine reading rather than human reading. A student argues: "This is just a formatting
-                        difference — the data is the same either way; it is just represented differently." What does
-                        that distinction mean architecturally?</h3>
+                    <h3>A census office changes from handwritten forms to punch cards that a counting machine can read.
+                        Why is this more than just a new writing format?</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input name="q2" type="radio" value="a" /> A. Machine-readable data
-                            is physically more compact than handwritten ledger entries, making storage rooms smaller and
-                            filing faster.</label>
-                        <label class="quiz-option"><input name="q2" type="radio" value="b" /> B. Machine-readable punch
-                            cards are made from sturdier material than paper ledgers, solving the durability failure of
-                            the physical era.</label>
-                        <label class="quiz-option"><input name="q2" type="radio" value="c" /> C. Machine-readable
-                            encoding allows counting machines to automatically process and aggregate records — removing
-                            the human bottleneck from computation itself, not just from storage, which is the first
-                            bridge to automated data processing.</label>
-                        <label class="quiz-option"><input name="q2" type="radio" value="d" /> D. Machine-readable data
-                            ensures arithmetic accuracy because mechanical counting machines cannot make the same errors
-                            a human clerk would when adding ledger entries.</label>
+                        <label class="quiz-option"><input name="q2" type="radio" value="a" /> A. Punch cards always take
+                            less physical space than forms.</label>
+                        <label class="quiz-option"><input name="q2" type="radio" value="b" /> B. Punch cards cannot be
+                            damaged like ordinary paper records.</label>
+                        <label class="quiz-option"><input name="q2" type="radio" value="c" /> C. A machine can process
+                            and count the records automatically, instead of humans doing every calculation.</label>
+                        <label class="quiz-option"><input name="q2" type="radio" value="d" /> D. A machine-readable
+                            record is always perfectly correct.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
                 <!-- Q3 -->
                 <div class="quiz-card" data-answer="b"
-                    data-reason="Solving durability does not solve consistency, atomicity, or concurrency. Those are separate architectural guarantees, and a spreadsheet does not provide them. A cloud backup can preserve a broken or contradictory file perfectly. The move from spreadsheets to a DBMS is about the data-management contract: the relational system adds guarantees that the flat-file model cannot supply, not just better storage safety.">
+                    data-reason="Backups help with durability, but they do not guarantee consistency, atomicity, or safe concurrent updates. A backed-up spreadsheet can still contain conflicting values or half-finished changes. A DBMS adds data-management guarantees that spreadsheets do not provide.">
                     <div class="question-meta">
                         <span class="question-num-pill">3</span>
                         <span class="question-type-tag">SINGLE CORRECT</span>
                     </div>
-                    <h3>A student argues: "Spreadsheets solved the most dangerous failure of physical systems —
-                        durability — through cloud backups and digital redundancy. Since the core danger of physical
-                        bookkeeping was that records could be permanently destroyed, and spreadsheets eliminate that
-                        danger, spreadsheets represent a fundamentally trustworthy upgrade. The remaining issues are
-                        minor inconveniences." Which response most precisely identifies the flaw in this argument?</h3>
+                    <h3>A student says, "Cloud backups make spreadsheets safe, so we do not need a DBMS." What is the
+                        main flaw in this reasoning?</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input name="q2b" type="radio" value="a" /> A. The argument's premise
-                            is wrong — cloud backups can fail too, so spreadsheets did not actually solve the durability
-                            problem.</label>
-                        <label class="quiz-option"><input name="q2b" type="radio" value="b" /> B. Solving durability
-                            does not solve consistency, atomicity, or concurrency — these are structurally separate
-                            failures that require different architectural solutions. The move from spreadsheets to DBMS
-                            is not about durability at all; it is about the data management contract the flat-file model
-                            cannot provide.</label>
-                        <label class="quiz-option"><input name="q2b" type="radio" value="c" /> C. Spreadsheets actually
-                            worsened retrieval compared to physical systems because digital search algorithms are less
-                            reliable than trained human filing clerks.</label>
-                        <label class="quiz-option"><input name="q2b" type="radio" value="d" /> D. The five core needs —
-                            storage, retrieval, transactions, audit, and archival — are DBMS features, not universal
-                            requirements, so measuring spreadsheets against them is inappropriate.</label>
+                        <label class="quiz-option"><input name="q2b" type="radio" value="a" /> A. Backups never work for
+                            spreadsheets.</label>
+                        <label class="quiz-option"><input name="q2b" type="radio" value="b" /> B. Backups protect files
+                            from loss, but they do not fix inconsistent values, partial updates, or simultaneous edit
+                            conflicts.</label>
+                        <label class="quiz-option"><input name="q2b" type="radio" value="c" /> C. Spreadsheets are always
+                            slower than paper ledgers.</label>
+                        <label class="quiz-option"><input name="q2b" type="radio" value="d" /> D. Storage, retrieval,
+                            transactions, audit, and archival matter only inside a DBMS.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
@@ -363,46 +347,44 @@
                 <!-- Q4 -->
                 <div class="quiz-card"
                     data-answer="c"
-                    data-reason="This is a consistency failure. The same real-world fact — the patient's blood type — ends up stored as two conflicting values across different copies of the data. That means the system is no longer in a valid state, because different parts of the same system now disagree about the same fact. This is different from atomicity, which would involve a single multi-step update failing halfway through, and different from durability, which would involve a committed update being lost.">
+                    data-reason="This is a consistency failure. The same fact is stored in two places, but the two copies now disagree. The issue is not that the update was lost; the issue is that the system now contains conflicting versions of one real-world fact.">
                     <div class="question-meta">
                         <span class="question-num-pill">4</span>
                         <span class="question-type-tag">SINGLE CORRECT</span>
                     </div>
-                    <h3>A hospital's spreadsheet-based patient management system records each patient's blood type in both a <code>surgery_schedule.xlsx</code> sheet and a <code>medication_allergies.xlsx</code> sheet. During an emergency, a nurse updates a patient's blood type in the surgery sheet after receiving new lab results, but the allergies sheet is not updated. Hours later, a pharmacist cross-references the allergies sheet and administers a medication based on the old, incorrect blood type. Based on the six DBMS parameters used in this question set, which parameter did the spreadsheet system most critically fail to guarantee?</h3>
+                    <h3>A patient's blood type is stored in two spreadsheets. One spreadsheet is updated after a new lab
+                        result, but the other still shows the old value. Which DBMS quality has failed?</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input type="radio" name="q4" value="a"> A. Atomicity — the blood type update was not executed as a single indivisible operation spanning both sheets simultaneously.</label>
-                        <label class="quiz-option"><input type="radio" name="q4" value="b"> B. Efficiency — the system wasted retrieval time by requiring clinicians to check two separate sheets for one patient's information.</label>
-                        <label class="quiz-option"><input type="radio" name="q4" value="c"> C. Consistency — the system allowed the same real-world fact to exist as two conflicting values across its stored representations, leaving the system in an invalid state.</label>
-                        <label class="quiz-option"><input type="radio" name="q4" value="d"> D. Durability — the new blood type committed to the surgery sheet was not permanently propagated to all storage locations.</label>
+                        <label class="quiz-option"><input type="radio" name="q4" value="a"> A. Atomicity — one multi-step
+                            transaction stopped halfway.</label>
+                        <label class="quiz-option"><input type="radio" name="q4" value="b"> B. Efficiency — the lookup
+                            took too long.</label>
+                        <label class="quiz-option"><input type="radio" name="q4" value="c"> C. Consistency — the same
+                            fact now has two conflicting stored values.</label>
+                        <label class="quiz-option"><input type="radio" name="q4" value="d"> D. Durability — a saved value
+                            disappeared after being committed.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
                 <!-- Q5 -->
                 <div class="quiz-card" data-answer="d"
-                    data-reason="NoSQL systems were created to extend the database ecosystem for use cases such as unstructured data and extreme horizontal scale. They did not replace relational databases. For transactional business data, relational systems remain the dominant architecture, and SQL, transactions, and relational design still matter. The flaw in the CTO's reasoning is treating NoSQL as a universal replacement rather than a complementary tool.">
+                    data-reason="NoSQL systems solve important problems such as flexible document storage and large-scale distribution, but they did not make relational databases obsolete. Transactional business systems still often depend on relational design, SQL, and transaction guarantees. NoSQL is a complement, not a universal replacement.">
                     <div class="question-meta">
                         <span class="question-num-pill">5</span>
                         <span class="question-type-tag">SINGLE CORRECT</span>
                     </div>
-                    <h3>A startup CTO announces: "We've migrated everything to MongoDB — a modern NoSQL system. The
-                        relational model is a 1970s relic. Our engineers no longer need to understand SQL, transactions,
-                        or the relational architecture." Which of the following most precisely identifies why this
-                        reasoning is flawed?</h3>
+                    <h3>A startup moves some data to MongoDB. The CTO says, "Now SQL and relational databases no longer
+                        matter." What is wrong with this conclusion?</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input name="q5" type="radio" value="a" /> A. MongoDB is inherently
-                            less secure than relational databases and should not be used for any production data
-                            regardless of the use case.</label>
-                        <label class="quiz-option"><input name="q5" type="radio" value="b" /> B. NoSQL systems are less
-                            mature than RDBMS and will eventually be replaced by a future generation of the relational
-                            model once they are made more scalable.</label>
+                        <label class="quiz-option"><input name="q5" type="radio" value="a" /> A. MongoDB should never be
+                            used in real applications.</label>
+                        <label class="quiz-option"><input name="q5" type="radio" value="b" /> B. NoSQL databases are only
+                            temporary and will all disappear.</label>
                         <label class="quiz-option"><input name="q5" type="radio" value="c" /> C. NoSQL databases cannot
-                            handle concurrent access, making any multi-user system built on them inherently
-                            unreliable.</label>
-                        <label class="quiz-option"><input name="q5" type="radio" value="d" /> D. NoSQL extended the
-                            ecosystem for unstructured data and extreme horizontal scale but did not replace RDBMS — the
-                            vast majority of transactional business data continues to live in relational systems, and
-                            the relational architecture remains the foundation of industry data practice.</label>
+                            support more than one user.</label>
+                        <label class="quiz-option"><input name="q5" type="radio" value="d" /> D. NoSQL is useful for some
+                            workloads, but it did not replace relational databases for transactional business data.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
@@ -415,97 +397,74 @@
                 <h2 class="quiz-section-title">Section B — Select All That Apply</h2>
                 <!-- Q6 -->
                 <div class="quiz-card" data-answer="a,c,d,e"
-                    data-reason="A spreadsheet under heavy concurrent use runs into several structural failures. Scalability breaks down because spreadsheets are not built for large, simultaneous, constantly changing workloads. Consistency fails because one cell can be changed while other copies of the same fact remain outdated. Atomicity fails because multi-cell updates can leave partial states if the application crashes. Security also fails because basic password protection does not provide fine-grained access control by user, table, column, or operation. Durability is not the main failure here, since cloud backup and auto-save can preserve the file.">
+                    data-reason="A shared spreadsheet under heavy use can fail on scalability, consistency, atomicity, and security. Many users editing at once creates scale problems; copied facts can become inconsistent; multi-cell updates can be left half-finished; and simple password protection is not fine-grained security. Durability is not the main issue if the file is backed up.">
                     <div class="question-meta">
                         <span class="question-num-pill">6</span>
                         <span class="question-type-tag multi">SELECT ALL THAT APPLY</span>
                     </div>
-                    <h3>A logistics company stores all shipment records in a shared Excel file accessed simultaneously
-                        by 50 warehouse workers. Each shipment record spans multiple cells: tracking ID, status,
-                        destination, assigned handler, and estimated arrival. Workers constantly update statuses, and
-                        the file is saved to a cloud backup service. Based on the six DBMS parameters used in this
-                        question set, which parameters does this spreadsheet-based system structurally fail to satisfy?
-                        Select all that apply.</h3>
+                    <h3>A warehouse uses one shared spreadsheet for shipments. Fifty workers edit it during the day, and
+                        each shipment update touches several cells. The file is backed up to the cloud. Which DBMS
+                        qualities are still weak here? Select all that apply.</h3>
                     <div class="quiz-options">
-                        <label class="quiz-option"><input name="q6" type="checkbox" value="a" /> A. Scalability — strict
-                            row limits and performance degradation under concurrent access from 50 simultaneous users
-                            continuously adding and modifying records.</label>
+                        <label class="quiz-option"><input name="q6" type="checkbox" value="a" /> A. Scalability — many
+                            people editing one spreadsheet at once does not scale well.</label>
                         <label class="quiz-option"><input name="q6" type="checkbox" value="b" /> B. Durability — cloud
-                            backup services cannot guarantee that committed data survives server failures, so this
-                            parameter is not satisfied.</label>
-                        <label class="quiz-option"><input name="q6" type="checkbox" value="c" /> C. Consistency —
-                            updating a shipment status in one cell does not automatically propagate to all other cells
-                            referencing that shipment's state, creating conflicting representations of the same
-                            real-world fact.</label>
-                        <label class="quiz-option"><input name="q6" type="checkbox" value="d" /> D. Atomicity — updating
-                            a single shipment event requires writing to multiple cells; if the application crashes
-                            between writes, the partial state cannot be automatically rolled back, leaving the data
-                            silently incorrect.</label>
-                        <label class="quiz-option"><input name="q6" type="checkbox" value="e" /> E. Security — basic
-                            password protection cannot enforce granular per-worker, per-shipment-type, or per-operation
-                            access control that different worker roles require.</label>
+                            backup is the main unsolved problem in this example.</label>
+                        <label class="quiz-option"><input name="q6" type="checkbox" value="c" /> C. Consistency — the
+                            same shipment status can appear differently in different places.</label>
+                        <label class="quiz-option"><input name="q6" type="checkbox" value="d" /> D. Atomicity — a
+                            multi-cell update can stop halfway and leave a partial change.</label>
+                        <label class="quiz-option"><input name="q6" type="checkbox" value="e" /> E. Security — a simple
+                            password cannot express detailed permissions for different worker roles.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
                 <!-- Q7 -->
                 <div class="quiz-card" data-answer="a,b,c"
-                    data-reason="Codd developed the relational model while working at IBM in the early 1970s. He represented data as sets of tuples organized into relations, with independence from physical storage layout. He also defined BCNF, a normalization technique that goes beyond 3NF to handle cases where 3NF still allows redundancy and anomalies. The claim that his model instantly replaced all navigational systems is incorrect, and the claim about SQL's WHERE clause is not stated here.">
+                    data-reason="Ted Codd developed the relational model at IBM in the early 1970s. The model represents data as relations made of tuples and separates logical structure from physical storage details. Codd also introduced BCNF, a stricter normalization form than 3NF. The relational model did not instantly replace every older system.">
                     <div class="question-meta">
                         <span class="question-num-pill">7</span>
                         <span class="question-type-tag multi">SELECT ALL THAT APPLY</span>
                     </div>
-                    <h3>A student is preparing a short profile of Ted Codd's intellectual contributions for a seminar.
-                        Which of the following statements are accurate and can be included without misrepresentation?
-                        Select all that apply.</h3>
+                    <h3>A student is writing a short note about Ted Codd. Which statements are accurate? Select all that
+                        apply.</h3>
                     <div class="quiz-options">
                         <label class="quiz-option"><input name="q7" type="checkbox" value="a" /> A. Codd developed the
                             relational model while working at IBM in the early 1970s.</label>
-                        <label class="quiz-option"><input name="q7" type="checkbox" value="b" /> B. Codd's model
-                            represented data as sets of tuples organised into relations — a framework designed to be
-                            independent of the physical storage layout, unlike the navigational models it
-                            replaced.</label>
+                        <label class="quiz-option"><input name="q7" type="checkbox" value="b" /> B. Codd's model treated
+                            data as relations made of tuples and separated logical design from physical storage.</label>
                         <label class="quiz-option"><input name="q7" type="checkbox" value="c" /> C. Codd defined BCNF, a
-                            normalization technique that goes beyond 3NF to address cases where 3NF conditions are
-                            satisfied but certain redundancy and update anomaly problems still remain.</label>
+                            normalization form that handles some redundancy problems left by 3NF.</label>
                         <label class="quiz-option"><input name="q7" type="checkbox" value="d" /> D. Codd's relational
-                            model immediately replaced all navigational database systems upon its publication in the
-                            early 1970s, which is why the 1970s timeline entry shows the SQL boom.</label>
-                        <label class="quiz-option"><input name="q7" type="checkbox" value="e" /> E. Codd proved that
-                            SQL's WHERE clause is a direct instantiation of predicate logic, which is why the relational
-                            model is credited as the first formal mathematical framework in computing history.</label>
+                            model immediately replaced all older database systems.</label>
+                        <label class="quiz-option"><input name="q7" type="checkbox" value="e" /> E. Codd proved that SQL
+                            was the first mathematical idea in computing.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
                 </div>
                 <!-- Q8 -->
                 <div class="quiz-card" data-answer="a,c,d"
-                    data-reason="The constants are the universal needs of record-keeping and the recurring transition pattern. Storage, retrieval, transactions, audit, and archival remain fundamental requirements in every era. The same cycle also repeats: a working system faces new demands, specific failures appear, and a new system is built as a direct response. The six DBMS parameters are also permanent evaluation criteria. What changes are the technologies and architectures used to satisfy those needs, not the needs themselves.">
+                    data-reason="Across eras, the basic needs stay similar: store records, retrieve them, update them, audit them, and preserve them. A repeated pattern also appears: an old system meets new demands, its failures become clear, and a new system is designed to answer those failures. The DBMS parameters remain useful for evaluation, even though the technologies change.">
                     <div class="question-meta">
                         <span class="question-num-pill">8</span>
                         <span class="question-type-tag multi">SELECT ALL THAT APPLY</span>
                     </div>
-                    <h3>The entire history of data management can be viewed as a single evolutionary design problem.
-                        Which statements about what remains constant across all four eras — from physical bookkeeping
-                        through the cloud era — are correct? Select all that apply.</h3>
+                    <h3>Across paper ledgers, electronic files, DBMSs, and cloud systems, what ideas stay constant? Select
+                        all that apply.</h3>
                     <div class="quiz-options">
                         <label class="quiz-option"><input name="q8" type="checkbox" value="a" /> A. The five core needs
-                            — storage, retrieval, transactions, audit, and archival — are universal requirements of
-                            record-keeping that exist in every era, from ledgers to cloud databases.</label>
+                            — storage, retrieval, transactions, audit, and archival — appear in every era.</label>
                         <label class="quiz-option"><input name="q8" type="checkbox" value="b" /> B. The specific
-                            technologies used to satisfy each core need — magnetic tape, spreadsheets, SQL engines —
-                            remain consistent across eras; only their implementation details differ.</label>
+                            technologies stay the same in every era.</label>
                         <label class="quiz-option"><input name="q8" type="checkbox" value="c" /> C. The transition
-                            pattern itself is a constant: every era exhibits the same cycle of a working system meeting
-                            new demands, producing specific failures, and being replaced by a system built as direct
-                            answers to those failures.</label>
+                            pattern repeats: new demands expose failures, and new systems are built to answer them.</label>
                         <label class="quiz-option"><input name="q8" type="checkbox" value="d" /> D. The six DBMS
-                            parameters — durability, scalability, security, consistency, atomicity, efficiency — serve
-                            as the permanent evaluation criteria against which every era of data management is
-                            measured.</label>
+                            parameters — durability, scalability, security, consistency, atomicity, efficiency — remain
+                            useful evaluation criteria.</label>
                         <label class="quiz-option"><input name="q8" type="checkbox" value="e" /> E. The relational model
-                            is a constant foundation across all four eras — NoSQL and cloud systems are built directly
-                            on the relational architecture, extending it rather than departing from it.</label>
+                            is the direct foundation of every era, including paper ledgers.</label>
                     </div>
                     <button class="quiz-btn" type="button">Check Answer</button>
                     <div class="quiz-feedback"></div>
@@ -531,19 +490,17 @@
                 </section>
                 <!-- Q9 -->
                 <div class="quiz-card" data-answer="a"
-                    data-reason="Both statements are true, and the reason correctly explains the assertion. BCNF is stricter than 3NF because there are schema structures where 3NF still permits update anomalies. BCNF exists to close that gap by imposing a tighter constraint on functional dependencies.">
+                    data-reason="Both statements are true, and the reason explains the assertion. BCNF is stricter than 3NF because some designs can satisfy 3NF but still allow update anomalies. BCNF adds a tighter rule to reduce those remaining problems.">
                     <div class="question-meta">
                         <span class="question-num-pill">9</span>
                         <span class="question-type-tag ar">ASSERTION – REASON</span>
                     </div>
                     <div class="ar-block">
-                        <p><span class="ar-label">Assertion (A):</span> BCNF (Boyce-Codd Normal Form) represents a more
-                            rigorous standard of normalisation than 3NF because it is designed to eliminate redundancy
-                            and update anomalies that 3NF is not always capable of eliminating on its own.</p>
-                        <p><span class="ar-label">Reason (R):</span> There exist schema structures in which all 3NF
-                            conditions are technically satisfied, yet certain functional dependency relationships still
-                            permit update anomalies — situations where a valid update in one place creates inconsistency
-                            elsewhere — and BCNF addresses precisely these cases by imposing a stricter constraint.</p>
+                        <p><span class="ar-label">Assertion (A):</span> BCNF is stricter than 3NF because it tries to
+                            remove some redundancy and update problems that 3NF can still allow.</p>
+                        <p><span class="ar-label">Reason (R):</span> Some table designs can satisfy 3NF and still have
+                            dependency patterns that create update anomalies; BCNF adds a stronger rule for those
+                            cases.</p>
                     </div>
                     <div class="quiz-options">
                         <label class="quiz-option"><input name="q9" type="radio" value="a" /> A. Both A and R are true,
@@ -560,23 +517,18 @@
                 </div>
                 <!-- Q10 -->
                 <div class="quiz-card" data-answer="d"
-                    data-reason="The assertion is false and the reason is true. The move from physical bookkeeping to electronic systems is a qualitative change: it makes durability software-managed and retrieval algorithmic. The move from spreadsheets to DBMS is a different advance: it adds data-management guarantees such as consistency, atomicity, concurrency, and constraint enforcement. Those are different axes of improvement, not the same improvement repeated.">
+                    data-reason="The assertion is false and the reason is true. Moving from paper to electronic files changes storage and search. Moving from spreadsheets to a DBMS adds stronger data guarantees such as consistency, atomicity, concurrency control, and constraint enforcement. These are different kinds of improvement.">
                     <div class="question-meta">
                         <span class="question-num-pill">10</span>
                         <span class="question-type-tag ar">ASSERTION – REASON</span>
                     </div>
                     <div class="ar-block">
-                        <p><span class="ar-label">Assertion (A):</span> The transition from physical bookkeeping to
-                            spreadsheets and the transition from spreadsheets to a relational DBMS are fundamentally the
-                            same kind of improvement — each makes the preceding system faster, more reliable, and better
-                            at the same tasks, in a continuous progression along a single axis of improvement.</p>
-                        <p><span class="ar-label">Reason (R):</span> The physical-to-electronic transition is a
-                            qualitative change — it changes the nature of what is possible by making durability a
-                            software concern and retrieval algorithmic rather than manual; the spreadsheet-to-DBMS
-                            transition is a different kind of advance — it changes the data management contract by
-                            adding consistency, atomicity, concurrency guarantees, and constraint enforcement that the
-                            flat-file model is structurally incapable of providing. These are different axes of
-                            improvement, not the same axis repeated.</p>
+                        <p><span class="ar-label">Assertion (A):</span> Moving from paper to spreadsheets and moving from
+                            spreadsheets to a DBMS are the same kind of improvement: both only make the old system
+                            faster.</p>
+                        <p><span class="ar-label">Reason (R):</span> Paper to electronic files improves storage and search,
+                            while spreadsheets to DBMS adds stronger guarantees such as consistency, atomicity,
+                            concurrency control, and constraints.</p>
                     </div>
                     <div class="quiz-options">
                         <label class="quiz-option"><input name="q10" type="radio" value="a" /> A. Both A and R are true,
