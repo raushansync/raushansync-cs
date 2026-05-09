@@ -2247,6 +2247,18 @@ body:not(:has(.header--hidden)) .breadcrumb {
     padding: clamp(0.75rem, 2.2vh, 1.35rem) 0.8rem;
 }
 
+/* When AI chat is open, ensure the site header sits beneath the modal
+   so the chat panel is not visually hidden by the navbar. This targets
+   the header and a few header-related stacking children only while the
+   `ai-chat-open` class is present on the body. */
+body.ai-chat-open .header,
+body.ai-chat-open .header-actions,
+body.ai-chat-open .nav-links,
+body.ai-chat-open .navbar,
+body.ai-chat-open .navbar-menu {
+  z-index: 0 !important;
+}
+
 .ai-chat-overlay {
     position: absolute;
     inset: 0;

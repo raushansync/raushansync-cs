@@ -1,0 +1,2581 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3b82f6" id="theme-color-meta">
+
+    <title>Intro to DBMS Concepts & Architecture | RaushanSYNC CS & DS</title>
+
+    <meta name="description"
+        content="Deep conceptual notes on DBMS fundamentals — three levels of abstraction, schema vs instance, DDL vs DML, the redundancy problem, the database engine internals, and architecture evolution.">
+
+    <meta name="keywords"
+        content="DBMS three levels of abstraction, schema vs instance, DDL DML, physical data independence, database engine, storage manager, query processor, transaction manager, ACID properties, RaushanSYNC">
+
+    <meta name="author" content="Raushan Kumar">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+
+    <link rel="canonical" href="https://cs.raushansync.com/computer-science/dbms/03-intro-to-dbms-concepts-and-architecture/">
+
+    <!-- Open Graph -->
+    <meta property="og:site_name" content="RaushanSYNC CS & DS">
+    <meta property="og:title" content="Intro to DBMS Concepts & Architecture — RaushanSYNC CS & DS">
+    <meta property="og:description"
+        content="From abstraction levels to the database engine black box — a deep conceptual walkthrough of how a DBMS is structured, designed, and reasoned about.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://cs.raushansync.com/computer-science/dbms/03-intro-to-dbms-concepts-and-architecture/">
+    <meta property="og:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@raushansync">
+    <meta name="twitter:title" content="Intro to DBMS Concepts & Architecture — RaushanSYNC CS & DS">
+    <meta name="twitter:description"
+        content="Three levels of abstraction, schema vs instance, DDL/DML, the redundancy problem, and the database engine explained deeply.">
+    <meta name="twitter:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Article",
+                "headline": "Introduction to DBMS Concepts & Architecture",
+                "description": "Deep conceptual notes on three levels of abstraction, schema vs instance, DDL/DML, the redundancy problem, the database engine internals, and architecture evolution.",
+                "url": "https://cs.raushansync.com/computer-science/dbms/03-intro-to-dbms-concepts-and-architecture/",
+                "author": { "@type": "Person", "name": "Raushan Kumar" },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "RaushanSYNC CS & DS",
+                    "url": "https://cs.raushansync.com/"
+                }
+            },
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Home",             "item": "https://cs.raushansync.com/" },
+                    { "@type": "ListItem", "position": 2, "name": "Computer Science", "item": "https://cs.raushansync.com/computer-science/" },
+                    { "@type": "ListItem", "position": 3, "name": "DBMS",             "item": "https://cs.raushansync.com/computer-science/dbms/" },
+                    { "@type": "ListItem", "position": 4, "name": "1.3 Intro to DBMS Concepts & Architecture", "item": "https://cs.raushansync.com/computer-science/dbms/03-intro-to-dbms-concepts-and-architecture/" }
+                ]
+            }
+        ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <style>
+
+        /* ══════════════════════════════════════
+           Lesson progress badge
+        ══════════════════════════════════════ */
+        .lesson-progress {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
+            margin: 0 0 1.6rem;
+            padding: 0.55rem 0.8rem;
+            color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.07);
+            border: 1px solid rgba(59, 130, 246, 0.16);
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .lesson-badge {
+            display: inline-grid;
+            place-items: center;
+            flex: 0 0 auto;
+            width: 1.9rem;
+            height: 1.9rem;
+            color: #fff;
+            background: var(--primary-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 18px rgba(59, 130, 246, 0.2);
+        }
+
+        .lesson-title-small {
+            min-width: 0;
+            font-size: 0.92rem;
+            line-height: 1.25;
+        }
+
+        /* ══════════════════════════════════════
+           Inline code
+        ══════════════════════════════════════ */
+        .notes-container p code,
+        .notes-container li code,
+        .notes-container td code {
+            padding: 0.12rem 0.35rem;
+            color: var(--primary-color-dark);
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.14);
+            border-radius: 6px;
+            font-family: Consolas, "SFMono-Regular", "Liberation Mono", monospace;
+            font-size: 0.92em;
+            white-space: nowrap;
+        }
+
+        /* ══════════════════════════════════════
+           Three-level abstraction tower
+        ══════════════════════════════════════ */
+        .abstraction-tower {
+            display: grid;
+            gap: 0;
+            margin: 1.5rem 0 2rem;
+        }
+
+        .abs-level {
+            --abs-c: #3b82f6;
+            --abs-soft: rgba(59,130,246,0.10);
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 0.9rem;
+            align-items: center;
+            padding: 1rem 1.2rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--abs-c);
+            position: relative;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+            overflow: hidden;
+        }
+
+        .abs-level::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 5rem;
+            background: linear-gradient(90deg, var(--abs-soft), transparent);
+            pointer-events: none;
+        }
+
+        .abs-level:first-child { border-radius: 12px 12px 0 0; }
+        .abs-level:last-child  { border-radius: 0 0 12px 12px; }
+
+        .abs-level + .abs-level { border-top: none; }
+
+        .abs-level:hover {
+            z-index: 1;
+            transform: translateY(-1px);
+            box-shadow: 0 10px 28px rgba(15,23,42,0.12);
+        }
+
+        .abs-level.level-view     { --abs-c: #8b5cf6; --abs-soft: rgba(139,92,246,0.10); }
+        .abs-level.level-logical  { --abs-c: #3b82f6; --abs-soft: rgba(59,130,246,0.10); }
+        .abs-level.level-physical { --abs-c: #f97316; --abs-soft: rgba(249,115,22,0.10); }
+
+        .abs-icon-wrap {
+            display: inline-grid;
+            place-items: center;
+            width: 2.4rem;
+            height: 2.4rem;
+            background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.38), transparent 30%),
+                        linear-gradient(135deg, var(--abs-c), color-mix(in srgb, var(--abs-c) 65%, #111827));
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 18px var(--abs-soft);
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .abs-body { min-width: 0; }
+
+        .abs-body strong {
+            display: block;
+            font-size: 0.97rem;
+            color: var(--text-color);
+            margin-bottom: 0.18rem;
+        }
+
+        .abs-body p {
+            margin: 0;
+            color: var(--secondary-text-color);
+            font-size: 0.86rem;
+            line-height: 1.5;
+        }
+
+        .abs-badge {
+            display: inline-flex;
+            padding: 0.22rem 0.6rem;
+            background: color-mix(in srgb, var(--abs-c) 14%, transparent);
+            color: var(--abs-c);
+            border: 1px solid color-mix(in srgb, var(--abs-c) 28%, transparent);
+            border-radius: 999px;
+            font-size: 0.67rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+            align-self: flex-start;
+        }
+
+        /* ══════════════════════════════════════
+           Schema vs Instance card pair
+        ══════════════════════════════════════ */
+        .schema-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.25rem 0 1.8rem;
+        }
+
+        .schema-card {
+            --sc-c: #3b82f6;
+            padding: 1.1rem 1.15rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--sc-c);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .schema-card.card-instance { --sc-c: #22c55e; }
+
+        .schema-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(15,23,42,0.12);
+        }
+
+        .schema-card-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.35rem;
+            line-height: 1;
+        }
+
+        .schema-card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+            color: var(--text-color);
+        }
+
+        .schema-card .sc-tag {
+            display: inline-flex;
+            margin-bottom: 0.5rem;
+            padding: 0.18rem 0.5rem;
+            background: color-mix(in srgb, var(--sc-c) 13%, transparent);
+            color: var(--sc-c);
+            border: 1px solid color-mix(in srgb, var(--sc-c) 25%, transparent);
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 700;
+        }
+
+        .schema-card ul {
+            margin: 0;
+            padding-left: 1.1rem;
+            color: var(--secondary-text-color);
+            font-size: 0.87rem;
+            line-height: 1.65;
+        }
+
+        /* ══════════════════════════════════════
+           Physical Data Independence highlight box
+        ══════════════════════════════════════ */
+        .pdi-box {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.9rem;
+            align-items: flex-start;
+            padding: 1.1rem 1.2rem;
+            margin: 1.2rem 0 2rem;
+            background: var(--card-background);
+            border: 1px solid rgba(34,197,94,0.22);
+            border-left: 5px solid #22c55e;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .pdi-icon {
+            display: inline-grid;
+            place-items: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, #22c55e, #15803d);
+            border-radius: 12px;
+            font-size: 1.15rem;
+            box-shadow: 0 8px 18px rgba(34,197,94,0.22);
+            flex-shrink: 0;
+        }
+
+        .pdi-body strong {
+            display: block;
+            color: var(--text-color);
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .pdi-body p {
+            margin: 0;
+            color: var(--secondary-text-color);
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        /* ══════════════════════════════════════
+           Data Model cards
+        ══════════════════════════════════════ */
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 0.9rem;
+            margin: 1.25rem 0 2rem;
+        }
+
+        .model-card {
+            --mc: #3b82f6;
+            padding: 1rem 1.05rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--mc);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .model-card.mc-relational { --mc: #3b82f6; }
+        .model-card.mc-er         { --mc: #f97316; }
+        .model-card.mc-nosql      { --mc: #8b5cf6; }
+
+        .model-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(15,23,42,0.12);
+        }
+
+        .model-card-icon { font-size: 1.6rem; margin-bottom: 0.4rem; line-height: 1; }
+
+        .model-badge {
+            display: inline-flex;
+            margin-bottom: 0.5rem;
+            padding: 0.2rem 0.5rem;
+            background: color-mix(in srgb, var(--mc) 13%, transparent);
+            color: var(--mc);
+            border: 1px solid color-mix(in srgb, var(--mc) 28%, transparent);
+            border-radius: 999px;
+            font-size: 0.67rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+        }
+
+        .model-card h3 { font-size: 0.98rem; margin-bottom: 0.3rem; color: var(--text-color); }
+
+        .model-card p {
+            margin: 0;
+            color: var(--secondary-text-color);
+            font-size: 0.86rem;
+            line-height: 1.55;
+        }
+
+        /* ══════════════════════════════════════
+           DDL vs DML split card
+        ══════════════════════════════════════ */
+        .lang-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.25rem 0 1.8rem;
+        }
+
+        .lang-card {
+            --lc: #3b82f6;
+            padding: 1.1rem 1.15rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-left: 5px solid var(--lc);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lang-card::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 4.5rem;
+            background: linear-gradient(90deg, color-mix(in srgb, var(--lc) 8%, transparent), transparent);
+            pointer-events: none;
+        }
+
+        .lang-card.lc-dml { --lc: #22c55e; }
+
+        .lang-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(15,23,42,0.12);
+        }
+
+        .lang-card h3 { font-size: 1rem; color: var(--lc); margin-bottom: 0.2rem; }
+
+        .lang-subtitle {
+            display: block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--secondary-text-color);
+            letter-spacing: 0.04em;
+            margin-bottom: 0.65rem;
+        }
+
+        .lang-card ul {
+            margin: 0;
+            padding-left: 1.1rem;
+            color: var(--secondary-text-color);
+            font-size: 0.87rem;
+            line-height: 1.65;
+        }
+
+        .lang-card .lang-example {
+            margin-top: 0.65rem;
+            padding: 0.5rem 0.65rem;
+            background: rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: Consolas, "SFMono-Regular", monospace;
+            font-size: 0.8rem;
+            color: var(--primary-color-dark);
+            word-break: break-all;
+        }
+
+        .dark-mode .lang-card .lang-example { background: rgba(255,255,255,0.04); }
+
+        /* ══════════════════════════════════════
+           DML command chips
+        ══════════════════════════════════════ */
+        .dml-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.55rem;
+            margin: 0.75rem 0 0;
+        }
+
+        .dml-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border: 1px solid transparent;
+        }
+
+        .dml-chip.c-select { background: rgba(59,130,246,0.12); color: #1d4ed8; border-color: rgba(59,130,246,0.22); }
+        .dml-chip.c-insert { background: rgba(34,197,94,0.12); color: #15803d; border-color: rgba(34,197,94,0.22); }
+        .dml-chip.c-update { background: rgba(234,179,8,0.14); color: #92400e; border-color: rgba(234,179,8,0.28); }
+        .dml-chip.c-delete { background: rgba(239,68,68,0.12); color: #991b1b; border-color: rgba(239,68,68,0.22); }
+
+        .dark-mode .dml-chip.c-select { color: #93c5fd; }
+        .dark-mode .dml-chip.c-insert { color: #86efac; }
+        .dark-mode .dml-chip.c-update { color: #fde68a; }
+        .dark-mode .dml-chip.c-delete { color: #fca5a5; }
+
+        /* ══════════════════════════════════════
+           Data Dictionary note card
+        ══════════════════════════════════════ */
+        .dict-card {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.85rem;
+            align-items: flex-start;
+            padding: 1rem 1.1rem;
+            background: var(--card-background);
+            border: 1px solid rgba(139,92,246,0.22);
+            border-left: 4px solid #8b5cf6;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            margin: 1rem 0 1.8rem;
+        }
+
+        .dict-icon {
+            display: inline-grid;
+            place-items: center;
+            width: 2.2rem;
+            height: 2.2rem;
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            border-radius: 9px;
+            font-size: 1rem;
+            box-shadow: 0 8px 18px rgba(139,92,246,0.22);
+            flex-shrink: 0;
+        }
+
+        .dict-body strong { display: block; color: var(--text-color); margin-bottom: 0.25rem; font-size: 0.98rem; }
+        .dict-body p { margin: 0; color: var(--secondary-text-color); font-size: 0.89rem; line-height: 1.55; }
+
+        /* ══════════════════════════════════════
+           Redundancy problem danger zone
+        ══════════════════════════════════════ */
+        .redundancy-scenario {
+            margin: 1.25rem 0 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .redundancy-header {
+            padding: 0.7rem 1rem;
+            background: linear-gradient(90deg, rgba(239,68,68,0.09), rgba(239,68,68,0.04));
+            border-bottom: 1px solid rgba(239,68,68,0.2);
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #dc2626;
+            letter-spacing: 0.04em;
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+
+        .redundancy-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+        .redundancy-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 520px;
+        }
+
+        .redundancy-table th {
+            padding: 0.6rem 1rem;
+            text-align: left;
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: var(--secondary-text-color);
+            border-bottom: 1px solid var(--border-color);
+            background: var(--card-background);
+        }
+
+        .redundancy-table td {
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+            font-family: Consolas, "SFMono-Regular", monospace;
+            color: var(--secondary-text-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .redundancy-table tr:last-child td { border-bottom: none; }
+
+        .redundancy-table .highlight-red td { background: rgba(239,68,68,0.07); }
+
+        .redundancy-table .td-dup { color: #dc2626; font-weight: 700; }
+
+        /* ══════════════════════════════════════
+           Solution decomposition visual
+        ══════════════════════════════════════ */
+        .decomposition-pair {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.25rem 0 2rem;
+        }
+
+        .decomp-table-card {
+            --dtc: #22c55e;
+            padding: 1rem 1.05rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--dtc);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .decomp-table-card.dtc-dept { --dtc: #3b82f6; }
+
+        .decomp-table-card h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--dtc);
+            margin-bottom: 0.55rem;
+        }
+
+        .decomp-cols {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .decomp-col-chip {
+            padding: 0.22rem 0.6rem;
+            background: color-mix(in srgb, var(--dtc) 10%, transparent);
+            border: 1px solid color-mix(in srgb, var(--dtc) 24%, transparent);
+            border-radius: 6px;
+            font-family: Consolas, "SFMono-Regular", monospace;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--dtc);
+        }
+
+        .decomp-col-chip.key-col {
+            background: color-mix(in srgb, var(--dtc) 18%, transparent);
+            border-style: solid;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .decomp-table-card p {
+            margin: 0.65rem 0 0;
+            font-size: 0.83rem;
+            color: var(--secondary-text-color);
+            line-height: 1.5;
+        }
+
+        /* ══════════════════════════════════════
+           Database Engine "Black Box" components
+        ══════════════════════════════════════ */
+        .engine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin: 1.25rem 0 2rem;
+        }
+
+        .engine-card {
+            --ec: #3b82f6;
+            padding: 1.1rem 1.15rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            border-left: 4px solid var(--ec);
+            box-shadow: var(--card-shadow);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .engine-card::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 4rem;
+            background: linear-gradient(90deg, color-mix(in srgb, var(--ec) 8%, transparent), transparent);
+            pointer-events: none;
+        }
+
+        .engine-card.ec-storage { --ec: #f97316; }
+        .engine-card.ec-query   { --ec: #8b5cf6; }
+        .engine-card.ec-txn     { --ec: #22c55e; }
+
+        .engine-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(15,23,42,0.12);
+        }
+
+        .engine-icon {
+            display: inline-grid;
+            place-items: center;
+            width: 2.2rem;
+            height: 2.2rem;
+            background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.38), transparent 30%),
+                        linear-gradient(135deg, var(--ec), color-mix(in srgb, var(--ec) 65%, #111827));
+            border-radius: 10px;
+            font-size: 1rem;
+            box-shadow: 0 8px 18px color-mix(in srgb, var(--ec) 28%, transparent);
+            margin-bottom: 0.65rem;
+        }
+
+        .engine-card h3 { font-size: 0.98rem; color: var(--text-color); margin-bottom: 0.2rem; }
+
+        .engine-card .engine-role {
+            display: inline-block;
+            margin-bottom: 0.55rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: var(--ec);
+        }
+
+        .engine-card ul {
+            margin: 0;
+            padding-left: 1.1rem;
+            color: var(--secondary-text-color);
+            font-size: 0.86rem;
+            line-height: 1.65;
+        }
+
+        /* ══════════════════════════════════════
+           Query Processor Pipeline
+        ══════════════════════════════════════ */
+        .query-pipeline {
+            display: grid;
+            gap: 0;
+            margin: 1.25rem 0 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .qp-step {
+            --qp-c: #8b5cf6;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.85rem;
+            align-items: flex-start;
+            padding: 0.9rem 1.1rem;
+            background: var(--card-background);
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+            transition: background 0.16s ease;
+        }
+
+        .qp-step:last-child { border-bottom: none; }
+
+        .qp-step:hover { background: rgba(139,92,246,0.03); }
+
+        .qp-num {
+            display: inline-grid;
+            place-items: center;
+            width: 1.7rem;
+            height: 1.7rem;
+            background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.38), transparent 30%),
+                        linear-gradient(135deg, #8b5cf6, #6d28d9);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.78rem;
+            font-weight: 800;
+            flex-shrink: 0;
+            box-shadow: 0 6px 14px rgba(139,92,246,0.25);
+        }
+
+        .qp-content strong {
+            display: block;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .qp-content p {
+            margin: 0;
+            color: var(--secondary-text-color);
+            font-size: 0.87rem;
+            line-height: 1.5;
+        }
+
+        /* ══════════════════════════════════════
+           ACID properties grid
+        ══════════════════════════════════════ */
+        .acid-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+            gap: 0.85rem;
+            margin: 1.25rem 0 2rem;
+        }
+
+        .acid-card {
+            --ac: #3b82f6;
+            padding: 1rem 1.05rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--ac);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .acid-card.ac-a { --ac: #f97316; }
+        .acid-card.ac-c { --ac: #3b82f6; }
+        .acid-card.ac-i { --ac: #8b5cf6; }
+        .acid-card.ac-d { --ac: #22c55e; }
+
+        .acid-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(15,23,42,0.12);
+        }
+
+        .acid-letter {
+            display: inline-grid;
+            place-items: center;
+            width: 2rem;
+            height: 2rem;
+            background: var(--ac);
+            color: #fff;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 6px 14px color-mix(in srgb, var(--ac) 32%, transparent);
+        }
+
+        .acid-card h3 { font-size: 0.97rem; color: var(--text-color); margin-bottom: 0.25rem; }
+
+        .acid-card p {
+            margin: 0;
+            color: var(--secondary-text-color);
+            font-size: 0.85rem;
+            line-height: 1.55;
+        }
+
+        /* ══════════════════════════════════════
+           Architecture evolution (reused pattern)
+        ══════════════════════════════════════ */
+        .evolution-flow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0;
+            align-items: stretch;
+            margin: 1.25rem 0 2rem;
+        }
+
+        .evo-step {
+            --evo-c: #3b82f6;
+            flex: 1 1 120px;
+            min-width: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+        }
+
+        .evo-step:not(:last-child)::after {
+            content: "→";
+            position: absolute;
+            right: -0.7rem;
+            top: 1rem;
+            color: var(--border-color);
+            font-size: 1.1rem;
+            line-height: 1;
+        }
+
+        .evo-step:nth-child(1) { --evo-c: #94a3b8; }
+        .evo-step:nth-child(2) { --evo-c: #3b82f6; }
+        .evo-step:nth-child(3) { --evo-c: #8b5cf6; }
+
+        .evo-bubble {
+            display: inline-grid;
+            place-items: center;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--evo-c);
+            border-radius: 50%;
+            color: #fff;
+            font-size: 1rem;
+            box-shadow: 0 6px 16px color-mix(in srgb, var(--evo-c) 35%, transparent);
+        }
+
+        .evo-label { font-size: 0.78rem; font-weight: 700; color: var(--text-color); text-align: center; }
+        .evo-sublabel { font-size: 0.71rem; color: var(--secondary-text-color); text-align: center; line-height: 1.4; }
+
+        /* ══════════════════════════════════════
+           Misconception card
+        ══════════════════════════════════════ */
+        .misconception-card {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.8rem;
+            align-items: flex-start;
+            margin: 0.9rem 0;
+            padding: 1rem;
+            background: var(--card-background);
+            border: 1px solid rgba(239, 68, 68, 0.18);
+            border-left: 4px solid #ef4444;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .misconception-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+        }
+
+        .misconception-icon {
+            display: inline-grid;
+            place-items: center;
+            width: 2rem;
+            height: 2rem;
+            color: #991b1b;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .misconception-body strong { display: block; margin-bottom: 0.35rem; color: var(--text-color); }
+        .misconception-body p { margin-bottom: 0.6rem; font-size: 0.9rem; color: var(--secondary-text-color); line-height: 1.55; }
+        .misconception-correct { color: #15803d; font-weight: 700; font-size: 0.9rem; }
+        .dark-mode .misconception-icon { color: #fecaca; background: rgba(248,113,113,0.14); }
+        .dark-mode .misconception-correct { color: #86efac; }
+
+        /* ══════════════════════════════════════
+           Compare table (reused)
+        ══════════════════════════════════════ */
+        .compare-table-wrap {
+            display: block;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 1.5rem 0 2rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--card-shadow);
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+
+        .compare-table thead tr {
+            background: linear-gradient(90deg, rgba(59,130,246,0.07), rgba(139,92,246,0.07));
+        }
+
+        .compare-table th {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .compare-table th:nth-child(2) { color: #3b82f6; }
+        .compare-table th:nth-child(3) { color: #22c55e; }
+
+        .compare-table td {
+            padding: 0.7rem 1rem;
+            font-size: 0.87rem;
+            color: var(--secondary-text-color);
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        .compare-table td:first-child { font-weight: 700; color: var(--text-color); white-space: nowrap; }
+        .compare-table tbody tr:last-child td { border-bottom: none; }
+        .compare-table tbody tr:hover td { background: rgba(59,130,246,0.03); }
+
+        /* ══════════════════════════════════════
+           Checkpoint & Checklist cards (reused)
+        ══════════════════════════════════════ */
+        .checkpoint-card {
+            display: grid;
+            gap: 0.7rem;
+            margin: 1.4rem 0 2rem;
+            padding: 1rem;
+            background: linear-gradient(180deg, rgba(99,102,241,0.06), rgba(99,102,241,0.01)), var(--card-background);
+            border: 1px solid rgba(99,102,241,0.18);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .checkpoint-item {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.75rem;
+            align-items: flex-start;
+            padding: 0.8rem 0.9rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+        }
+
+        .checkpoint-num {
+            display: inline-grid;
+            place-items: center;
+            width: 1.6rem;
+            height: 1.6rem;
+            color: #fff;
+            background: #6366f1;
+            border-radius: 6px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .checkpoint-item p { margin: 0; color: var(--secondary-text-color); font-size: 0.9rem; line-height: 1.55; }
+
+        .checklist-card {
+            display: grid;
+            gap: 0.7rem;
+            margin: 1.4rem 0 2rem;
+            padding: 1rem;
+            background: linear-gradient(180deg, rgba(34,197,94,0.06), rgba(34,197,94,0.01)), var(--card-background);
+            border: 1px solid rgba(34,197,94,0.18);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .checklist-item {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.75rem;
+            align-items: flex-start;
+            padding: 0.8rem 0.9rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .checklist-check { width: 1.05rem; height: 1.05rem; margin-top: 0.18rem; accent-color: #22c55e; cursor: pointer; }
+
+        .checklist-item:has(.checklist-check:checked) {
+            color: #15803d;
+            background: rgba(34,197,94,0.08);
+            border-color: rgba(34,197,94,0.24);
+        }
+
+        .dark-mode .checklist-card {
+            background: linear-gradient(180deg, rgba(34,197,94,0.08), rgba(34,197,94,0.02)), var(--card-background);
+        }
+
+        .dark-mode .checklist-item:has(.checklist-check:checked) { color: #86efac; }
+
+        /* ══════════════════════════════════════
+           Beyond-relational model cards
+        ══════════════════════════════════════ */
+        .beyond-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1.25rem 0 2rem;
+        }
+
+        .beyond-card {
+            --bc: #6366f1;
+            padding: 1.05rem 1.1rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-top: 4px solid var(--bc);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .beyond-card.bc-xml { --bc: #f97316; }
+
+        .beyond-card:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(15,23,42,0.12); }
+
+        .beyond-card-icon { font-size: 1.5rem; margin-bottom: 0.4rem; line-height: 1; }
+        .beyond-card h3 { font-size: 0.97rem; color: var(--text-color); margin-bottom: 0.3rem; }
+        .beyond-card p { margin: 0; color: var(--secondary-text-color); font-size: 0.86rem; line-height: 1.55; }
+
+        /* ══════════════════════════════════════
+           Limitation pipeline (reused)
+        ══════════════════════════════════════ */
+        .limitation-pipeline {
+            counter-reset: limitation;
+            display: grid;
+            gap: 0.75rem;
+            margin: 1.5rem 0 1.8rem;
+        }
+
+        .limitation-step {
+            --limit-accent: #ef4444;
+            --limit-accent-soft: rgba(239,68,68,0.14);
+            counter-increment: limitation;
+            position: relative;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.85rem;
+            align-items: flex-start;
+            padding: 1rem 1.1rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--limit-accent);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .limitation-step:nth-child(2) { --limit-accent: #f97316; --limit-accent-soft: rgba(249,115,22,0.14); }
+
+        .limitation-step::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 4.5rem;
+            background: linear-gradient(90deg, var(--limit-accent-soft), transparent);
+            pointer-events: none;
+        }
+
+        .limitation-step:hover { transform: translateY(-2px); box-shadow: 0 16px 32px rgba(15,23,42,0.14); }
+
+        .limitation-icon {
+            position: relative;
+            display: inline-grid;
+            place-items: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            color: #fff;
+            background: radial-gradient(circle at 30% 25%, rgba(255,255,255,0.42), transparent 30%),
+                        linear-gradient(135deg, var(--limit-accent), color-mix(in srgb, var(--limit-accent) 68%, #111827));
+            border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 10px;
+            box-shadow: 0 10px 22px var(--limit-accent-soft), inset 0 -1px 0 rgba(0,0,0,0.2);
+            flex-shrink: 0;
+            font-size: 0;
+            isolation: isolate;
+            transform: rotate(-4deg);
+        }
+
+        .limitation-icon::before {
+            content: counter(limitation, decimal-leading-zero);
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            line-height: 1;
+            transform: rotate(4deg);
+        }
+
+        .limitation-icon::after {
+            content: "";
+            position: absolute;
+            width: 0.36rem;
+            height: 0.36rem;
+            right: 0.28rem;
+            bottom: 0.28rem;
+            background: rgba(255,255,255,0.78);
+            border-radius: 999px;
+            transform: rotate(4deg);
+        }
+
+        .limitation-content > strong { display: block; margin-bottom: 0.25rem; color: var(--text-color); }
+        .limitation-content p { margin: 0; color: var(--secondary-text-color); font-size: 0.9rem; line-height: 1.55; }
+
+        /* ══════════════════════════════════════
+           Responsive
+        ══════════════════════════════════════ */
+        @media (max-width: 700px) {
+            .notes-page { padding-top: calc(var(--header-height) + 20px); }
+            .notes-header { margin-bottom: 2rem; }
+            .notes-header h1 { font-size: clamp(1.45rem, 7vw, 1.85rem); line-height: 1.18; }
+            .notes-header-actions { justify-content: center; flex-wrap: wrap; }
+            .lesson-progress { width: 100%; justify-content: flex-start; margin-bottom: 1.25rem; }
+
+            .schema-pair,
+            .lang-pair,
+            .decomposition-pair,
+            .beyond-grid { grid-template-columns: 1fr; }
+
+            .evolution-flow { gap: 0.75rem; flex-direction: column; align-items: flex-start; }
+            .evo-step { flex-direction: row; }
+            .evo-step:not(:last-child)::after { content: "↓"; right: auto; top: auto; position: static; margin-left: 0.5rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .abs-level, .schema-card, .model-card, .lang-card, .engine-card,
+            .acid-card, .beyond-card, .misconception-card { transition: none; }
+            .abs-level:hover, .schema-card:hover, .model-card:hover, .lang-card:hover,
+            .engine-card:hover, .acid-card:hover, .beyond-card:hover,
+            .misconception-card:hover { transform: none; }
+        }
+    </style>
+
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo">RaushanSYNC CS &amp; DS</a>
+            <div id="nav"></div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode">
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                    </svg>
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="notes-page practice-page">
+        <div class="notes-container">
+
+            <header class="notes-header">
+                <div class="notes-header-left">
+                    <h1>Part 1.3: Introduction to DBMS Concepts &amp; Architecture</h1>
+                    <p>Abstraction · Schema · Languages · Design · The Engine · ACID</p>
+                </div>
+                <div class="notes-header-actions">
+                    <span class="page-header-tick-label">Mark completed</span>
+                    <div id="note-tick" data-tick-container data-tick-position="header" data-tick-type="article"></div>
+                </div>
+            </header>
+
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <ol>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/computer-science/">Computer Science</a></li>
+                    <li><a href="/computer-science/dbms/">DBMS</a></li>
+                    <li aria-current="page">Part 1.3: Intro to DBMS Concepts &amp; Architecture</li>
+                </ol>
+            </nav>
+
+            <!-- Progress badge -->
+            <div class="lesson-progress">
+                <span class="lesson-badge">1.3</span>
+                <span class="lesson-title-small">DBMS Concepts &amp; Architecture — Abstraction to Engine Internals</span>
+            </div>
+
+            <div class="notes-box summary">
+                <p>
+                    This section moves from the <em>why</em> of DBMS (covered in 1.2) to the
+                    <em>what</em> and <em>how</em>. You will learn how a DBMS hides complexity
+                    through three levels of abstraction, how it separates structure from data,
+                    how designers interact with it through two distinct languages, and why
+                    getting the data design wrong produces failures that cascade through the
+                    entire system. The section concludes by cracking open the database "black
+                    box" — revealing the three internal engines that make a DBMS work — and
+                    tracing how deployment architectures evolved from a single mainframe to
+                    today's cloud-distributed systems.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 1 — Big Picture
+                 ═══════════════════════════════════════════ -->
+            <h2 id="big-picture">1. Big Picture Overview</h2>
+
+            <p>
+                This section is fundamentally about the idea of <strong>separation</strong>.
+                Every major concept here — abstraction layers, schema vs instance,
+                DDL vs DML, logical vs physical design, the engine's subsystems —
+                is an instance of separating one concern from another. That separation
+                is not cosmetic; it is the engineering principle that makes databases
+                manageable, trustworthy, and scalable.
+            </p>
+
+            <p>
+                The three threads running through this section are: how a DBMS
+                <em>hides</em> complexity (abstraction), how it <em>organises</em>
+                data correctly (design), and how it <em>delivers</em> the right
+                behaviour internally (the engine). Understanding each thread, and
+                how they connect, is the goal.
+            </p>
+
+            <div class="notes-box example">
+                <h3>The Design Lesson Underneath</h3>
+                <p>
+                    Every concept in this section exists to solve a specific problem.
+                    Abstraction exists because different stakeholders need to think
+                    about data differently. Schema exists because structure must
+                    outlive individual data entries. The engine's subsystems exist
+                    because no single program could reliably manage storage, querying,
+                    and transactions simultaneously. Understanding what each concept
+                    is <em>solving</em> is more important than memorising what it is.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 2 — Three Levels of Abstraction
+                 ═══════════════════════════════════════════ -->
+            <h2 id="abstraction">2. The Three Levels of Abstraction</h2>
+
+            <p>
+                A key feature of any well-designed DBMS is that it hides complexity from
+                the user. Not all complexity — the right complexity for the right audience.
+                It does this by viewing data at three distinct levels, each of which
+                separates how data is <em>stored</em> from how data is <em>used</em>.
+            </p>
+
+            <p>
+                Think of it this way: an airline has three groups of people who all
+                interact with the same flight data — engineers who design the storage
+                systems, database designers who define what data exists and how it relates,
+                and passengers who only care about their own booking. All three need
+                access to "data," but radically different amounts of it, in radically
+                different forms. The three abstraction levels exist to serve these
+                three audiences without mixing their concerns.
+            </p>
+
+            <!-- Abstraction Tower -->
+            <div class="abstraction-tower" role="list" aria-label="Three levels of DBMS abstraction">
+
+                <div class="abs-level level-view" role="listitem">
+                    <div class="abs-icon-wrap" aria-hidden="true">👤</div>
+                    <div class="abs-body">
+                        <strong>View Level — Highest Level</strong>
+                        <p>
+                            This is what a specific user actually sees. It does not expose
+                            the full database — it presents only the portion relevant to
+                            a given role or task. Sensitive fields (like an employee's
+                            Salary) can be hidden entirely. Computed fields can appear
+                            without existing in storage — for example, "Age" shown to the
+                            user derived on the fly from "Date of Birth" in the table.
+                            Crucially, the same underlying data can be exposed through
+                            multiple different views simultaneously — a payroll view, an
+                            HR view, and a manager view can all draw from the same table
+                            while showing completely different columns.
+                        </p>
+                    </div>
+                    <span class="abs-badge">FOR USERS</span>
+                </div>
+
+                <div class="abs-level level-logical" role="listitem">
+                    <div class="abs-icon-wrap" aria-hidden="true">🗂️</div>
+                    <div class="abs-body">
+                        <strong>Logical Level — Middle Level</strong>
+                        <p>
+                            This is the level at which the structure of the database is
+                            defined: what data exists, what tables there are, what columns
+                            each table has, and how different tables relate to each other.
+                            A database designer working at this level says things like
+                            "an Instructor record has an ID, a Name, and a Salary."
+                            The logical level deliberately ignores the complex physical
+                            reality of bits and bytes — it lets the designer think in
+                            terms of meaningful concepts, not storage mechanisms.
+                        </p>
+                    </div>
+                    <span class="abs-badge">FOR DESIGNERS</span>
+                </div>
+
+                <div class="abs-level level-physical" role="listitem">
+                    <div class="abs-icon-wrap" aria-hidden="true">⚙️</div>
+                    <div class="abs-body">
+                        <strong>Physical Level — Lowest Level</strong>
+                        <p>
+                            This is where the data actually lives. How it is encoded in
+                            binary, which disk sectors it occupies, what data structures
+                            (B-trees, hash tables, etc.) organise it for fast access —
+                            all of this is the concern of the physical level. It is the
+                            territory of system engineers, not of application developers
+                            or end users. Most people working with a database never
+                            need to know anything at this level.
+                        </p>
+                    </div>
+                    <span class="abs-badge">FOR ENGINEERS</span>
+                </div>
+
+            </div>
+
+            <div class="notes-box careful">
+                <h3>Why This Separation Is Not Just Convenience</h3>
+                <p>
+                    The three levels are not just organisational tidiness. They represent
+                    a guarantee: changing something at one level does not automatically
+                    break the levels above it. A system engineer can reorganise how data
+                    is stored on disk — moving from one storage format to another — without
+                    the logical structure (tables and columns) changing at all. A database
+                    designer can add a new table without any user's existing view being
+                    disrupted. This independence is a structural property of the system,
+                    not a side effect.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 3 — Schema vs Instance
+                 ═══════════════════════════════════════════ -->
+            <h2 id="schema-instance">3. Schema vs Instance</h2>
+
+            <p>
+                Every database has two things that must never be confused: its
+                <strong>structure</strong> and its <strong>content</strong>. These
+                are formally called the Schema and the Instance.
+            </p>
+
+            <div class="schema-pair">
+
+                <div class="schema-card">
+                    <div class="schema-card-icon">📐</div>
+                    <h3>Schema</h3>
+                    <span class="sc-tag">THE BLUEPRINT</span>
+                    <ul>
+                        <li>The logical structure of the database — the definition of what exists</li>
+                        <li>Defines the names of tables and the columns within them</li>
+                        <li>Example: <code>Customer(Name, ID, AccountNo)</code> — this is a schema declaration, not data</li>
+                        <li>Analogous to declaring a variable type in code: <code>int x;</code> — you are defining what kind of thing will exist, not yet putting a value in it</li>
+                        <li>Changes very rarely — usually only when the business or data model fundamentally changes</li>
+                    </ul>
+                </div>
+
+                <div class="schema-card card-instance">
+                    <div class="schema-card-icon">📦</div>
+                    <h3>Instance</h3>
+                    <span class="sc-tag">THE CONTENT</span>
+                    <ul>
+                        <li>The actual data stored in the database at a specific moment in time</li>
+                        <li>The contents of the tables — the real records, numbers, names, and values</li>
+                        <li>Analogous to assigning a value to a variable: <code>x = 10;</code> — the structure already exists; now something is in it</li>
+                        <li>Changes constantly — every INSERT, UPDATE, and DELETE creates a new instance</li>
+                        <li>The instance is always temporary; the schema is what persists as the stable frame</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <p>
+                The analogy with programming is worth sitting with. When a programmer
+                writes <code>int x;</code>, they are defining a named space that can
+                hold an integer. They have not stored anything yet — the variable's
+                type is like the schema. When they write <code>x = 10;</code>, they
+                are filling that space with a value — analogous to the instance. The
+                schema defines what kinds of data may exist; the instance is the data
+                that actually exists right now.
+            </p>
+
+            <h3>Physical Data Independence — The Critical Consequence</h3>
+
+            <p>
+                The separation of schema from physical storage leads to an important
+                guarantee called Physical Data Independence: the logical schema should
+                not break just because the physical storage method changes.
+            </p>
+
+            <div class="pdi-box">
+                <div class="pdi-icon" aria-hidden="true">🔗</div>
+                <div class="pdi-body">
+                    <strong>Physical Data Independence</strong>
+                    <p>
+                        If a database is migrated from a traditional hard drive to a
+                        solid-state drive — or if the underlying file format changes — the
+                        logical layer remains intact. The tables, the columns, and the
+                        relationships between them are defined at the logical level, not
+                        the physical level. Queries and application code written against
+                        the logical schema continue to work without modification. The
+                        physical and logical levels are deliberately insulated from each other.
+                    </p>
+                </div>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 4 — Data Models
+                 ═══════════════════════════════════════════ -->
+            <h2 id="data-models">4. Data Models</h2>
+
+            <p>
+                A data model is a collection of tools used to describe data, how it
+                relates to other data, and the constraints that govern it. It is the
+                conceptual vocabulary for thinking about data. Different models make
+                different trade-offs about what kinds of data relationships they can
+                represent and how efficiently.
+            </p>
+
+            <div class="model-grid">
+
+                <div class="model-card mc-relational">
+                    <div class="model-card-icon">🗄️</div>
+                    <span class="model-badge">DOMINANT — THIS COURSE</span>
+                    <h3>Relational Model</h3>
+                    <p>
+                        The industry standard for structured data. Organises data into
+                        <strong>Tables</strong> (called Relations), where each table has
+                        <strong>Rows</strong> (Records) and <strong>Columns</strong>
+                        (Attributes). Every fact about an entity lives in a row;
+                        every category of information is a column. Relationships between
+                        tables are expressed through shared key values, not physical pointers.
+                        This is the model this course focuses on entirely.
+                    </p>
+                </div>
+
+                <div class="model-card mc-er">
+                    <div class="model-card-icon">📊</div>
+                    <span class="model-badge">DESIGN PHASE</span>
+                    <h3>Entity-Relationship (ER) Model</h3>
+                    <p>
+                        Used primarily as a <em>design tool before building</em> the
+                        database, not as the implemented structure. The ER model lets
+                        designers draw out the entities in a system (e.g., Students,
+                        Courses) and the relationships between them (e.g., "a Student
+                        <em>enrolls in</em> a Course") diagrammatically. Once design
+                        is complete, the ER diagram is translated into a relational schema.
+                    </p>
+                </div>
+
+                <div class="model-card mc-nosql">
+                    <div class="model-card-icon">🕸️</div>
+                    <span class="model-badge">EMERGING / SPECIALISED</span>
+                    <h3>NoSQL / Graph Models</h3>
+                    <p>
+                        Emerging models designed for data that does not fit naturally
+                        into rows and columns — social graphs, video, images, or
+                        loosely structured documents (like Facebook's friend network).
+                        Although these models are gaining ground for specific use cases,
+                        the Relational model remains the industry standard for
+                        structured, transactional data.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 5 — DDL vs DML
+                 ═══════════════════════════════════════════ -->
+            <h2 id="languages">5. Database Languages: DDL vs DML</h2>
+
+            <p>
+                To interact with a database, two fundamentally different kinds of
+                operations are needed: building the structure, and working with the
+                data inside it. These are handled by two distinct language types,
+                both realised in modern systems through SQL.
+            </p>
+
+            <div class="lang-pair">
+
+                <div class="lang-card">
+                    <h3>DDL — Data Definition Language</h3>
+                    <span class="lang-subtitle">DEFINES STRUCTURE · BUILDS THE CONTAINER</span>
+                    <ul>
+                        <li><strong>Purpose:</strong> Defines the schema — the structure of the database</li>
+                        <li><strong>Action:</strong> It builds the "container" into which data will eventually go — not the data itself</li>
+                        <li><strong>Scope:</strong> Operates at the logical level — tables, columns, data types, constraints</li>
+                    </ul>
+                    <div class="lang-example">CREATE TABLE Instructor (ID, Name, Dept)</div>
+                </div>
+
+                <div class="lang-card lc-dml">
+                    <h3>DML — Data Manipulation Language</h3>
+                    <span class="lang-subtitle">MANIPULATES DATA · OPERATES INSIDE THE CONTAINER</span>
+                    <ul>
+                        <li><strong>Purpose:</strong> Manipulates the instance — the actual data stored</li>
+                        <li><strong>Action:</strong> Performs operations on the data inside an already-defined container</li>
+                        <li><strong>Scope:</strong> Works with rows — retrieving, inserting, changing, or removing them</li>
+                    </ul>
+                    <div class="dml-chips">
+                        <span class="dml-chip c-select">SELECT — Query/Read</span>
+                        <span class="dml-chip c-insert">INSERT — Add</span>
+                        <span class="dml-chip c-update">UPDATE — Change</span>
+                        <span class="dml-chip c-delete">DELETE — Remove</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <h3>The Data Dictionary — DDL's Hidden Output</h3>
+
+            <div class="dict-card">
+                <div class="dict-icon" aria-hidden="true">📖</div>
+                <div class="dict-body">
+                    <strong>The Data Dictionary (System Catalogue)</strong>
+                    <p>
+                        Every time you run a DDL statement, the database does not just
+                        create the table — it also updates an internal record of what
+                        tables and columns now exist. This internal record is called the
+                        Data Dictionary (or System Catalogue). It is a special internal
+                        table that the DBMS itself maintains to keep track of its own
+                        structure. When you query a table, the DBMS first checks the
+                        Data Dictionary to confirm the table exists and verify the
+                        column names and types before it processes anything.
+                        It is the database's own metadata — data <em>about</em> the data.
+                    </p>
+                </div>
+            </div>
+
+            <h3>An Important Boundary: What SQL Cannot Do Alone</h3>
+
+            <p>
+                SQL is not Turing Complete. This is a precise statement: there are
+                categories of complex logical computation — like sophisticated mathematical
+                simulations or multi-step conditional branching logic — that SQL cannot
+                express or execute on its own. This is not a flaw; SQL is designed as
+                a data retrieval and manipulation language, not a general-purpose
+                programming language.
+            </p>
+
+            <p>
+                In real-world applications, SQL is therefore embedded inside a "Host
+                Language" — Python, Java, or C++ — which handles the heavy application
+                logic, while SQL handles precisely what it is optimised for: retrieving
+                and manipulating data from the database. The two languages work together,
+                each doing what it does best.
+            </p>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 6 — Database Design: Logical vs Physical
+                 ═══════════════════════════════════════════ -->
+            <h2 id="design">6. Database Design: Logical vs Physical</h2>
+
+            <p>
+                Design in a DBMS context happens in two distinct phases, corresponding
+                to the two lower levels of the abstraction stack.
+            </p>
+
+            <div class="lang-pair">
+
+                <div class="lang-card" style="--lc: #f97316;">
+                    <h3>Physical Design</h3>
+                    <span class="lang-subtitle">HOW DATA IS STORED ON DISK</span>
+                    <ul>
+                        <li>Concerns how files are laid out, how B-Trees are structured, how disk pages are organised</li>
+                        <li>Decides data structures like indexes and hash tables to ensure fast access</li>
+                        <li>Usually decided once during initial system setup and rarely revisited</li>
+                        <li>Invisible to application developers and users — handled by the system</li>
+                    </ul>
+                </div>
+
+                <div class="lang-card" style="--lc: #3b82f6;">
+                    <h3>Logical Design</h3>
+                    <span class="lang-subtitle">WHAT TABLES EXIST AND HOW THEY RELATE</span>
+                    <ul>
+                        <li>Deciding which tables to create, what columns they contain, and how they relate to each other</li>
+                        <li>Driven by two kinds of decisions in tandem:</li>
+                        <li><strong>Business Decisions:</strong> What data does the organisation need to track? (e.g., "We need to track student grades")</li>
+                        <li><strong>CS Decisions:</strong> How should that data be structured efficiently? (e.g., "Should grades live in the Student table or a separate Course table?")</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <p>
+                Logical design is where most of the intellectual work happens — and
+                where most of the serious mistakes are made. It is the territory of
+                this section's central case study: the redundancy problem.
+            </p>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 7 — The Redundancy Problem
+                 ═══════════════════════════════════════════ -->
+            <h2 id="redundancy">7. The "Bad Design" Case Study: The Redundancy Problem</h2>
+
+            <p>
+                The most important design question this section raises is: what happens
+                when you store related data in a single merged table instead of splitting
+                it across two properly separated tables?
+            </p>
+
+            <h3>The Scenario</h3>
+
+            <p>
+                Imagine designing a database for a university. Two things need to be
+                tracked: faculty members (their names and salaries), and departments
+                (their buildings and budgets). The temptation is to store everything
+                in one table:
+            </p>
+
+            <!-- Redundancy Table -->
+            <div class="redundancy-scenario">
+                <div class="redundancy-header">⚠️ BAD DESIGN — MERGED TABLE (faculty_dept)</div>
+                <div class="redundancy-table-wrap">
+                    <table class="redundancy-table">
+                        <thead>
+                            <tr>
+                                <th>Faculty_Name</th>
+                                <th>Salary</th>
+                                <th>Dept_Name</th>
+                                <th>Building</th>
+                                <th>Budget</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="highlight-red">
+                                <td>Sharma, A.</td>
+                                <td>₹90,000</td>
+                                <td>Computer Science</td>
+                                <td class="td-dup">Taylor Hall</td>
+                                <td class="td-dup">$2,000,000</td>
+                            </tr>
+                            <tr class="highlight-red">
+                                <td>Singh, R.</td>
+                                <td>₹85,000</td>
+                                <td>Computer Science</td>
+                                <td class="td-dup">Taylor Hall</td>
+                                <td class="td-dup">$2,000,000</td>
+                            </tr>
+                            <tr class="highlight-red">
+                                <td>Verma, K.</td>
+                                <td>₹92,000</td>
+                                <td>Computer Science</td>
+                                <td class="td-dup">Taylor Hall</td>
+                                <td class="td-dup">$2,000,000</td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" style="text-align:center; font-style:italic; font-family: inherit; font-size: 0.8rem; color: var(--secondary-text-color);">
+                                    … 7 more rows for Computer Science, all with the same Building and Budget …
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <h3>Why This Is Dangerous</h3>
+
+            <div class="limitation-pipeline">
+
+                <div class="limitation-step">
+                    <div class="limitation-icon" aria-hidden="true">①</div>
+                    <div class="limitation-content">
+                        <strong>Storage Waste</strong>
+                        <p>
+                            The strings "Taylor Hall" and "$2,000,000" are stored ten
+                            separate times — once for each faculty member in the Computer
+                            Science department. This is not merely inefficient; it is
+                            structurally wrong. A fact about a department (its building
+                            and budget) is being stored as if it were a fact about each
+                            individual person. The data model is misrepresenting reality.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="limitation-step">
+                    <div class="limitation-icon" aria-hidden="true">②</div>
+                    <div class="limitation-content">
+                        <strong>Update Anomaly — The Real Danger</strong>
+                        <p>
+                            When the Computer Science budget changes, the system must update
+                            the Budget column in all ten rows. Now consider what happens if
+                            the system successfully updates nine rows and then crashes before
+                            the tenth. The database is now in a corrupted state: nine faculty
+                            members have one budget figure and one has a different one.
+                            Both figures appear valid — there is no way to detect the
+                            inconsistency without external knowledge of what the correct
+                            value should be. The database has become untrustworthy.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <h3>The Solution: Decomposition</h3>
+
+            <p>
+                The fix is to split the merged table into two properly separated tables,
+                each storing only the data that belongs to the entity it represents.
+            </p>
+
+            <div class="decomposition-pair">
+
+                <div class="decomp-table-card">
+                    <h4>Faculty Table</h4>
+                    <div class="decomp-cols">
+                        <span class="decomp-col-chip">Name</span>
+                        <span class="decomp-col-chip">Salary</span>
+                        <span class="decomp-col-chip key-col">Dept_Name ↗</span>
+                    </div>
+                    <p>
+                        Stores only what is true about a <em>person</em>. The
+                        <code>Dept_Name</code> column is a link (foreign key) to the
+                        Department table — not a copy of the department's data.
+                    </p>
+                </div>
+
+                <div class="decomp-table-card dtc-dept">
+                    <h4>Department Table</h4>
+                    <div class="decomp-cols">
+                        <span class="decomp-col-chip key-col">Dept_Name 🔑</span>
+                        <span class="decomp-col-chip">Building</span>
+                        <span class="decomp-col-chip">Budget</span>
+                    </div>
+                    <p>
+                        Stores only what is true about a <em>department</em>. Now if
+                        the budget changes, exactly one row is updated. There is one
+                        source of truth — and it cannot become inconsistent with itself.
+                    </p>
+                </div>
+
+            </div>
+
+            <p>
+                This is not merely a performance improvement. It is a correctness
+                improvement. The decomposed design accurately represents the structure
+                of reality: departments have budgets, not individual faculty members.
+                When data design mirrors reality correctly, anomalies of the kind
+                described above become structurally impossible.
+            </p>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 8 — Design Approaches
+                 ═══════════════════════════════════════════ -->
+            <h2 id="design-approaches">8. Design Approaches: Two Formal Methods</h2>
+
+            <p>
+                The redundancy problem above is not solved by intuition — at scale,
+                databases have hundreds of tables and thousands of columns. Two formal
+                methods exist for systematically arriving at correct designs.
+            </p>
+
+            <div class="lang-pair">
+
+                <div class="lang-card" style="--lc: #f97316;">
+                    <h3>Entity-Relationship (ER) Model</h3>
+                    <span class="lang-subtitle">DIAGRAMMATIC DESIGN TOOL</span>
+                    <ul>
+                        <li>A diagrammatic method for mapping business requirements into a data model before any tables are created</li>
+                        <li>Identifies the <strong>Entities</strong> in the problem domain (e.g., Students, Instructors, Courses) and the <strong>Relationships</strong> between them (e.g., "a Student <em>enrolls in</em> a Course")</li>
+                        <li>Works at the conceptual level — before SQL or schema definitions are written</li>
+                        <li>Produces a blueprint that is then translated into a relational schema</li>
+                    </ul>
+                </div>
+
+                <div class="lang-card" style="--lc: #22c55e;">
+                    <h3>Normalization</h3>
+                    <span class="lang-subtitle">MATHEMATICAL THEORY FROM THE 1970s</span>
+                    <ul>
+                        <li>A formal, mathematical theory for systematically eliminating redundancy from a database schema</li>
+                        <li>Defines a series of "Normal Forms" — rules a schema must satisfy to be considered redundancy-free at that level</li>
+                        <li>Directly prevents the update anomalies described in the case study above</li>
+                        <li>Not optional — it is the scientific basis on which correct data design rests</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="notes-box example">
+                <h3>ER and Normalization Are Complementary</h3>
+                <p>
+                    ER modelling is used at the beginning of design — it helps you identify
+                    what entities and relationships exist before you commit to any table structure.
+                    Normalization is applied to the resulting schema — it checks whether the
+                    tables you defined are correctly decomposed and refines them if not.
+                    They are not competing approaches; they are sequential phases of the same
+                    design discipline.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 9 — Beyond the Relational Model
+                 ═══════════════════════════════════════════ -->
+            <h2 id="beyond-relational">9. Beyond the Relational Model</h2>
+
+            <p>
+                While the relational model is the primary focus of this course, two
+                extended forms are worth understanding at a conceptual level.
+            </p>
+
+            <div class="beyond-grid">
+
+                <div class="beyond-card">
+                    <div class="beyond-card-icon">🧩</div>
+                    <h3>Object-Relational Model</h3>
+                    <p>
+                        An extension of the relational model that allows columns to contain
+                        complex objects rather than simple scalar values. In a standard
+                        relational table, a column holds a number or a string. In an
+                        object-relational system, a column could hold an entire
+                        "Student object" — a structured record with its own fields.
+                        This bridges relational and object-oriented data representation,
+                        though it adds complexity to the schema and query model.
+                    </p>
+                </div>
+
+                <div class="beyond-card bc-xml">
+                    <div class="beyond-card-icon">📄</div>
+                    <h3>XML (Extensible Markup Language)</h3>
+                    <p>
+                        A hierarchical, tag-based format for representing structured data.
+                        Unlike relational tables which are flat and rectangular, XML can
+                        represent nested, tree-structured information. It is rarely used
+                        <em>inside</em> a database for processing, but it is the dominant
+                        standard for <strong>exporting and interchanging</strong> data
+                        between different systems. When two systems that do not share a
+                        database need to exchange records, XML is a common transport format.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 10 — The Database Engine
+                 ═══════════════════════════════════════════ -->
+            <h2 id="engine">10. The Database Engine — The "Black Box"</h2>
+
+            <p>
+                A DBMS is not a single program. It is an engine built from multiple
+                specialised subsystems, each handling a different class of problem.
+                Understanding this internal architecture explains <em>how</em> a DBMS
+                provides the guarantees it advertises: fast queries, safe transactions,
+                crash recovery. Three major subsystems do this work.
+            </p>
+
+            <div class="engine-grid">
+
+                <div class="engine-card ec-storage">
+                    <div class="engine-icon" aria-hidden="true">💾</div>
+                    <h3>Storage Manager</h3>
+                    <span class="engine-role">INTERFACE BETWEEN DB AND OS</span>
+                    <ul>
+                        <li>The OS manages files at the lowest level; the Storage Manager sits above it</li>
+                        <li>Its job: figure out how to store data <em>efficiently</em> within those OS-managed files</li>
+                        <li>Implements indexing and hashing to ensure fast retrieval — so queries do not have to scan every row</li>
+                        <li>Effectively translates between "what the database needs" and "what the file system can provide"</li>
+                    </ul>
+                </div>
+
+                <div class="engine-card ec-query">
+                    <div class="engine-icon" aria-hidden="true">🔍</div>
+                    <h3>Query Processor</h3>
+                    <span class="engine-role">TURNS SQL INTO EXECUTION PLANS</span>
+                    <ul>
+                        <li>Takes the high-level SQL written by a user and converts it into low-level instructions the machine can execute</li>
+                        <li>This is a multi-stage pipeline — not a single operation</li>
+                        <li>The result is an efficient execution plan tailored to the current state of the database</li>
+                    </ul>
+                </div>
+
+                <div class="engine-card ec-txn">
+                    <div class="engine-icon" aria-hidden="true">🔒</div>
+                    <h3>Transaction Manager</h3>
+                    <span class="engine-role">GUARANTEES ACID PROPERTIES</span>
+                    <ul>
+                        <li>Ensures every transaction satisfies the ACID properties — no partial commits, no inconsistent states</li>
+                        <li><strong>Concurrency Control:</strong> When two users attempt the same operation simultaneously (e.g., booking the last available train seat at the exact same millisecond), the Transaction Manager serialises them so only one succeeds and the data remains consistent</li>
+                        <li><strong>Recovery:</strong> If the system crashes mid-transaction, the Transaction Manager rolls back the incomplete operation so the database returns to a valid, consistent state</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <h3>Inside the Query Processor: A Four-Stage Pipeline</h3>
+
+            <p>
+                The Query Processor is worth examining in more detail because it
+                illustrates how much work happens invisibly between writing a SQL
+                statement and receiving a result.
+            </p>
+
+            <div class="query-pipeline">
+
+                <div class="qp-step">
+                    <div class="qp-num">1</div>
+                    <div class="qp-content">
+                        <strong>Parsing — Syntax Check</strong>
+                        <p>
+                            The first step is purely about correctness of form: did the
+                            user write valid SQL? Misspelled keywords, missing parentheses,
+                            or invalid column references are caught here before any data
+                            access happens. Think of it as a grammar check on the query.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="qp-step">
+                    <div class="qp-num">2</div>
+                    <div class="qp-content">
+                        <strong>Translation — SQL → Relational Algebra</strong>
+                        <p>
+                            The parsed query is converted from SQL — a declarative, English-like
+                            language — into Relational Algebra, a formal mathematical language
+                            of set operations. This translation creates an internal representation
+                            that the system can reason about precisely. SQL says <em>what</em>
+                            you want; Relational Algebra says <em>what operations</em> produce it.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="qp-step">
+                    <div class="qp-num">3</div>
+                    <div class="qp-content">
+                        <strong>Optimization — The Brain of the Processor</strong>
+                        <p>
+                            The single most important step. The optimizer examines the
+                            algebraic representation and calculates the most efficient
+                            way to execute it. For a query that joins three tables, the
+                            optimizer asks: which table should be scanned first? Should
+                            the join be done using an index, or would a full scan be faster
+                            given the current data volume? Different execution orders can
+                            differ in performance by orders of magnitude — the optimizer
+                            picks the cheapest plan automatically.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="qp-step">
+                    <div class="qp-num">4</div>
+                    <div class="qp-content">
+                        <strong>Evaluation — Execution and Result Return</strong>
+                        <p>
+                            The chosen execution plan is finally run against the actual
+                            data. The storage manager is called to retrieve the required
+                            records. The results are assembled and returned to the user
+                            or application that issued the query.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 11 — ACID Properties
+                 ═══════════════════════════════════════════ -->
+            <h2 id="acid">11. ACID Properties — What the Transaction Manager Guarantees</h2>
+
+            <p>
+                The Transaction Manager's responsibility is to ensure that every
+                database transaction satisfies four properties, collectively known
+                as ACID. These are not aspirational goals — they are guarantees
+                the DBMS is engineered to uphold.
+            </p>
+
+            <div class="acid-grid">
+
+                <div class="acid-card ac-a">
+                    <div class="acid-letter">A</div>
+                    <h3>Atomicity</h3>
+                    <p>
+                        A transaction either completes in full or has no effect at all.
+                        There is no in-between. If a bank transfer debits one account
+                        but the system crashes before crediting the other, the debit
+                        is rolled back. Partial transactions do not persist.
+                    </p>
+                </div>
+
+                <div class="acid-card ac-c">
+                    <div class="acid-letter">C</div>
+                    <h3>Consistency</h3>
+                    <p>
+                        The database must be in a valid state both before and after
+                        every transaction. Every rule and constraint defined in the
+                        schema must hold. A transaction that would violate a constraint
+                        (e.g., making a balance go negative) is not permitted to complete.
+                    </p>
+                </div>
+
+                <div class="acid-card ac-i">
+                    <div class="acid-letter">I</div>
+                    <h3>Isolation</h3>
+                    <p>
+                        Transactions executing concurrently must not interfere with
+                        each other. Each transaction behaves as if it has exclusive
+                        access to the data. This is what the Transaction Manager's
+                        concurrency control mechanism enforces.
+                    </p>
+                </div>
+
+                <div class="acid-card ac-d">
+                    <div class="acid-letter">D</div>
+                    <h3>Durability</h3>
+                    <p>
+                        Once a transaction has been committed, its effects are permanent.
+                        Even if the system crashes immediately after a commit, the change
+                        survives. This is enforced through techniques like write-ahead
+                        logging that persist changes to stable storage before acknowledging
+                        the commit.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="notes-box careful">
+                <h3>Why All Four Must Hold Together</h3>
+                <p>
+                    Each ACID property protects against a distinct class of failure.
+                    Atomicity protects against partial execution. Consistency protects
+                    against rule violations. Isolation protects against concurrent
+                    interference. Durability protects against data loss after commitment.
+                    A system that satisfies three of the four is not "mostly safe" —
+                    it has a structural vulnerability that can corrupt data under the
+                    right conditions. All four must hold simultaneously.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 12 — Architecture Evolution
+                 ═══════════════════════════════════════════ -->
+            <h2 id="architecture">12. Architecture Evolution</h2>
+
+            <p>
+                How database systems are <em>deployed</em> has evolved in step with
+                computing infrastructure. The same DBMS concepts — the three-level
+                abstraction, ACID transactions, the query pipeline — have been
+                implemented in three fundamentally different deployment architectures.
+            </p>
+
+            <div class="evolution-flow" role="list" aria-label="Database architecture evolution">
+                <div class="evo-step" role="listitem">
+                    <div class="evo-bubble">🖥️</div>
+                    <div>
+                        <div class="evo-label">Monolithic</div>
+                        <div class="evo-sublabel">Mainframe era<br>One machine does everything</div>
+                    </div>
+                </div>
+                <div class="evo-step" role="listitem">
+                    <div class="evo-bubble">🔗</div>
+                    <div>
+                        <div class="evo-label">Client–Server</div>
+                        <div class="evo-sublabel">Standard today<br>DB on server, app on client</div>
+                    </div>
+                </div>
+                <div class="evo-step" role="listitem">
+                    <div class="evo-bubble">☁️</div>
+                    <div>
+                        <div class="evo-label">Cloud / Distributed</div>
+                        <div class="evo-sublabel">AWS, Google Cloud<br>Spread across many machines</div>
+                    </div>
+                </div>
+            </div>
+
+            <p>
+                The <strong>Monolithic (Mainframe)</strong> era placed everything on a
+                single large computer. The database, the application, and the user
+                terminals all connected to one central machine. It was reliable but
+                inflexible — a single point of failure and a hard ceiling on scale.
+            </p>
+
+            <p>
+                The <strong>Client–Server</strong> model separated concerns: the database
+                lives on a dedicated server, and applications (a website, a desktop app)
+                run on separate client machines that query the server over a network.
+                This is still the dominant deployment model today. The network connection
+                introduces latency but enables many clients to share the same database
+                simultaneously.
+            </p>
+
+            <p>
+                The <strong>Cloud / Distributed</strong> architecture takes this further:
+                the database itself is distributed across multiple machines, possibly in
+                different geographic regions, managed by a cloud provider such as AWS or
+                Google Cloud. This allows massive scalability and resilience — if one
+                machine fails, others continue. It also introduces new challenges around
+                keeping distributed copies of data consistent with each other, which is
+                where the frontier of database research currently lives.
+            </p>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 13 — Distinctions & Comparisons
+                 ═══════════════════════════════════════════ -->
+            <h2 id="distinctions">13. Important Distinctions &amp; Comparisons</h2>
+
+            <div class="compare-table-wrap">
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Dimension</th>
+                            <th>Schema</th>
+                            <th>Instance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>What it is</td>
+                            <td>The structure — table names, column definitions, data types</td>
+                            <td>The content — the actual rows of data at a moment in time</td>
+                        </tr>
+                        <tr>
+                            <td>Programming analogy</td>
+                            <td><code>int x;</code> — declaring the type</td>
+                            <td><code>x = 10;</code> — assigning a value</td>
+                        </tr>
+                        <tr>
+                            <td>Frequency of change</td>
+                            <td>Very rare — only when the data model changes</td>
+                            <td>Constantly — every transaction modifies it</td>
+                        </tr>
+                        <tr>
+                            <td>Which language modifies it</td>
+                            <td>DDL (Data Definition Language)</td>
+                            <td>DML (Data Manipulation Language)</td>
+                        </tr>
+                        <tr>
+                            <td>Which abstraction level</td>
+                            <td>Logical Level</td>
+                            <td>Logical Level content / Physical storage</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="compare-table-wrap">
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Dimension</th>
+                            <th>DDL</th>
+                            <th>DML</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Full name</td>
+                            <td>Data Definition Language</td>
+                            <td>Data Manipulation Language</td>
+                        </tr>
+                        <tr>
+                            <td>Operates on</td>
+                            <td>Schema — the structure</td>
+                            <td>Instance — the data</td>
+                        </tr>
+                        <tr>
+                            <td>Builds or reads</td>
+                            <td>Builds the container</td>
+                            <td>Fills, reads, and modifies the container</td>
+                        </tr>
+                        <tr>
+                            <td>Key operations</td>
+                            <td><code>CREATE TABLE</code>, <code>ALTER TABLE</code>, <code>DROP TABLE</code></td>
+                            <td><code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code></td>
+                        </tr>
+                        <tr>
+                            <td>Side effect</td>
+                            <td>Updates the Data Dictionary</td>
+                            <td>Changes the instance — new snapshot of data</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="compare-table-wrap">
+                <table class="compare-table">
+                    <thead>
+                        <tr>
+                            <th>Dimension</th>
+                            <th>Logical Design</th>
+                            <th>Physical Design</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Concern</td>
+                            <td>What tables exist and how they relate</td>
+                            <td>How data is stored on disk</td>
+                        </tr>
+                        <tr>
+                            <td>Decisions made by</td>
+                            <td>Business needs + CS structural principles</td>
+                            <td>System engineers and DB administrators</td>
+                        </tr>
+                        <tr>
+                            <td>Visibility to application</td>
+                            <td>Directly visible — tables and queries use this</td>
+                            <td>Invisible — abstracted away from application</td>
+                        </tr>
+                        <tr>
+                            <td>Frequency of change</td>
+                            <td>Changes with business requirements</td>
+                            <td>Usually decided once at setup</td>
+                        </tr>
+                        <tr>
+                            <td>Key risk if wrong</td>
+                            <td>Redundancy, update anomalies, corruption</td>
+                            <td>Slow access, poor indexing, poor scalability</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 14 — Common Misconceptions
+                 ═══════════════════════════════════════════ -->
+            <h2 id="misconceptions">14. Common Misconceptions</h2>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"The View Level just means a visual interface — like a dashboard or a form."</strong>
+                    <p>
+                        It is tempting to think "view" means a graphical display, because
+                        that is what "view" usually means in everyday language. In database
+                        terminology, a View is a defined, named window onto a subset of
+                        the database — constructed from a query — that can be presented
+                        to a user as if it were a table, even though it may not be stored
+                        as one. Multiple different views can exist simultaneously over the
+                        same underlying data. The view level is about data access control
+                        and data presentation — not about graphical interfaces.
+                    </p>
+                    <div class="misconception-correct">✓ A View is a defined logical window over specific data — it controls what a user sees and can derive computed values, but it is not a GUI concept.</div>
+                </div>
+            </div>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"DDL and DML are two separate languages — you choose one or the other."</strong>
+                    <p>
+                        In modern practice, DDL and DML are both part of SQL. They are
+                        not competing languages or separate tools. They are classifications
+                        of what a particular SQL statement does: some SQL statements define
+                        structure (DDL), and others manipulate data (DML). A developer
+                        uses both in the same SQL session, in the same tool, against the
+                        same database. The distinction matters for understanding what
+                        each statement affects, not for choosing which language to use.
+                    </p>
+                    <div class="misconception-correct">✓ DDL and DML are categories of SQL statements — both are expressed in SQL, used together in the same system.</div>
+                </div>
+            </div>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"A merged table is bad only because it wastes storage space."</strong>
+                    <p>
+                        Storage waste is a minor consequence. The catastrophic consequence
+                        is the update anomaly: the possibility of a partial update leaving
+                        the database in an internally inconsistent state with no way to
+                        detect which value is correct. A merged table with redundant data
+                        violates the principle of having a single source of truth. When
+                        that source is duplicated, inconsistency becomes a structural
+                        possibility — not just a risk to be managed carefully, but an
+                        architectural inevitability under failure conditions.
+                    </p>
+                    <div class="misconception-correct">✓ The primary danger of a bad design is update anomalies — partial updates creating undetectable corruption — not storage cost.</div>
+                </div>
+            </div>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"The Query Optimizer is just about making things faster."</strong>
+                    <p>
+                        While the optimizer does produce faster execution, framing it
+                        purely as a performance tool misses its significance. The optimizer
+                        is what makes SQL practical at all. SQL is declarative: you state
+                        <em>what</em> result you want, not <em>how</em> to compute it.
+                        The optimizer is the component that bridges this gap — it determines
+                        the how. Without the optimizer, users would have to write
+                        procedural query plans manually for every query, which would
+                        defeat the purpose of a high-level query language.
+                    </p>
+                    <div class="misconception-correct">✓ The optimizer is what makes declarative SQL viable — it translates intent into efficient execution, not just making existing plans faster.</div>
+                </div>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 15 — Concept Checkpoints
+                 ═══════════════════════════════════════════ -->
+            <h2 id="checkpoints">15. Concept Checkpoints</h2>
+
+            <p>
+                These questions test reasoning, not recall. Work through each one
+                to verify that you understand the logic — not just the labels.
+            </p>
+
+            <div class="checkpoint-card">
+
+                <div class="checkpoint-item">
+                    <span class="checkpoint-num">Q1</span>
+                    <p>
+                        The three abstraction levels are designed so that changes at one
+                        level do not propagate upward and break the levels above it.
+                        Describe a specific scenario where this independence fails —
+                        that is, where a change at the physical level would <em>force</em>
+                        a change at the logical or view level. What architectural property
+                        has been violated, and what does this tell you about the conditions
+                        under which physical data independence holds?
+                    </p>
+                </div>
+
+                <div class="checkpoint-item">
+                    <span class="checkpoint-num">Q2</span>
+                    <p>
+                        Schema changes very rarely; instances change constantly. Given this,
+                        what would happen to a running application if the schema changed —
+                        say, if a column name was altered in a table the application queries?
+                        What does this tell you about why schema design decisions are treated
+                        with much greater caution than decisions about what data to insert?
+                    </p>
+                </div>
+
+                <div class="checkpoint-item">
+                    <span class="checkpoint-num">Q3</span>
+                    <p>
+                        The update anomaly in the merged faculty-department table becomes
+                        dangerous only when a partial update is interrupted. If a system
+                        could guarantee that no crash ever occurs mid-update, would the
+                        merged design become acceptable? Identify what other problem remains
+                        even without the crash scenario, and explain why that problem alone
+                        should motivate decomposition.
+                    </p>
+                </div>
+
+                <div class="checkpoint-item">
+                    <span class="checkpoint-num">Q4</span>
+                    <p>
+                        The Query Optimizer determines whether to use an index or a full
+                        table scan. Consider a table with 10 rows versus the same table
+                        with 10 million rows. For each case, reason about which strategy
+                        the optimizer would likely prefer, and explain why the correct
+                        choice is different at different data scales.
+                    </p>
+                </div>
+
+                <div class="checkpoint-item">
+                    <span class="checkpoint-num">Q5</span>
+                    <p>
+                        The Transaction Manager serialises concurrent requests — ensuring
+                        only one succeeds when two users attempt the same operation
+                        simultaneously. What is the cost of this serialization in terms
+                        of system performance? And what would happen to the data if the
+                        Transaction Manager did <em>not</em> serialise concurrent writes
+                        to the same row?
+                    </p>
+                </div>
+
+                <div class="checkpoint-item">
+                    <span class="checkpoint-num">Q6</span>
+                    <p>
+                        SQL is described as "not Turing Complete." In the client-server
+                        model, two components work together: a host language (Python, Java)
+                        and SQL. Explain why this division of labour is architecturally
+                        sensible — why would you want data retrieval to be a separate,
+                        declarative language rather than just writing it all in Python?
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 16 — Mental Model Checklist
+                 ═══════════════════════════════════════════ -->
+            <h2 id="mental-model-checklist">16. Mental Model Checklist</h2>
+
+            <p>
+                Before moving to the next section, verify that you can reason through
+                each of these without consulting the notes:
+            </p>
+
+            <div class="checklist-card">
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>The three abstraction levels — Physical (how stored), Logical (what exists), View (what a user sees) — exist to separate concerns for different audiences, not for organisational tidiness. Changing one level should not break the level above it.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>Schema is the structure (the blueprint, the variable type declaration). Instance is the content (the actual data right now, the variable's value). Schema changes rarely; instances change constantly.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>Physical Data Independence: the logical schema should not break when the physical storage method changes. Moving from HDD to SSD should not require rewriting table definitions or queries.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>DDL defines structure (schema) and updates the Data Dictionary. DML manipulates data (instance) — SELECT, INSERT, UPDATE, DELETE. Both are expressed in SQL; they are categories of statements, not separate languages.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>SQL is not Turing Complete — complex application logic lives in a host language (Python, Java). SQL handles data retrieval; the host language handles everything else.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>The primary danger of redundant design is the update anomaly: a partial update interrupted by a crash leaves the database in a corrupted, undetectable inconsistency. Storage waste is secondary. The fix is decomposition — one fact, one place.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>The database engine has three internal subsystems: Storage Manager (interfaces with the OS for efficient physical storage), Query Processor (parses → translates → optimizes → evaluates SQL), and Transaction Manager (enforces ACID through concurrency control and recovery).</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>ACID = Atomicity (all-or-nothing), Consistency (valid state before and after), Isolation (concurrent transactions do not interfere), Durability (committed changes survive crashes). All four must hold simultaneously.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>Architecture evolved: Monolithic (one machine) → Client-Server (DB on server, app on client — still the standard) → Cloud/Distributed (spread across many machines, new consistency challenges). The DBMS concepts remain the same; only the deployment changes.</span>
+                </label>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION-LEVEL MENTAL MODEL
+                 ═══════════════════════════════════════════ -->
+            <div class="notes-box summary" style="margin-top: 3rem;">
+                <h2 style="margin-top: 0; color: inherit;">Section-Level Mental Model</h2>
+                <p>
+                    This section trains you to think about a DBMS as a system built on
+                    <strong>deliberate separations</strong>. Every major concept here is
+                    a boundary: between how data is stored and how it is described (abstraction
+                    levels), between structure and content (schema vs instance), between
+                    defining and operating (DDL vs DML), between what belongs to one entity
+                    versus another (decomposition), and between the user-facing query
+                    language and the internal execution machinery (the engine).
+                </p>
+                <p>
+                    These separations are not bureaucratic — each one solves a real failure
+                    mode. The abstraction stack prevents low-level storage decisions from
+                    destabilising the entire application. The schema/instance distinction
+                    allows structure to outlive any particular batch of data. Correct
+                    decomposition prevents update anomalies from corrupting the database
+                    silently. The engine's three-part structure ensures that storage
+                    optimisation, query efficiency, and transactional correctness can each
+                    be developed and reasoned about independently.
+                </p>
+                <p>
+                    The mental model to retain: <strong>a well-designed DBMS is a system
+                    of enforced separations, each of which eliminates a class of failure.</strong>
+                    When you understand what failure each separation prevents, you understand
+                    why the system is built the way it is — and you can reason about what
+                    would go wrong if any separation were removed.
+                </p>
+                <ul>
+                    <li><strong>Three abstraction levels</strong> → protects each stakeholder from the complexity above and below their concern</li>
+                    <li><strong>Schema / Instance separation</strong> → structure outlives content; changes to structure are deliberate and controlled</li>
+                    <li><strong>DDL / DML separation</strong> → defining a container and operating on its contents are fundamentally different actions</li>
+                    <li><strong>Logical / Physical design separation</strong> → physical changes do not propagate to break logical structure (Physical Data Independence)</li>
+                    <li><strong>Decomposition (Normalization)</strong> → one fact, one place; eliminates update anomalies and inconsistency</li>
+                    <li><strong>Three-engine architecture</strong> → storage, query processing, and transaction management each require specialised, independent subsystems</li>
+                    <li><strong>ACID properties</strong> → the four-part guarantee that transactions always leave the database in a trustworthy state</li>
+                </ul>
+            </div>
+
+            <!-- Navigation -->
+            <!--
+            <div class="navigation-buttons" style="margin-top: 2.5rem;">
+                <a href="../02-evolution-of-data-management/"
+                    class="btn"
+                    style="background: transparent; color: var(--primary-color); border: 1.5px solid var(--primary-color);">
+                    ← Part 1.2: Evolution of Data Management
+                </a>
+                <a href="../03-practice/" class="btn">
+                    Test your understanding →
+                </a>
+            </div>
+            -->
+
+        </div>
+    </main>
+
+    <div id="support-cta"></div>
+    <div class="notes-watermark">
+        Source: RaushanSYNC CS &amp; DS · https://cs.raushansync.com
+        Licensed for personal, non-commercial learning only.
+    </div>
+    <div id="footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4"></script>
+    <script src="/assets/js/auth-config.js"></script>
+    <script src="/assets/js/auth-guard.js"></script>
+    <script src="/assets/js/progress-tracker.js"></script>
+    <script src="/assets/js/tick-manager.js"></script>
+    <script src="/assets/js/script.js"></script>
+
+    <script>
+        /* ── Checklist persistence ── */
+        const checkboxes = document.querySelectorAll('.checklist-check');
+        const STORAGE_KEY = 'dbms-intro-concepts-checklist';
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        checkboxes.forEach((cb, i) => {
+            if (saved[i]) cb.checked = true;
+            cb.addEventListener('change', () => {
+                const state = Array.from(checkboxes).map(c => c.checked);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            });
+        });
+    </script>
+</body>
+
+</html>
