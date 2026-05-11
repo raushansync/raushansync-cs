@@ -507,7 +507,7 @@ body:not(.home-page) main {
 .welcome-section #auth-buttons-user.home-learning-card h2 {
   margin: 0;
   width: 100%;
-  font-size: clamp(1.45rem, 2.4vw, 1.95rem);
+  font-size: clamp(1.15rem, 1.8vw, 1.6rem);
 }
 
 .welcome-section #auth-buttons-user.home-learning-card h2.home-learning-title--typing::after {
