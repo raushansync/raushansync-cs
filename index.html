@@ -1479,6 +1479,36 @@
             </section>
         </div>
 
+        <!-- ── Track Choice Modal — Choose CS or DS ──────────────── -->
+        <div id="track-choice-modal" class="ai-chat-modal track-choice-modal" hidden aria-hidden="true" role="dialog"
+            aria-modal="true" aria-labelledby="track-choice-title">
+            <div class="ai-chat-overlay" data-track-choice-close></div>
+            <section class="ai-chat-panel track-choice-panel">
+                <header class="ai-chat-header">
+                    <div class="ai-chat-header-copy">
+                        <h2 id="track-choice-title">Choose Your Learning Track</h2>
+                        <p id="track-choice-subtitle" class="ai-chat-subtitle">
+                            Select Computer Science or Data Science to get started.
+                        </p>
+                    </div>
+                    <button id="track-choice-close" class="ai-chat-close" type="button" aria-label="Close track choice">
+                        ×
+                    </button>
+                </header>
+
+                <div class="track-choice-body">
+                    <button type="button" id="track-choice-computer-science" class="btn btn-primary track-choice-btn">
+                        <span class="track-choice-icon">🖥️</span>
+                        Computer Science
+                    </button>
+                    <button type="button" id="track-choice-data-science" class="btn btn-secondary track-choice-btn">
+                        <span class="track-choice-icon">📊</span>
+                        Data Science
+                    </button>
+                </div>
+            </section>
+        </div>
+
         <!-- ── PRESERVED: AI Chat Modal — EXACT COPY ─────────────── -->
         <div id="ai-chat-modal" class="ai-chat-modal" hidden aria-hidden="true" role="dialog"
             aria-modal="true" aria-labelledby="ai-chat-title">
