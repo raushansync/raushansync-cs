@@ -1717,7 +1717,13 @@ html.home-hero-reserved .home-page .welcome-section .welcome-actions {
 }
 
 .track-choice-icon {
-  font-size: 1.4rem;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: currentColor;
 }
 
 .track-choice-btn.btn-primary:hover {
@@ -3049,6 +3055,7 @@ body.ai-chat-open {
 @media (max-width: 700px) {
     .ai-chat-modal {
         padding: 0.42rem;
+        align-items: center;
     }
 
     .ai-chat-panel {
