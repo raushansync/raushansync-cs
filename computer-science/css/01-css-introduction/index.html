@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3b82f6" id="theme-color-meta">
+
+    <title>Introducing CSS — Core Concept Notes | RaushanSYNC CS &amp; DS</title>
+
+    <meta name="description"
+        content="Deep conceptual notes on Introducing CSS — what CSS does, how it works, selectors, declarations, properties, values, and the box model mental model. RaushanSYNC Learning Network.">
+
+    <meta name="keywords"
+        content="introducing CSS, what is CSS, how CSS works, CSS selector, CSS declaration, CSS properties values, external CSS, internal CSS, block inline elements, box model, RaushanSYNC">
+
+    <meta name="author" content="Raushan Kumar">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+
+    <link rel="canonical" href="https://cs.raushansync.com/computer-science/css/01-css-introduction/">
+
+    <!-- Open Graph -->
+    <meta property="og:site_name" content="RaushanSYNC CS &amp; DS">
+    <meta property="og:title" content="Introducing CSS — RaushanSYNC CS &amp; DS">
+    <meta property="og:description"
+        content="Understand what CSS truly does, how it targets HTML elements, and what rules, selectors, properties, and values mean — from first principles.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://cs.raushansync.com/computer-science/css/01-css-introduction/">
+    <meta property="og:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@raushansync">
+    <meta name="twitter:title" content="Introducing CSS — RaushanSYNC CS &amp; DS">
+    <meta name="twitter:description"
+        content="What CSS does, how it works, and how rules, selectors, properties, and values fit together — deep notes for serious learners.">
+    <meta name="twitter:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Article",
+                "headline": "Introducing CSS — Core Concept Notes",
+                "description": "Understand what CSS truly does, how it targets HTML elements, and what rules, selectors, properties, and values mean — from first principles.",
+                "url": "https://cs.raushansync.com/computer-science/css/01-css-introduction/",
+                "author": {
+                    "@type": "Person",
+                    "name": "Raushan Kumar"
+                },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "RaushanSYNC CS & DS",
+                    "url": "https://cs.raushansync.com/"
+                }
+            },
+            {
+                "@type": "BreadcrumbList",
+                "itemListElement": [
+                    { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://cs.raushansync.com/" },
+                    { "@type": "ListItem", "position": 2, "name": "Computer Science", "item": "https://cs.raushansync.com/computer-science/" },
+                    { "@type": "ListItem", "position": 3, "name": "CSS", "item": "https://cs.raushansync.com/computer-science/css/" },
+                    { "@type": "ListItem", "position": 4, "name": "1. Introducing CSS", "item": "https://cs.raushansync.com/computer-science/css/01-css-introduction/" }
+                ]
+            }
+        ]
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
+    <style>
+        /* ─── Page-local styles: CSS-chapter specific components ─── */
+
+        /* Lesson progress badge */
+        .lesson-progress {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.65rem;
+            margin: 0 0 1.6rem;
+            padding: 0.55rem 0.8rem;
+            color: var(--primary-color);
+            background: rgba(59, 130, 246, 0.07);
+            border: 1px solid rgba(59, 130, 246, 0.16);
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .lesson-badge {
+            display: inline-grid;
+            place-items: center;
+            flex: 0 0 auto;
+            width: 1.9rem;
+            height: 1.9rem;
+            color: #fff;
+            background: var(--primary-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 18px rgba(59, 130, 246, 0.2);
+        }
+
+        .lesson-title-small {
+            min-width: 0;
+            font-size: 0.92rem;
+            line-height: 1.25;
+        }
+
+        /* Inline code */
+        .notes-container p code,
+        .notes-container li code,
+        .notes-container td code {
+            padding: 0.12rem 0.35rem;
+            color: var(--primary-color-dark);
+            background: rgba(59, 130, 246, 0.08);
+            border: 1px solid rgba(59, 130, 246, 0.14);
+            border-radius: 6px;
+            font-family: Consolas, "SFMono-Regular", "Liberation Mono", monospace;
+            font-size: 0.92em;
+            white-space: nowrap;
+        }
+
+        /* Code blocks */
+        .code-block {
+            margin: 1.25rem 0 1.75rem;
+            padding: 1rem;
+            overflow-x: auto;
+            color: #dbeafe;
+            background: #0f172a;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            tab-size: 2;
+        }
+
+        .code-block code {
+            display: block;
+            min-width: max-content;
+            font-family: Consolas, "SFMono-Regular", "Liberation Mono", monospace;
+            font-size: 0.92rem;
+            line-height: 1.65;
+            white-space: pre;
+        }
+
+        .code-block::-webkit-scrollbar { height: 0.55rem; }
+        .code-block::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.45);
+            border-radius: 999px;
+        }
+
+        /* Scrollable table wrapper */
+        .notes-table-wrapper {
+            display: block;
+            max-width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 1.5rem;
+        }
+        
+        .notes-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        /* Syntax token colours */
+        .code-angle, .code-doctype { color: #7dd3fc; }
+        .code-tag { color: #60a5fa; }
+        .code-attr, .code-css-selector-part { color: #f9a8d4; }
+        .code-value, .code-css-value { color: #86efac; }
+        .code-text { color: #e2e8f0; }
+        .code-comment { color: #94a3b8; font-style: italic; }
+        .code-css-selector { color: #fde68a; }
+        .code-css-prop { color: #f9a8d4; }
+        .code-css-num { color: #fca5a5; }
+
+        /* ── Journey pipeline (step-by-step) ── */
+        .journey-pipeline {
+            display: grid;
+            gap: 0.45rem;
+            margin: 1.5rem 0 1.8rem;
+        }
+
+        .journey-step {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.9rem;
+            align-items: flex-start;
+            padding: 0.9rem 1rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .journey-num {
+            display: inline-grid;
+            place-items: center;
+            width: 2rem;
+            height: 2rem;
+            color: #fff;
+            background: var(--primary-color);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .journey-content strong {
+            display: block;
+            margin-bottom: 0.25rem;
+            color: var(--text-color);
+        }
+
+        .journey-content p {
+            margin: 0;
+            color: var(--secondary-text-color);
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        .journey-arrow {
+            color: var(--secondary-text-color);
+            text-align: center;
+            opacity: 0.55;
+        }
+
+        /* ── Misconception cards ── */
+        .misconception-card {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.8rem;
+            align-items: flex-start;
+            margin: 0.9rem 0;
+            padding: 1rem;
+            background: var(--card-background);
+            border: 1px solid rgba(239, 68, 68, 0.18);
+            border-left: 4px solid #ef4444;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .misconception-icon {
+            display: inline-grid;
+            place-items: center;
+            width: 2rem;
+            height: 2rem;
+            color: #991b1b;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .misconception-body strong {
+            display: block;
+            margin-bottom: 0.35rem;
+            color: var(--text-color);
+        }
+
+        .misconception-body p { margin-bottom: 0.6rem; }
+
+        .misconception-correct {
+            color: #15803d;
+            font-weight: 700;
+        }
+
+        /* ── Checklist card ── */
+        .checklist-card {
+            display: grid;
+            gap: 0.7rem;
+            margin: 1.4rem 0 2rem;
+            padding: 1rem;
+            background: linear-gradient(180deg, rgba(34, 197, 94, 0.06), rgba(34, 197, 94, 0.01)), var(--card-background);
+            border: 1px solid rgba(34, 197, 94, 0.18);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .checklist-item {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.75rem;
+            align-items: flex-start;
+            padding: 0.8rem 0.9rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .checklist-check {
+            width: 1.05rem;
+            height: 1.05rem;
+            margin-top: 0.18rem;
+            accent-color: #22c55e;
+            cursor: pointer;
+        }
+
+        .checklist-item:has(.checklist-check:checked) {
+            color: #15803d;
+            background: rgba(34, 197, 94, 0.08);
+            border-color: rgba(34, 197, 94, 0.24);
+        }
+
+        /* ── CSS anatomy diagram ── */
+        .anatomy-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0;
+            margin: 1.75rem 0 2rem;
+            padding: 1.5rem 1.75rem;
+            background: #0f172a;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            border-radius: 14px;
+            box-shadow: var(--card-shadow);
+            overflow-x: auto;
+        }
+
+        .anatomy-code-line {
+            font-family: Consolas, "SFMono-Regular", "Liberation Mono", monospace;
+            font-size: 1.05rem;
+            line-height: 1.7;
+            white-space: nowrap;
+        }
+
+        .anatomy-labels {
+            display: flex;
+            align-items: flex-start;
+            gap: 0;
+            margin-top: 0.5rem;
+            font-family: Consolas, "SFMono-Regular", "Liberation Mono", monospace;
+            font-size: 0.78rem;
+            white-space: nowrap;
+        }
+
+        .anatomy-label-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .anatomy-bracket {
+            color: #94a3b8;
+        }
+
+        .anatomy-tag {
+            display: inline-block;
+            padding: 0.18rem 0.55rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .anatomy-tag.selector { background: rgba(253, 230, 138, 0.15); color: #fde68a; border: 1px solid rgba(253, 230, 138, 0.3); }
+        .anatomy-tag.property { background: rgba(249, 168, 212, 0.15); color: #f9a8d4; border: 1px solid rgba(249, 168, 212, 0.3); }
+        .anatomy-tag.value    { background: rgba(134, 239, 172, 0.15); color: #86efac; border: 1px solid rgba(134, 239, 172, 0.3); }
+        .anatomy-tag.declaration { background: rgba(147, 197, 253, 0.15); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.3); }
+
+        /* ── Box model visual ── */
+        .box-model-visual {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 1.75rem 0 2rem;
+            padding: 1.5rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .box-layer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+        }
+
+        .box-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            margin-bottom: 0.2rem;
+        }
+
+        .box-margin   { background: rgba(251, 191, 36, 0.10); border: 2px dashed rgba(251, 191, 36, 0.5);  }
+        .box-border   { background: rgba(239, 68, 68, 0.10);  border: 2px solid rgba(239, 68, 68, 0.5);   margin: 0.55rem; }
+        .box-padding  { background: rgba(34, 197, 94, 0.10);  border: 2px solid rgba(34, 197, 94, 0.5);   margin: 0.55rem; }
+        .box-content  { background: rgba(59, 130, 246, 0.12); border: 2px solid rgba(59, 130, 246, 0.5);  margin: 0.55rem; padding: 1rem 2rem; }
+
+        .box-margin .box-label  { color: #d97706; }
+        .box-border .box-label  { color: #ef4444; }
+        .box-padding .box-label { color: #22c55e; }
+        .box-content .box-label { color: #60a5fa; }
+
+        /* ── Comparison cards (external vs internal) ── */
+        .method-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0 2rem;
+        }
+
+        .method-card {
+            padding: 1.1rem 1.15rem;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .method-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.28);
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+        }
+
+        .method-card.external { border-top: 4px solid #3b82f6; }
+        .method-card.internal { border-top: 4px solid #8b5cf6; }
+        .method-card.inline-style { border-top: 4px solid #ef4444; }
+
+        .method-tag {
+            display: inline-flex;
+            margin-bottom: 0.55rem;
+            padding: 0.24rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 700;
+        }
+
+        .method-card.external .method-tag { background: #3b82f6; color: #fff; }
+        .method-card.internal .method-tag { background: #8b5cf6; color: #fff; }
+        .method-card.inline-style .method-tag { background: #ef4444; color: #fff; }
+
+        .method-card h3 {
+            margin-bottom: 0.35rem;
+            font-size: 1rem;
+        }
+
+        .method-card p {
+            margin: 0;
+            color: var(--secondary-text-color);
+            font-size: 0.9rem;
+            line-height: 1.55;
+        }
+
+        /* ── Hover transitions ── */
+        .journey-step,
+        .misconception-card {
+            transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .journey-step:hover,
+        .misconception-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(59, 130, 246, 0.28);
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+        }
+
+        /* ── Dark mode overrides ── */
+        .dark-mode .lesson-progress,
+        .dark-mode .notes-container p code,
+        .dark-mode .notes-container li code,
+        .dark-mode .notes-container td code {
+            background: rgba(96, 165, 250, 0.12);
+            border-color: rgba(96, 165, 250, 0.22);
+        }
+
+        .dark-mode .notes-container p code,
+        .dark-mode .notes-container li code,
+        .dark-mode .notes-container td code {
+            color: #93c5fd;
+        }
+
+        .dark-mode .code-block {
+            color: #dbeafe;
+            background: #020617;
+            border-color: rgba(96, 165, 250, 0.22);
+        }
+
+        .dark-mode .anatomy-diagram {
+            background: #020617;
+        }
+
+        .dark-mode .misconception-icon {
+            color: #fecaca;
+            background: rgba(248, 113, 113, 0.14);
+        }
+
+        .dark-mode .misconception-correct,
+        .dark-mode .checklist-item:has(.checklist-check:checked) {
+            color: #86efac;
+        }
+
+        .dark-mode .checklist-card {
+            background: linear-gradient(180deg, rgba(34, 197, 94, 0.08), rgba(34, 197, 94, 0.02)), var(--card-background);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 700px) {
+            .notes-page { padding-top: calc(var(--header-height) + 20px); }
+
+            .notes-header { margin-bottom: 2rem; }
+
+            .notes-header h1 {
+                font-size: clamp(1.45rem, 7vw, 1.85rem);
+                line-height: 1.18;
+            }
+
+            .notes-header-actions {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .lesson-progress {
+                width: 100%;
+                justify-content: flex-start;
+                margin-bottom: 1.25rem;
+            }
+
+            .method-grid { gap: 0.85rem; }
+
+            .journey-step,
+            .misconception-card,
+            .checklist-item {
+                grid-template-columns: auto minmax(0, 1fr);
+            }
+
+            .code-block {
+                padding: 0.85rem;
+                border-radius: 10px;
+            }
+
+            .code-block code { font-size: 0.84rem; }
+
+            .anatomy-diagram { padding: 1rem; }
+            .anatomy-code-line { font-size: 0.88rem; }
+        }
+
+        @media (max-width: 420px) {
+            .notes-container p code,
+            .notes-container li code,
+            .notes-container td code {
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
+
+            .journey-step,
+            .misconception-card,
+            .checklist-item { padding: 0.85rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .journey-step,
+            .misconception-card,
+            .method-card {
+                transition: none;
+            }
+
+            .journey-step:hover,
+            .misconception-card:hover,
+            .method-card:hover {
+                transform: none;
+            }
+        }
+    </style>
+
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark' || (!theme && prefersDark)) {
+                document.documentElement.classList.add('dark-mode');
+            }
+        })();
+    </script>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container header-container">
+            <a href="/" class="logo">RaushanSYNC CS &amp; DS</a>
+            <div id="nav"></div>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle dark mode">
+                    <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
+                    </svg>
+                    <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                        stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="notes-page practice-page">
+        <div class="notes-container">
+            <header class="notes-header">
+                <div class="notes-header-left">
+                    <h1>Introducing CSS</h1>
+                    <p>CSS Fundamentals · Web Presentation Layer</p>
+                </div>
+
+                <div class="notes-header-actions">
+                    <span class="page-header-tick-label">Mark completed</span>
+                    <div id="note-tick" data-tick-container data-tick-position="header" data-tick-type="article"></div>
+                </div>
+            </header>
+
+            <nav class="breadcrumb" aria-label="Breadcrumb">
+                <ol>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/computer-science/">Computer Science</a></li>
+                    <li><a href="/computer-science/css/">CSS</a></li>
+                    <li aria-current="page">Part 1: Introducing CSS</li>
+                </ol>
+            </nav>
+
+            <!-- Progress indicator -->
+            <div class="lesson-progress">
+                <span class="lesson-badge">1</span>
+                <span class="lesson-title-small">Introducing CSS</span>
+            </div>
+
+            <div class="notes-box summary">
+                <p>
+                    HTML gives every page its structure and meaning. CSS gives it a visual identity.
+                    This chapter establishes the mental model that makes all future CSS knowledge
+                    fit together — the invisible-box thinking that everything else in CSS builds on.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 1 — Big Picture Overview
+                 ═══════════════════════════════════════════ -->
+            <h2 id="big-picture">1. Big Picture Overview</h2>
+
+            <p>
+                CSS stands for <strong>Cascading Style Sheets</strong>. Where HTML describes
+                <em>what</em> content is — headings, paragraphs, links — CSS describes
+                <em>how</em> that content should appear visually. The two languages have
+                deliberately separate responsibilities, and keeping them separate is the
+                foundation of clean, maintainable web design.
+            </p>
+
+            <p>
+                The word <em>cascading</em> points to one of CSS's defining behaviours:
+                when multiple rules compete to style the same element, CSS resolves the conflict
+                using a predictable priority order. You do not need to memorise this cascade
+                immediately — but understanding that it exists explains why some styles seem to
+                override others.
+            </p>
+
+            <p>
+                The mental model you need to carry into the rest of CSS study is this:
+                every HTML element, regardless of what it is or how small it appears on screen,
+                occupies a rectangular box. CSS controls everything about that box — its size,
+                its colour, its border, its position, and the typography inside it.
+                Once this box model becomes intuitive, CSS stops feeling arbitrary.
+            </p>
+
+            <div class="notes-box example">
+                <h3>What CSS Can Control</h3>
+                <p>
+                    CSS can specify rules as concrete as: all <code>&lt;h1&gt;</code> elements
+                    appear in blue italics using the Times typeface; all paragraphs use Arial in grey;
+                    the page background is cream. The reason CSS feels powerful is that one rule
+                    can instantly affect every matching element across the entire page.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 2 — The Box Model Intuition
+                 ═══════════════════════════════════════════ -->
+            <h2 id="box-model">2. The Invisible Box Around Every Element</h2>
+
+            <p>
+                Before writing a single CSS rule, you need one fundamental insight:
+                the browser treats every HTML element as if it lives inside an
+                invisible rectangular box. This is not a metaphor — it is literally how
+                the browser calculates where to place things on screen.
+            </p>
+
+            <p>
+                CSS rules do not float freely. They target these boxes. When you write
+                a CSS rule, you are telling the browser: find the boxes that match this
+                description, then apply these visual instructions to them.
+            </p>
+
+            <h3>Block vs. Inline Elements — Two Kinds of Boxes</h3>
+
+            <p>
+                Not all boxes behave the same way. The browser distinguishes between
+                two fundamental display modes:
+            </p>
+
+            <div class="notes-table-wrapper">
+                <table class="notes-table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Behaviour</th>
+                            <th>Common examples</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Block-level</strong></td>
+                            <td>Each element starts on a new line and stretches the full available width</td>
+                            <td><code>&lt;h1&gt;</code>–<code>&lt;h6&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;div&gt;</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Inline</strong></td>
+                            <td>Sits within the flow of text, on the same line as surrounding content</td>
+                            <td><code>&lt;b&gt;</code>, <code>&lt;i&gt;</code>, <code>&lt;img&gt;</code>, <code>&lt;em&gt;</code>, <code>&lt;span&gt;</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>
+                Block elements create a clean vertical stack — each one breaks to a new line.
+                Inline elements live within the text stream — a <code>&lt;b&gt;</code> tag
+                inside a sentence does not push surrounding words to a new line.
+                Understanding this difference explains why CSS layout behaves the way it does.
+            </p>
+
+            <!-- Box model diagram -->
+            <div class="box-model-visual" aria-label="CSS box model diagram">
+                <p style="font-size:0.78rem; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; color:var(--secondary-text-color); margin-bottom:0.75rem;">Every HTML element — visualised as boxes within boxes</p>
+                <div class="box-layer box-margin">
+                    <span class="box-label">Margin — space outside the border</span>
+                    <div class="box-layer box-border">
+                        <span class="box-label">Border — the visible edge</span>
+                        <div class="box-layer box-padding">
+                            <span class="box-label">Padding — space between border and content</span>
+                            <div class="box-layer box-content">
+                                <span class="box-label">Content — text, image, child elements</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="notes-box careful">
+                <h3>Why This Matters</h3>
+                <p>
+                    CSS rules that affect <em>boxes</em> — like <code>width</code>,
+                    <code>height</code>, <code>border</code>, <code>background-color</code>,
+                    and <code>position</code> — operate on the outer structure of an element.
+                    Rules that affect <em>text</em> inside a box — like <code>color</code>,
+                    <code>font-family</code>, and <code>font-size</code> — operate on the content within.
+                    Keeping these two categories mentally separate reduces confusion.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 3 — CSS Rules: Structure
+                 ═══════════════════════════════════════════ -->
+            <h2 id="css-rules">3. How CSS Rules Are Written</h2>
+
+            <p>
+                CSS works by associating <strong>rules</strong> with HTML elements.
+                A rule tells the browser: for every element that matches this description,
+                apply these visual instructions. Each rule has exactly two parts:
+                a <strong>selector</strong> and a <strong>declaration</strong>.
+            </p>
+
+            <!-- Anatomy diagram -->
+            <div class="anatomy-diagram" aria-label="CSS rule anatomy">
+                <div class="anatomy-code-line">
+                    <span style="color:#fde68a;">p</span>
+                    <span style="color:#7dd3fc;"> {</span>
+                </div>
+                <div class="anatomy-code-line">
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#f9a8d4;">font-family</span><span style="color:#94a3b8;">: </span><span style="color:#86efac;">Arial</span><span style="color:#94a3b8;">;</span>
+                </div>
+                <div class="anatomy-code-line">
+                    <span style="color:#7dd3fc;">}</span>
+                </div>
+                <div style="display:flex; gap:2rem; margin-top:0.9rem; flex-wrap:wrap;">
+                    <div>
+                        <span class="anatomy-tag selector">Selector</span>
+                        <p style="margin:0.3rem 0 0; font-size:0.82rem; color:var(--secondary-text-color); font-family:inherit;">Which element(s) to target</p>
+                    </div>
+                    <div>
+                        <span class="anatomy-tag property">Property</span>
+                        <p style="margin:0.3rem 0 0; font-size:0.82rem; color:var(--secondary-text-color); font-family:inherit;">What aspect to change</p>
+                    </div>
+                    <div>
+                        <span class="anatomy-tag value">Value</span>
+                        <p style="margin:0.3rem 0 0; font-size:0.82rem; color:var(--secondary-text-color); font-family:inherit;">What setting to apply</p>
+                    </div>
+                    <div>
+                        <span class="anatomy-tag declaration">Declaration = Property + Value</span>
+                        <p style="margin:0.3rem 0 0; font-size:0.82rem; color:var(--secondary-text-color); font-family:inherit;">The full instruction inside the curly braces</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Selectors</h3>
+
+            <p>
+                The selector sits before the opening curly brace. It identifies which
+                HTML elements the rule applies to. The simplest selectors are element-type
+                selectors — the tag name alone. Writing <code>p</code> as the selector
+                means "apply this rule to every <code>&lt;p&gt;</code> element on the page."
+            </p>
+
+            <p>
+                Multiple elements can share the same rule. Separate their names with commas
+                and the declaration applies to all of them:
+            </p>
+
+            <pre class="code-block"><code><span class="code-comment">/* This single rule targets h1, h2, and h3 simultaneously */</span>
+<span class="code-css-selector">h1</span><span style="color:#94a3b8;">, </span><span class="code-css-selector">h2</span><span style="color:#94a3b8;">, </span><span class="code-css-selector">h3</span> <span style="color:#7dd3fc;">{</span>
+    <span class="code-css-prop">font-family</span><span style="color:#94a3b8;">: </span><span class="code-css-value">Arial</span><span style="color:#94a3b8;">;</span>
+    <span class="code-css-prop">color</span><span style="color:#94a3b8;">: </span><span class="code-css-value">yellow</span><span style="color:#94a3b8;">;</span>
+<span style="color:#7dd3fc;">}</span></code></pre>
+
+            <h3>Declarations</h3>
+
+            <p>
+                The declaration block sits between the curly braces <code>{ }</code>. It contains one
+                or more declarations, each consisting of a <strong>property</strong> and a
+                <strong>value</strong>, separated by a colon. Multiple declarations are separated by
+                semicolons. Each declaration expresses one specific styling instruction.
+            </p>
+
+            <div class="notes-table-wrapper">
+                <table class="notes-table">
+                    <thead>
+                        <tr>
+                            <th>Part</th>
+                            <th>Role</th>
+                            <th>Examples</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Property</strong></td>
+                            <td>The aspect of the element you want to change</td>
+                            <td><code>color</code>, <code>font-family</code>, <code>width</code>, <code>border</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Value</strong></td>
+                            <td>The specific setting you want for that property</td>
+                            <td><code>yellow</code>, <code>Arial</code>, <code>200px</code>, <code>2px solid red</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>
+                Learning CSS is largely a matter of learning available properties and the values
+                they accept. The syntax structure — selector, curly braces, property: value; — stays
+                identical for every rule you will ever write.
+            </p>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 4 — What CSS Can Style
+                 ═══════════════════════════════════════════ -->
+            <h2 id="what-css-styles">4. Categories of CSS Styling</h2>
+
+            <p>
+                CSS properties fall into two broad categories based on what they control.
+                Keeping these categories in mind helps you reach for the right property
+                when you want a specific effect.
+            </p>
+
+            <div class="notes-table-wrapper">
+                <table class="notes-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>What it controls</th>
+                            <th>Example properties</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Box styling</strong></td>
+                            <td>The rectangular container itself</td>
+                            <td><code>width</code>, <code>height</code>, <code>border</code>, <code>background-color</code>, <code>position</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Text styling</strong></td>
+                            <td>The typography inside the box</td>
+                            <td><code>font-family</code>, <code>font-size</code>, <code>color</code>, <code>font-style</code>, <code>text-transform</code></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Element-specific</strong></td>
+                            <td>Rules tailored to particular HTML elements</td>
+                            <td>List markers, table borders, form control appearance</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>
+                When you look at a designed web page, almost every visual decision comes
+                from one of these three categories. The background gradient behind a hero section
+                is box styling. The serif font in an article is text styling. The alternating
+                row colours in a data table are element-specific styling.
+            </p>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 5 — Linking CSS to HTML
+                 ═══════════════════════════════════════════ -->
+            <h2 id="linking-css">5. Three Ways to Apply CSS to a Page</h2>
+
+            <p>
+                A browser needs to be told where to find the CSS rules for a page.
+                There are three distinct methods, each with different appropriate uses.
+            </p>
+
+            <div class="method-grid">
+                <div class="method-card external">
+                    <span class="method-tag">Recommended</span>
+                    <h3>External Stylesheet</h3>
+                    <p>CSS lives in a separate <code>.css</code> file. The HTML page links to it
+                    using a <code>&lt;link&gt;</code> element in the <code>&lt;head&gt;</code>.
+                    One file can style every page of a site.</p>
+                </div>
+                <div class="method-card internal">
+                    <span class="method-tag">Single-page use</span>
+                    <h3>Internal (Embedded) CSS</h3>
+                    <p>CSS rules are written inside a <code>&lt;style&gt;</code> element within
+                    the HTML page's <code>&lt;head&gt;</code>. Affects only that page.</p>
+                </div>
+                <div class="method-card inline-style">
+                    <span class="method-tag">Avoid in new code</span>
+                    <h3>Inline Styles</h3>
+                    <p>A <code>style</code> attribute placed directly on an HTML element.
+                    Affects only that one element. Hard to maintain; appears in legacy code.</p>
+                </div>
+            </div>
+
+            <h3>External CSS: The <code>&lt;link&gt;</code> Element</h3>
+
+            <p>
+                When using an external stylesheet, the <code>&lt;link&gt;</code> element carries
+                three essential attributes. Understanding each one clarifies what the browser
+                needs to know:
+            </p>
+
+            <div class="journey-pipeline" aria-label="link element attributes">
+                <div class="journey-step">
+                    <div class="journey-num">1</div>
+                    <div class="journey-content">
+                        <strong><code>href</code> — the path to the CSS file</strong>
+                        <p>Tells the browser where the CSS file is located. Commonly placed in a
+                        folder called <code>css</code> or <code>styles</code> for organisation.
+                        Follows the same relative/absolute path rules as any link.</p>
+                    </div>
+                </div>
+                <div class="journey-arrow" aria-hidden="true">↓</div>
+
+                <div class="journey-step">
+                    <div class="journey-num">2</div>
+                    <div class="journey-content">
+                        <strong><code>type</code> — the content type of the linked file</strong>
+                        <p>Historically set to <code>text/css</code> to tell the browser
+                        what kind of file is being linked. In modern HTML5 this attribute
+                        is optional (browsers default to CSS), but you will see it in
+                        existing codebases.</p>
+                    </div>
+                </div>
+                <div class="journey-arrow" aria-hidden="true">↓</div>
+
+                <div class="journey-step">
+                    <div class="journey-num">3</div>
+                    <div class="journey-content">
+                        <strong><code>rel</code> — the relationship between the HTML and the linked file</strong>
+                        <p>Set to <code>stylesheet</code> when linking a CSS file.
+                        This is the attribute that tells the browser: treat this linked
+                        file as the styling source for this page — not as a script,
+                        icon, or any other kind of resource.</p>
+                    </div>
+                </div>
+            </div>
+
+            <pre class="code-block"><code><span class="code-comment">&lt;!-- External CSS linked in the &lt;head&gt; --&gt;</span>
+<span class="code-angle">&lt;</span><span class="code-tag">head</span><span class="code-angle">&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">title</span><span class="code-angle">&gt;</span><span class="code-text">Using External CSS</span><span class="code-angle">&lt;/</span><span class="code-tag">title</span><span class="code-angle">&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">link</span> <span class="code-attr">href</span>=<span class="code-value">"css/styles.css"</span> <span class="code-attr">type</span>=<span class="code-value">"text/css"</span> <span class="code-attr">rel</span>=<span class="code-value">"stylesheet"</span> <span class="code-angle">/&gt;</span>
+<span class="code-angle">&lt;/</span><span class="code-tag">head</span><span class="code-angle">&gt;</span>
+
+<span class="code-comment">/* css/styles.css */</span>
+<span class="code-css-selector">body</span> <span style="color:#7dd3fc;">{</span>
+    <span class="code-css-prop">font-family</span><span style="color:#94a3b8;">: </span><span class="code-css-value">Arial</span><span style="color:#94a3b8;">, </span><span class="code-css-value">Verdana</span><span style="color:#94a3b8;">, </span><span class="code-css-value">sans-serif</span><span style="color:#94a3b8;">;</span>
+    <span class="code-css-prop">background-color</span><span style="color:#94a3b8;">: </span><span class="code-css-value">rgb(185, 179, 175)</span><span style="color:#94a3b8;">;</span>
+<span style="color:#7dd3fc;">}</span>
+
+<span class="code-css-selector">h1</span> <span style="color:#7dd3fc;">{</span>
+    <span class="code-css-prop">color</span><span style="color:#94a3b8;">: </span><span class="code-css-value">rgb(255, 255, 255)</span><span style="color:#94a3b8;">;</span>
+<span style="color:#7dd3fc;">}</span></code></pre>
+
+            <p>
+                A single HTML page can reference more than one external stylesheet using
+                multiple <code>&lt;link&gt;</code> elements. A common pattern is one stylesheet
+                for typography and colours, and a second for layout — keeping concerns
+                cleanly separated even within CSS itself.
+            </p>
+
+            <h3>Internal CSS: The <code>&lt;style&gt;</code> Element</h3>
+
+            <p>
+                When rules are embedded directly in the page, they sit inside a
+                <code>&lt;style type="text/css"&gt;</code> element, placed in the
+                <code>&lt;head&gt;</code>. The syntax of the rules is identical to an external
+                stylesheet — only the delivery mechanism changes. Use this method only when
+                one page genuinely needs rules that no other page will share.
+            </p>
+
+            <pre class="code-block"><code><span class="code-angle">&lt;</span><span class="code-tag">head</span><span class="code-angle">&gt;</span>
+    <span class="code-angle">&lt;</span><span class="code-tag">style</span> <span class="code-attr">type</span>=<span class="code-value">"text/css"</span><span class="code-angle">&gt;</span>
+        <span class="code-css-selector">body</span> <span style="color:#7dd3fc;">{</span>
+            <span class="code-css-prop">font-family</span><span style="color:#94a3b8;">: </span><span class="code-css-value">arial</span><span style="color:#94a3b8;">;</span>
+            <span class="code-css-prop">background-color</span><span style="color:#94a3b8;">: </span><span class="code-css-value">rgb(185, 179, 175)</span><span style="color:#94a3b8;">;</span>
+        <span style="color:#7dd3fc;">}</span>
+        <span class="code-css-selector">h1</span> <span style="color:#7dd3fc;">{</span>
+            <span class="code-css-prop">color</span><span style="color:#94a3b8;">: </span><span class="code-css-value">rgb(255, 255, 255)</span><span style="color:#94a3b8;">;</span>
+        <span style="color:#7dd3fc;">}</span>
+    <span class="code-angle">&lt;/</span><span class="code-tag">style</span><span class="code-angle">&gt;</span>
+<span class="code-angle">&lt;/</span><span class="code-tag">head</span><span class="code-angle">&gt;</span></code></pre>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 6 — Why External Is Preferred
+                 ═══════════════════════════════════════════ -->
+            <h2 id="why-external">6. Why External Stylesheets Are Preferred</h2>
+
+            <p>
+                For any site with more than one page, the external stylesheet approach is not
+                simply a convention — it is an engineering decision with three concrete benefits.
+                These same benefits are the reason CSS was designed as a separate language
+                rather than being folded into HTML itself.
+            </p>
+
+            <div class="journey-pipeline" aria-label="Benefits of external CSS">
+                <div class="journey-step">
+                    <div class="journey-num">1</div>
+                    <div class="journey-content">
+                        <strong>Consistency across all pages</strong>
+                        <p>Every page links to the same stylesheet. If you want all headings
+                        to become blue, you change one file. Without external CSS, you would
+                        have to edit every individual page — a task that scales impossibly
+                        with site size.</p>
+                    </div>
+                </div>
+                <div class="journey-arrow" aria-hidden="true">↓</div>
+
+                <div class="journey-step">
+                    <div class="journey-num">2</div>
+                    <div class="journey-content">
+                        <strong>Separation of content from presentation</strong>
+                        <p>Your HTML file contains only the content and its structure.
+                        Your CSS file contains only the visual rules. Each can be read, edited,
+                        and understood independently. This separation is one of the foundational
+                        principles of good web architecture.</p>
+                    </div>
+                </div>
+                <div class="journey-arrow" aria-hidden="true">↓</div>
+
+                <div class="journey-step">
+                    <div class="journey-num">3</div>
+                    <div class="journey-content">
+                        <strong>Single-point redesign</strong>
+                        <p>When a site's visual identity changes — new brand colours, different
+                        typography — the content in every HTML page stays untouched. Only the
+                        stylesheet changes. Without this, a visual redesign requires reopening
+                        and modifying every HTML file in the project.</p>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 7 — Important Distinctions
+                 ═══════════════════════════════════════════ -->
+            <h2 id="distinctions">7. Important Distinctions</h2>
+
+            <div class="notes-table-wrapper">
+                <table class="notes-table">
+                    <thead>
+                        <tr>
+                            <th>Concept A</th>
+                            <th>vs.</th>
+                            <th>Concept B</th>
+                            <th>Key distinction</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Selector</strong></td>
+                            <td>vs.</td>
+                            <td><strong>Declaration</strong></td>
+                            <td>The selector identifies <em>which</em> element; the declaration describes <em>how</em> to style it</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Property</strong></td>
+                            <td>vs.</td>
+                            <td><strong>Value</strong></td>
+                            <td>The property names the aspect (e.g. <code>color</code>); the value sets the specific setting (e.g. <code>yellow</code>)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Block element</strong></td>
+                            <td>vs.</td>
+                            <td><strong>Inline element</strong></td>
+                            <td>Block starts on a new line and fills available width; inline flows within the surrounding text</td>
+                        </tr>
+                        <tr>
+                            <td><strong>External CSS</strong></td>
+                            <td>vs.</td>
+                            <td><strong>Internal CSS</strong></td>
+                            <td>External lives in a separate <code>.css</code> file shared across pages; internal is embedded per-page in a <code>&lt;style&gt;</code> tag</td>
+                        </tr>
+                        <tr>
+                            <td><strong>HTML structure</strong></td>
+                            <td>vs.</td>
+                            <td><strong>CSS appearance</strong></td>
+                            <td>HTML defines what content <em>is</em>; CSS defines how it <em>looks</em> — different questions, different languages</td>
+                        </tr>
+                </tbody>
+                </table>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 8 — Common Misconceptions
+                 ═══════════════════════════════════════════ -->
+            <h2 id="misconceptions">8. Common Misconceptions</h2>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"CSS rules apply to individual characters or words."</strong>
+                    <p>A CSS rule targets elements — complete HTML tags like
+                    <code>&lt;p&gt;</code> or <code>&lt;h1&gt;</code>. To style a single
+                    word differently within a paragraph, you must first wrap it in an inline
+                    element like <code>&lt;span&gt;</code> and then target that element with CSS.</p>
+                    <div class="misconception-correct">✓ CSS targets elements (boxes). To target sub-word content, you need an HTML wrapper first.</div>
+                </div>
+            </div>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"The selector and the declaration are interchangeable parts of a rule."</strong>
+                    <p>They have completely different jobs and neither can fill the role of the other.
+                    The selector is a query — it identifies targets. The declaration is an instruction —
+                    it says what to do to those targets. Swapping them produces invalid CSS.</p>
+                    <div class="misconception-correct">✓ Selector = who. Declaration = what to do. Both are required, non-swappable halves of a rule.</div>
+                </div>
+            </div>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"Inline styles are fine for real projects — they're simpler."</strong>
+                    <p>Inline styles feel simpler at first because you see the CSS right next to the
+                    HTML it affects. But they cannot be reused, cannot be overridden cleanly,
+                    scatter visual rules throughout an HTML file, and make redesigning anything a
+                    painstaking manual task. They exist in the language for edge cases only.</p>
+                    <div class="misconception-correct">✓ Inline styles trade short-term ease for long-term fragility. Use external stylesheets for any real project.</div>
+                </div>
+            </div>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"A declaration is just the value — the property is something else."</strong>
+                    <p>A declaration is the complete unit: <em>property + value together</em>,
+                    separated by a colon. Neither alone is a declaration. The property is the
+                    name of the aspect you want to change; the value is the setting you want
+                    for it. Both are required to form one declaration.</p>
+                    <div class="misconception-correct">✓ Declaration = property: value; — it is always both parts as a pair.</div>
+                </div>
+            </div>
+
+            <div class="misconception-card">
+                <div class="misconception-icon">❌</div>
+                <div class="misconception-body">
+                    <strong>"Block and inline elements look different by default."</strong>
+                    <p>The distinction is about layout behaviour, not visual appearance.
+                    A block element takes up a full line; an inline element does not.
+                    You can make a block element <em>look</em> tiny, and an inline element
+                    can be styled to look large. The CSS property <code>display</code> can
+                    even switch between the two modes entirely.</p>
+                    <div class="misconception-correct">✓ Block vs. inline describes how an element flows on the page, not how it looks.</div>
+                </div>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 9 — Concept Checkpoints
+                 ═══════════════════════════════════════════ -->
+            <h2 id="checkpoints">9. Concept Checkpoints</h2>
+
+            <p>
+                These questions require reasoning — not recall. Work through them
+                before moving to the next chapter.
+            </p>
+
+            <div class="notes-box careful">
+                <h3>On the Box Model</h3>
+                <ul>
+                    <li>If every HTML element is a box, what does it mean for an inline element like <code>&lt;b&gt;</code> — is it also a box? How does its box behave differently from a <code>&lt;div&gt;</code>?</li>
+                    <li>CSS can control the width and height of a box. Why would those properties behave differently for an inline element versus a block element?</li>
+                </ul>
+            </div>
+
+            <div class="notes-box careful">
+                <h3>On Rules and Selectors</h3>
+                <ul>
+                    <li>A single rule can target <code>h1, h2, h3</code> simultaneously. What would break if you forgot the comma between them? What different behaviour would the browser interpret?</li>
+                    <li>If the selector determines which elements a rule applies to, what happens when there are zero matching elements on a page — does the rule cause an error?</li>
+                </ul>
+            </div>
+
+            <div class="notes-box careful">
+                <h3>On CSS Delivery</h3>
+                <ul>
+                    <li>If a site has 50 pages all linking to one external stylesheet, and you change the background colour in that stylesheet, what happens — and why is this architecturally significant?</li>
+                    <li>An internal stylesheet and an external stylesheet can both define rules for <code>&lt;h1&gt;</code>. If both are active on the same page, which one takes effect? What principle is this an example of?</li>
+                </ul>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 10 — Chapter Mental Model
+                 ═══════════════════════════════════════════ -->
+            <h2 id="mental-model">10. Chapter-Level Mental Model</h2>
+
+            <p>
+                This chapter trains a very specific way of seeing web pages.
+                When a browser loads a page, it does not see text, images, and links —
+                it sees a nested hierarchy of boxes. Every element, from the outermost
+                <code>&lt;body&gt;</code> to the most deeply nested <code>&lt;span&gt;</code>,
+                is a box. CSS is the language you use to describe what those boxes look like.
+            </p>
+
+            <p>
+                A CSS rule is a precise instruction: "Find all boxes that match this selector,
+                then apply this list of declarations to each one." Every declaration is a
+                property-value pair that addresses one specific visual aspect of a box —
+                its background colour, its typeface, its border, or its position.
+            </p>
+
+            <p>
+                The separation between HTML (what boxes exist and what they mean) and CSS
+                (what those boxes look like) is not arbitrary. It enables one stylesheet to
+                control thousands of pages, lets visual redesigns happen without touching content,
+                and allows content to be restyled for print, screen, or accessibility without
+                ever editing the underlying structure.
+            </p>
+
+            <div class="notes-box summary" style="margin-top: 1.5rem;">
+                <h3>Carry This Forward</h3>
+                <p>
+                    Every CSS property you will ever learn either controls a box's container
+                    (size, border, background, position) or controls the typography within it
+                    (font, colour, size, style). Every selector you will ever write is simply
+                    a more precise or more powerful way of identifying which boxes to target.
+                    The rest of CSS is depth, not a different kind of thinking.
+                </p>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 SECTION 11 — Mental Model Checklist
+                 ═══════════════════════════════════════════ -->
+            <h2 id="checklist">11. Your Mental Model Checklist</h2>
+
+            <p>
+                Before moving to the next chapter, verify each of these
+                ideas feels solid to you:
+            </p>
+
+            <div class="checklist-card">
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>CSS controls the presentation of HTML elements — not their meaning or content.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>Every HTML element is treated by the browser as an invisible rectangular box.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>Block-level elements start on a new line and fill the available width; inline elements flow within the text.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>A CSS rule has exactly two parts: a selector (who) and a declaration (what to do).</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>A declaration is a property–value pair, separated by a colon and terminated with a semicolon.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>Multiple elements can share one rule by listing their selectors separated by commas.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>External CSS uses a <code>&lt;link&gt;</code> element with <code>href</code>, <code>type</code>, and <code>rel</code> attributes.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>Internal CSS uses a <code>&lt;style&gt;</code> element in the <code>&lt;head&gt;</code>; inline CSS uses the <code>style</code> attribute on a tag.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>External stylesheets enable site-wide consistency, separation of concerns, and single-point redesign.</span>
+                </label>
+                <label class="checklist-item">
+                    <input type="checkbox" class="checklist-check">
+                    <span>CSS properties fall into box styling (containers) and text styling (typography) — two different categories of control.</span>
+                </label>
+            </div>
+
+
+            <!-- ═══════════════════════════════════════════
+                 Summary
+                 ═══════════════════════════════════════════ -->
+            <div class="notes-box summary" style="margin-top: 3rem;">
+                <h2 style="margin-top: 0; color: inherit;">Section Summary</h2>
+                <p>In this chapter you learned:</p>
+                <ul>
+                    <li>CSS is the presentation language of the web — it answers <em>how</em> content looks, while HTML answers <em>what</em> content is</li>
+                    <li>The box model: every HTML element occupies a rectangular box; CSS controls that box and the content within it</li>
+                    <li>Block-level elements stack vertically; inline elements flow within text — this distinction governs how CSS properties apply</li>
+                    <li>A CSS rule = selector + declaration block. A declaration = property: value; — the fundamental unit of styling</li>
+                    <li>Commas in selectors (<code>h1, h2, h3</code>) share one rule across multiple element types</li>
+                    <li>Three methods of CSS delivery: external (<code>&lt;link&gt;</code>), internal (<code>&lt;style&gt;</code>), inline (<code>style</code> attribute)</li>
+                    <li>External stylesheets are architecturally preferred: one file controls all pages; content and presentation stay separate; redesign touches one file only</li>
+                    <li>CSS properties divide into box properties (size, border, background, position) and text properties (font, colour, style)</li>
+                </ul>
+            </div>
+
+
+        </div>
+    </main>
+
+    <div id="support-cta"></div>
+    <div class="notes-watermark">
+        Source: RaushanSYNC CS &amp; DS · https://cs.raushansync.com
+        Licensed for personal, non-commercial learning only.
+    </div>
+    <div id="footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4"></script>
+    <script src="/assets/js/auth-config.js"></script>
+    <script src="/assets/js/auth-guard.js"></script>
+    <script src="/assets/js/progress-tracker.js"></script>
+    <script src="/assets/js/tick-manager.js"></script>
+    <script src="/assets/js/script.js"></script>
+    <script>
+        /* ── Checklist persistence ── */
+        const checkboxes = document.querySelectorAll('.checklist-check');
+        const STORAGE_KEY = 'css-introduction-checklist';
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        checkboxes.forEach((cb, i) => {
+            if (saved[i]) cb.checked = true;
+            cb.addEventListener('change', () => {
+                const state = Array.from(checkboxes).map(c => c.checked);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            });
+        });
+    </script>
+</body>
+
+</html>
