@@ -421,7 +421,7 @@ window.TickManager = (() => {
                     // Determine if it represents a practice or article based on URL
                     const itemType = window.ProgressTracker 
                         ? window.ProgressTracker.detectItemType(itemPath) 
-                        : (itemPath.includes('/practice/') ? 'practice' : 'article');
+                        : (itemPath.toLowerCase().includes('practice') ? 'practice' : 'article');
 
                     let flexWrap = card.querySelector('.card-header-flex');
                     let container = card.querySelector('.card-tick-container');

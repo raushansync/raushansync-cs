@@ -330,25 +330,14 @@ window.ProgressTracker = (() => {
 
             const lowerPath = path.toLowerCase();
             
-            // Practice detection
-            if (lowerPath.includes('/practice/') || 
-                lowerPath.includes('/practice-advanced/') ||
-                lowerPath.includes('/practice-solution/')) {
+            // Practice detection: if filename contains "practice", it's a practice item
+            if (lowerPath.includes('practice')) {
                 return 'practice';
             }
 
-            // Check if it's a practice page (renamed from quiz)
-            if (lowerPath.includes('/practice') && lowerPath.endsWith('.html')) {
+            // Also check for quiz (legacy naming)
+            if (lowerPath.includes('quiz')) {
                 return 'practice';
-            }
-
-            // Articles in notes folder
-            if (lowerPath.includes('/notes/')) {
-                // If it has practice in the name, it's a practice
-                if (lowerPath.includes('practice') || lowerPath.includes('quiz')) {
-                    return 'practice';
-                }
-                return 'article';
             }
 
             return 'article'; // Default
