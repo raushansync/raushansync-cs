@@ -2285,9 +2285,7 @@
                 '/practice/',
                 '/practice-advanced/',
                 '/practice-solution/',
-                '/video-lessons/',
-                '/computer-science/',
-                '/data-science/'
+                '/video-lessons/'
             ].some(prefix => pathname === prefix.slice(0, -1) || pathname.startsWith(prefix));
         }
 
@@ -2301,7 +2299,7 @@
         }
 
         function isSciencePathFallback(url) {
-            return /^\/(?:notes|practice|practice-advanced|practice-solution|video-lessons|computer-science|data-science)\/(?:class\d{2}\/chapter\d+|[a-z-]+)/i.test(url.pathname || '');
+            return /^\/(?:notes|practice|practice-advanced|practice-solution|video-lessons)\/class\d{2}\/chapter\d+/i.test(url.pathname || '');
         }
 
         async function pathExistsOnScienceSite(itemPath) {
@@ -2430,7 +2428,15 @@
                 const { data: { session } } = await window.supabaseClient.auth.getSession();
                 
                 if (!session) {
-                    window.location.replace("/login");
+                    const targetPath = typeof window.getCurrentPath === "function"
+                        ? window.getCurrentPath()
+                        : "/dashboard";
+
+                    if (typeof window.redirectToLogin === "function") {
+                        window.redirectToLogin(targetPath);
+                    } else {
+                        window.location.replace("/login?redirect=" + encodeURIComponent(targetPath));
+                    }
                     return;
                 }
 

@@ -635,6 +635,22 @@ body:not(.home-page) main {
   color: var(--primary-color);
 }
 
+/* Card Header Flex - positions status and tick */
+.card-header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* Card Tick Container - positions tick on the right */
+.card-tick-container {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 @keyframes class-card-gradient {
   0% {
     background-position: 0% 50%;
