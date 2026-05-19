@@ -2280,13 +2280,15 @@
             if (!url) return false;
 
             const pathname = url.pathname || '/';
-            return [
-                '/notes/',
-                '/practice/',
-                '/practice-advanced/',
-                '/practice-solution/',
-                '/video-lessons/'
-            ].some(prefix => pathname === prefix.slice(0, -1) || pathname.startsWith(prefix));
+            
+            // Reject obvious non-trackable paths
+            const nonTrackablePrefixes = ['/assets/', '/admin/', '/api/', '/.', '/cdn/'];
+            if (nonTrackablePrefixes.some(prefix => pathname.startsWith(prefix))) {
+                return false;
+            }
+            
+            // Accept any other path (validation will happen via HEAD request)
+            return true;
         }
 
         function getSafeProgressHref(itemPath) {
@@ -2305,26 +2307,33 @@
         async function pathExistsOnScienceSite(itemPath) {
             const url = getProgressUrl(itemPath);
             if (!url || !isTrackableSciencePath(url)) {
+                console.log('Path rejected: invalid URL or not trackable science path', { itemPath, hasUrl: !!url, isTrackable: isTrackableSciencePath(url) });
                 return false;
             }
 
             url.hash = '';
             const cacheKey = url.pathname.replace(/\/index\.html$/, '/').replace(/\/$/, '') + url.search;
             if (progressPathValidationCache.has(cacheKey)) {
-                return progressPathValidationCache.get(cacheKey);
+                const cached = progressPathValidationCache.get(cacheKey);
+                console.log('Path from cache:', { cacheKey, exists: cached });
+                return cached;
             }
 
             try {
+                console.log('Fetching URL to verify exists:', url.href);
                 const response = await fetch(url.href, {
                     method: 'HEAD',
                     cache: 'no-store',
                     credentials: 'same-origin'
                 });
                 const exists = response.ok;
+                console.log('Fetch response:', { url: url.href, status: response.status, exists });
                 progressPathValidationCache.set(cacheKey, exists);
                 return exists;
             } catch (error) {
+                console.log('Fetch error, using fallback:', { error: error.message, url: url.href });
                 const exists = isSciencePathFallback(url);
+                console.log('Fallback result:', { exists });
                 progressPathValidationCache.set(cacheKey, exists);
                 return exists;
             }
@@ -2336,11 +2345,18 @@
             for (const item of rows || []) {
                 if (filtered.length >= limit) break;
 
-                if (await pathExistsOnScienceSite(item.item_path)) {
+                console.log('Checking path:', item.item_path);
+                const exists = await pathExistsOnScienceSite(item.item_path);
+                console.log('Path exists result:', exists);
+
+                if (exists) {
                     const safeHref = getSafeProgressHref(item.item_path);
+                    console.log('Safe href:', safeHref);
                     if (safeHref) {
                         filtered.push({ ...item, item_path: safeHref });
                     }
+                } else {
+                    console.log('Path filtered out (pathExistsOnScienceSite returned false)');
                 }
             }
 
@@ -2348,8 +2364,12 @@
         }
 
         async function fetchRecentProgress(itemType, limit = 3) {
-            if (!window.supabaseClient || !currentUser) return [];
+            if (!window.supabaseClient || !currentUser) {
+                console.warn('fetchRecentProgress: Missing supabaseClient or currentUser', { hasClient: !!window.supabaseClient, hasUser: !!currentUser });
+                return [];
+            }
             try {
+                console.log('Fetching recent progress for:', itemType);
                 const queryLimit = Math.max(limit * 25, 75);
                 const { data, error } = await window.supabaseClient
                     .from('progress')
@@ -2361,7 +2381,10 @@
                     .limit(queryLimit);
 
                 if (error) throw error;
-                return await filterScienceRecentProgress(data, limit);
+                console.log('Raw data from DB for', itemType + ':', data);
+                const filtered = await filterScienceRecentProgress(data, limit);
+                console.log('Filtered data for', itemType + ':', filtered);
+                return filtered;
             } catch (err) {
                 console.error("Error fetching recent " + itemType + ":", err);
                 return [];
@@ -2378,9 +2401,10 @@
             setups.forEach(setup => {
                 const card = document.getElementById(setup.cardId);
                 const palette = document.getElementById(setup.paletteId);
-                if (!card || !palette) return;
-
-                let loaded = false;
+                if (!card || !palette) {
+                    console.warn('setupProgressPalettes: Missing card or palette', { cardId: setup.cardId, paletteId: setup.paletteId });
+                    return;
+                }
 
                 card.addEventListener('click', async (e) => {
                     e.stopPropagation();
@@ -2395,17 +2419,27 @@
                     palette.classList.add('show');
                     card.classList.add('palette-active');
 
+                    // Check if we need to load data
+                    const loaded = card.dataset.loaded === 'true';
                     if (!loaded && setup.type !== 'account') {
-                        const items = await fetchRecentProgress(setup.type);
-                        if (items.length === 0) {
-                            palette.innerHTML = '<div class="palette-empty">No recent activity.</div>';
-                        } else {
-                            palette.innerHTML = items.map(item => {
-                                const title = formatPathToTitle(item.item_path);
-                                return `<div class="palette-item"><a href="${item.item_path}">${title}</a></div>`;
-                            }).join('');
+                        // Show loading state
+                        palette.innerHTML = '<div class="palette-loading">Loading...</div>';
+                        
+                        try {
+                            const items = await fetchRecentProgress(setup.type);
+                            if (items.length === 0) {
+                                palette.innerHTML = '<div class="palette-empty">No recent activity.</div>';
+                            } else {
+                                palette.innerHTML = items.map(item => {
+                                    const title = formatPathToTitle(item.item_path);
+                                    return `<div class="palette-item"><a href="${item.item_path}">${title}</a></div>`;
+                                }).join('');
+                            }
+                            card.dataset.loaded = 'true';
+                        } catch (error) {
+                            console.error('Error loading palette for', setup.type + ':', error);
+                            palette.innerHTML = '<div class="palette-empty" style="color: #ef4444;">Error loading items</div>';
                         }
-                        loaded = true;
                     }
                 });
 
@@ -2417,6 +2451,20 @@
                 document.querySelectorAll('.stat-card.palette-active').forEach(c => c.classList.remove('palette-active'));
             });
         }
+
+        // Expose function for tick manager to call when progress is updated
+        window.updateProgressDisplay = function() {
+            // Reset loaded flags so palettes are refreshed on next click
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.dataset.loaded = 'false';
+            });
+            
+            // Clear existing palettes
+            document.querySelectorAll('.dashboard-palette').forEach(palette => {
+                palette.innerHTML = '';
+            });
+        };
+
 
         async function initializeDashboard() {
             if (!window.supabaseClient) {
