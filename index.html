@@ -89,7 +89,7 @@
 
         .welcome-section #auth-buttons-guest {
             align-self: flex-start;
-            align-items: center;
+            align-items: start;
         }
 
         .welcome-section #auth-buttons-guest,
@@ -118,17 +118,6 @@
          ============================================================ -->
     <style>
 
-        /* ── Particle Canvas ─────────────────────────────────────── */
-        #science-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
         /* ── Body atmosphere ─────────────────────────────────────── */
         body.home-page {
             position: relative;
@@ -139,7 +128,7 @@
             background: linear-gradient(145deg, #020c1b 0%, #030e22 50%, #020a17 100%);
         }
 
-        /* Grid overlay */
+        /* Scientific grid overlay */
         body.home-page::after {
             content: '';
             position: fixed;
@@ -154,10 +143,11 @@
 
         .dark-mode body.home-page::after {
             background-image:
-                linear-gradient(rgba(96, 165, 250, 0.045) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(96, 165, 250, 0.045) 1px, transparent 1px);
+                linear-gradient(rgba(96, 165, 250, 0.11) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(96, 165, 250, 0.11) 1px, transparent 1px);
         }
 
+        /* Lift page content above the decorative canvas. Header uses shared site CSS. */
         main {
             position: relative;
             z-index: 1;
@@ -178,7 +168,7 @@
             display: grid;
             grid-template-columns: minmax(700px, 0.95fr) minmax(360px, 0.85fr);
             gap: 1.6rem;
-            align-items: start;
+            align-items: center;
             min-height: auto;
             padding: 0.85rem 0 1.35rem;
         }
@@ -198,6 +188,8 @@
             align-items: center;
             justify-content: flex-end;
             padding-top: 0.35rem;
+            position: relative;
+            top: -1.25rem;
             animation: heroFadeUp 0.75s 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
@@ -351,36 +343,36 @@
             line-height: 1;
         }
 
-        .hero-domain-pill.cs {
+        .hero-domain-pill.physics {
             border-color: rgba(37, 99, 235, 0.34);
             color: #1d4ed8;
         }
-        .hero-domain-pill.ds {
+        .hero-domain-pill.chemistry {
             border-color: rgba(8, 145, 178, 0.34);
             color: #0e7490;
         }
-        .hero-domain-pill.algo {
+        .hero-domain-pill.biology {
             border-color: rgba(5, 150, 105, 0.34);
             color: #047857;
         }
-        .hero-domain-pill.ml {
+        .hero-domain-pill.enviro {
             border-color: rgba(101, 163, 13, 0.34);
             color: #3f6212;
         }
 
-        .hero-domain-pill.ds .hero-domain-icon { background: rgba(6, 182, 212, 0.12); }
-        .hero-domain-pill.algo .hero-domain-icon { background: rgba(16, 185, 129, 0.12); }
-        .hero-domain-pill.ml .hero-domain-icon { background: rgba(132, 204, 22, 0.14); }
+        .hero-domain-pill.chemistry .hero-domain-icon { background: rgba(6, 182, 212, 0.12); }
+        .hero-domain-pill.biology .hero-domain-icon { background: rgba(16, 185, 129, 0.12); }
+        .hero-domain-pill.enviro .hero-domain-icon { background: rgba(132, 204, 22, 0.14); }
 
         .dark-mode .hero-domain-pill {
             background: rgba(8, 20, 42, 0.62);
             box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
 
-        .dark-mode .hero-domain-pill.cs   { border-color: rgba(96,165,250,0.18); color: #93c5fd; }
-        .dark-mode .hero-domain-pill.ds   { border-color: rgba(34,211,238,0.18); color: #67e8f9; }
-        .dark-mode .hero-domain-pill.algo { border-color: rgba(52,211,153,0.18); color: #6ee7b7; }
-        .dark-mode .hero-domain-pill.ml   { border-color: rgba(163,230,53,0.18); color: #bef264; }
+        .dark-mode .hero-domain-pill.physics  { border-color: rgba(96,165,250,0.18); color: #93c5fd; }
+        .dark-mode .hero-domain-pill.chemistry { border-color: rgba(34,211,238,0.18); color: #67e8f9; }
+        .dark-mode .hero-domain-pill.biology   { border-color: rgba(52,211,153,0.18); color: #6ee7b7; }
+        .dark-mode .hero-domain-pill.enviro    { border-color: rgba(163,230,53,0.18); color: #bef264; }
 
         /* ── Welcome actions alignment inside hero-left ──────────── */
         .hero-left .welcome-actions {
@@ -529,410 +521,51 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45) !important;
         }
 
-        /* ═══════════════════════════════════════════════════════
-           HERO RIGHT — CS Visualization Panel
-           ═══════════════════════════════════════════════════════ */
-
-        .sci-vis-container {
-            position: relative;
-            width: 100%;
-            max-width: 440px;
-            aspect-ratio: 460 / 370;
+        /* ── Hero profile image ─────────────────────────────────── */
+        .hero-profile-motion {
+            width: 300px;
+            height: 300px;
+            margin-top: -10px;
+            animation: portraitFloat 6s ease-in-out infinite;
         }
 
-        @media (min-width: 1121px) {
-            .sci-vis-container {
-                transform: translateX(clamp(2.5rem, 4.5vw, 5rem));
-            }
-        }
-
-        .sci-vis-glass {
-            position: absolute;
-            inset: 0;
-            background: rgba(248, 252, 255, 0.88);
-            backdrop-filter: blur(14px) saturate(1.5);
-            -webkit-backdrop-filter: blur(14px) saturate(1.5);
-            border: 1px solid rgba(37, 99, 235, 0.24);
-            border-radius: 22px;
-            box-shadow:
-                0 22px 60px rgba(37, 99, 235, 0.14),
-                0 4px 16px rgba(15, 23, 42, 0.08),
-                inset 0 1px 0 rgba(255, 255, 255, 0.95);
-            overflow: hidden;
-        }
-
-        .dark-mode .sci-vis-glass {
-            background: rgba(6, 18, 40, 0.72);
-            border-color: rgba(96, 165, 250, 0.14);
-            box-shadow:
-                0 20px 60px rgba(0, 0, 0, 0.55),
-                0 4px 16px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(96, 165, 250, 0.07);
-        }
-
-        .sci-vis-glass::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(37, 99, 235, 0.07) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(37, 99, 235, 0.07) 1px, transparent 1px);
-            background-size: 22px 22px;
-        }
-
-        .dark-mode .sci-vis-glass::before {
-            background-image:
-                linear-gradient(rgba(96, 165, 250, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(96, 165, 250, 0.05) 1px, transparent 1px);
-        }
-
-        .sci-glow-1 {
-            position: absolute;
-            width: 220px;
-            height: 220px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.14) 0%, transparent 70%);
-            top: -60px;
-            right: -40px;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: floatOrb1 9s ease-in-out infinite;
-        }
-
-        .sci-glow-2 {
-            position: absolute;
-            width: 160px;
-            height: 160px;
-            background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, transparent 70%);
-            bottom: -30px;
-            left: 20px;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: floatOrb2 11s ease-in-out infinite;
-        }
-
-        .sci-glow-3 {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
-            bottom: 40%;
-            right: 15%;
-            border-radius: 50%;
-            pointer-events: none;
-            animation: floatOrb1 7s ease-in-out infinite reverse;
-        }
-
-        .dark-mode .sci-glow-1 { background: radial-gradient(circle, rgba(96, 165, 250, 0.22) 0%, transparent 70%); }
-        .dark-mode .sci-glow-2 { background: radial-gradient(circle, rgba(34, 211, 238, 0.18) 0%, transparent 70%); }
-        .dark-mode .sci-glow-3 { background: radial-gradient(circle, rgba(52, 211, 153, 0.16) 0%, transparent 70%); }
-
-        @keyframes floatOrb1 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            33%       { transform: translate(-14px, 10px) scale(1.06); }
-            66%       { transform: translate(10px, -8px) scale(0.94); }
-        }
-
-        @keyframes floatOrb2 {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            40%       { transform: translate(12px, -14px) scale(1.08); }
-            70%       { transform: translate(-8px, 6px) scale(0.93); }
-        }
-
-        .sci-corner {
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(59, 130, 246, 0.38);
-            border-radius: 3px;
-            pointer-events: none;
-        }
-
-        .sci-corner.tl { top: 11px; left: 11px; border-right: none; border-bottom: none; border-radius: 3px 0 0 0; }
-        .sci-corner.tr { top: 11px; right: 11px; border-left: none; border-bottom: none; border-radius: 0 3px 0 0; }
-        .sci-corner.bl { bottom: 11px; left: 11px; border-right: none; border-top: none; border-radius: 0 0 0 3px; }
-        .sci-corner.br { bottom: 11px; right: 11px; border-left: none; border-top: none; border-radius: 0 0 3px 0; }
-
-        .dark-mode .sci-corner { border-color: rgba(96, 165, 250, 0.32); }
-
-        .sci-network-svg {
-            position: absolute;
-            inset: 0;
+        .hero-profile {
+            margin: 0;
             width: 100%;
             height: 100%;
-            z-index: 1;
-        }
-
-        .sci-modules-overlay {
-            position: absolute;
-            inset: 0;
-            z-index: 2;
-            pointer-events: none;
-        }
-
-        .sci-mod {
-            position: absolute;
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            padding: 0.52rem 0.9rem;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid;
-            font-size: 0.78rem;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            white-space: nowrap;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-            animation: modFloat 6s ease-in-out infinite;
-        }
-
-        .sci-mod.cs {
-            top: 10%;
-            left: 5%;
-            background: rgba(235, 245, 255, 0.92);
-            border-color: rgba(59, 130, 246, 0.28);
-            color: #1e40af;
-            animation-delay: 0s;
-        }
-
-        .sci-mod.ds {
-            top: 40%;
-            right: 4%;
-            background: rgba(232, 252, 255, 0.92);
-            border-color: rgba(6, 182, 212, 0.28);
-            color: #0c6473;
-            animation-delay: -2.1s;
-        }
-
-        .sci-mod.algo {
-            bottom: 12%;
-            left: 8%;
-            background: rgba(232, 252, 242, 0.92);
-            border-color: rgba(16, 185, 129, 0.28);
-            color: #065f46;
-            animation-delay: -4s;
-        }
-
-        .sci-mod.ml {
-            top: 10%;
-            right: 6%;
-            background: rgba(247, 254, 229, 0.92);
-            border-color: rgba(132, 204, 22, 0.28);
-            color: #3a5a0f;
-            animation-delay: -1.3s;
-        }
-
-        .dark-mode .sci-mod.cs   { background: rgba(8, 20, 48, 0.88); border-color: rgba(96,165,250,0.24); color: #93c5fd; }
-        .dark-mode .sci-mod.ds   { background: rgba(6, 22, 36, 0.88); border-color: rgba(34,211,238,0.24); color: #67e8f9; }
-        .dark-mode .sci-mod.algo { background: rgba(6, 24, 18, 0.88); border-color: rgba(52,211,153,0.24); color: #6ee7b7; }
-        .dark-mode .sci-mod.ml   { background: rgba(16, 24, 6, 0.88); border-color: rgba(163,230,53,0.24); color: #bef264; }
-
-        @keyframes modFloat {
-            0%, 100% { transform: translateY(0px); }
-            50%       { transform: translateY(-7px); }
-        }
-
-        .sci-chip {
-            position: absolute;
-            padding: 0.32rem 0.62rem;
-            border-radius: 7px;
-            background: rgba(255, 255, 255, 0.88);
-            border: 1px solid rgba(59, 130, 246, 0.14);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            font-size: 0.68rem;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            color: var(--text-color);
-            box-shadow: 0 2px 8px rgba(59,130,246,0.06);
-            animation: modFloat 8s ease-in-out infinite;
-        }
-
-        .sci-chip.c1 { bottom: 36%; right: 8%;  animation-delay: -3s; }
-        .sci-chip.c2 { top: 55%;  left: 5%;  animation-delay: -5.5s; }
-
-        .dark-mode .sci-chip {
-            background: rgba(6, 16, 36, 0.88);
-            border-color: rgba(96, 165, 250, 0.14);
-        }
-
-        /* ═══════════════════════════════════════════════════════
-           QUOTE SECTION
-           ═══════════════════════════════════════════════════════ */
-
-        .quote-display-section {
-            margin: 1.35rem 0 1.15rem;
-            animation: heroFadeUp 0.75s 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
-        }
-
-        .quote-hud {
-            position: relative;
-            padding: 1.55rem 2rem 1.4rem;
-            background:
-                linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(239, 247, 255, 0.84)),
-                radial-gradient(circle at 18% 18%, rgba(37, 99, 235, 0.12), transparent 42%);
-            backdrop-filter: blur(16px) saturate(1.2);
-            -webkit-backdrop-filter: blur(16px) saturate(1.2);
-            border: 1px solid rgba(37, 99, 235, 0.24);
-            border-radius: 14px;
-            box-shadow:
-                0 12px 32px rgba(37, 99, 235, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.96);
+            border-radius: 50%;
             overflow: hidden;
-            text-align: center;
+            border: 2px solid rgba(59, 130, 246, 0.42);
+            box-shadow: 0 18px 44px rgba(37, 99, 235, 0.2), 0 0 28px rgba(59, 130, 246, 0.2);
+            transition: box-shadow 340ms ease;
         }
 
-        .dark-mode .quote-hud {
-            background:
-                linear-gradient(135deg, rgba(6, 18, 40, 0.78), rgba(4, 13, 30, 0.68)),
-                radial-gradient(circle at 18% 18%, rgba(96, 165, 250, 0.1), transparent 42%);
-            border-color: rgba(96, 165, 250, 0.14);
-            box-shadow:
-                0 10px 34px rgba(0, 0, 0, 0.38),
-                inset 0 1px 0 rgba(96, 165, 250, 0.07);
-        }
-
-        .quote-hud::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(37, 99, 235, 0.045) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(37, 99, 235, 0.045) 1px, transparent 1px);
-            background-size: 28px 28px;
-            mask-image: linear-gradient(180deg, rgba(0,0,0,0.72), transparent 78%);
-            -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,0.72), transparent 78%);
-            pointer-events: none;
-        }
-
-        .dark-mode .quote-hud::before {
-            background-image:
-                linear-gradient(rgba(96, 165, 250, 0.035) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(96, 165, 250, 0.035) 1px, transparent 1px);
-        }
-
-        .qhud-line {
-            position: absolute;
-            left: 1.7rem;
-            right: 1.7rem;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.22), transparent);
-            pointer-events: none;
-        }
-
-        .qhud-line.top    { top: 0; }
-        .qhud-line.bottom { bottom: 0; }
-
-        .dark-mode .qhud-line {
-            background: linear-gradient(90deg, transparent, rgba(96, 165, 250, 0.18), transparent);
-        }
-
-        .quote-deco-mark {
-            position: absolute;
-            top: 0.35rem;
-            left: 1.3rem;
-            font-size: 4.1rem;
-            line-height: 1;
-            font-family: Georgia, 'Times New Roman', serif;
-            color: rgba(59, 130, 246, 0.1);
-            pointer-events: none;
-            user-select: none;
-        }
-
-        .dark-mode .quote-deco-mark { color: rgba(96, 165, 250, 0.1); }
-
-        .quote-label {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            padding: 0.24rem 0.78rem;
-            border-radius: 999px;
-            background: rgba(59, 130, 246, 0.07);
-            border: 1px solid rgba(59, 130, 246, 0.14);
-            color: #1d4ed8;
-            font-size: 0.58rem;
-            font-weight: 700;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            margin-bottom: 0.85rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .dark-mode .quote-label {
-            background: rgba(96, 165, 250, 0.08);
-            border-color: rgba(96, 165, 250, 0.15);
-            color: #93c5fd;
-        }
-
-        .quote-label-dot {
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: currentColor;
-            opacity: 0.8;
-        }
-
-        #quote-text {
-            font-size: 0.94rem !important;
-            line-height: 1.72 !important;
-            color: #475569 !important;
-            font-weight: 400 !important;
-            font-style: italic !important;
-            max-width: 64ch !important;
-            margin: 0 auto 0.78rem !important;
-            transition: opacity 0.7s ease !important;
-            position: relative;
-            z-index: 1;
-        }
-
-        .dark-mode #quote-text {
-            color: #b7c3d5 !important;
-        }
-
-        #quote-author {
+        .hero-profile img {
             display: block;
-            font-size: 0.82rem;
-            font-weight: 600;
-            color: var(--primary-color);
-            letter-spacing: 0.07em;
-            transition: opacity 0.7s ease;
-            position: relative;
-            z-index: 1;
+            width: 100%;
+            height: 100%;
+            border-radius: inherit;
+            object-fit: cover;
+            object-position: 58% 35%;
         }
 
-        .dark-mode #quote-author {
-            color: #87b7f2;
+        .hero-profile:hover {
+            box-shadow: 0 22px 52px rgba(37, 99, 235, 0.24), 0 0 34px rgba(59, 130, 246, 0.26);
         }
 
-        .quote-indicators {
-            display: flex;
-            justify-content: center;
-            gap: 0.38rem;
-            margin-top: 0.82rem;
-            position: relative;
-            z-index: 1;
+        @keyframes portraitFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-9px); }
         }
 
-        .q-dot {
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: rgba(59, 130, 246, 0.2);
-            transition: background 0.45s ease, transform 0.45s ease, width 0.45s ease;
-            cursor: pointer;
+        .dark-mode .hero-profile {
+            border-color: rgba(96, 165, 250, 0.28);
+            box-shadow: 0 18px 42px rgba(2, 6, 23, 0.56), 0 0 26px rgba(96, 165, 250, 0.22);
         }
 
-        .q-dot.active {
-            background: var(--primary-color);
-            width: 14px;
-            border-radius: 999px;
-            transform: scale(1);
+        .dark-mode .hero-profile:hover {
+            box-shadow: 0 20px 46px rgba(2, 6, 23, 0.62), 0 0 32px rgba(96, 165, 250, 0.28);
         }
-
-        .dark-mode .q-dot { background: rgba(96, 165, 250, 0.2); }
-        .dark-mode .q-dot.active { background: #60a5fa; }
 
         /* ═══════════════════════════════════════════════════════
            HERO PALETTE — Premium Glass Upgrade
@@ -988,7 +621,7 @@
             .hero-subtitle { text-align: center; max-width: none; }
             .hero-domains { justify-content: center; }
 
-            .hero-right { display: none; }
+            .hero-right { justify-content: center; width: 100%; padding-top: 0.35rem; top: 0; }
         }
 
         @media (max-width: 1120px) {
@@ -997,9 +630,8 @@
                 justify-items: center;
             }
 
-            .hero-right {
-                display: none;
-            }
+            .hero-right { justify-content: center; width: 100%; padding-top: 0.35rem; top: 0; }
+            .hero-profile-motion { width: 250px; height: 250px; }
 
             .hero-left {
                 align-items: center;
@@ -1027,6 +659,7 @@
 
         @media (max-width: 768px) {
             .hero-split { padding: 1.15rem 0 1.05rem; gap: 1.25rem; }
+            .hero-profile-motion { width: 195px; height: 195px; }
             .hero-left h1 {
                 font-size: 1.9rem !important;
                 line-height: 1.16 !important;
@@ -1057,20 +690,6 @@
                 white-space: normal;
             }
 
-            .quote-hud {
-                padding: 1.5rem 1.4rem 1.4rem;
-            }
-            #quote-text {
-                font-size: 0.82rem !important;
-                line-height: 1.65 !important;
-                max-width: 40ch !important;
-            }
-            #quote-author {
-                font-size: 0.72rem;
-            }
-            .quote-deco-mark { font-size: 3.5rem; }
-            .qhud-line { left: 1.2rem; right: 1.2rem; }
-
             .home-page .welcome-section .palette.hero-palette {
                 padding: 1.3rem 1.4rem !important;
             }
@@ -1078,6 +697,7 @@
 
         @media (max-width: 480px) {
             .hero-split { padding: 1.35rem 0 1.15rem; gap: 1.35rem; }
+            .hero-profile-motion { width: 195px; height: 195px; }
             .hero-left {
                 gap: 1rem;
             }
@@ -1095,24 +715,14 @@
                 line-height: 1.75 !important;
                 text-align: center !important;
             }
-            .quote-hud { padding: 1.25rem 1.1rem 1.2rem; }
-            #quote-text {
-                font-size: 0.78rem !important;
-                line-height: 1.62 !important;
-            }
         }
 
         /* ── Reduced motion ──────────────────────────────────────── */
         @media (prefers-reduced-motion: reduce) {
             .hero-left,
             .hero-right,
-            .quote-display-section,
             .home-page .welcome-section .palette.hero-palette,
-            .sci-mod,
-            .sci-chip,
-            .sci-glow-1,
-            .sci-glow-2,
-            .sci-glow-3,
+            .hero-profile-motion,
             .hero-badge-dot,
             .hero-left .btn-primary,
             .hero-left .btn-primary::before {
@@ -1120,6 +730,7 @@
                 transform: none !important;
             }
         }
+
     </style>
 
     <meta property="og:image" content="https://cs.raushansync.com/assets/og/og-image.jpg">
@@ -1151,9 +762,6 @@
             </div>
         </div>
     </header>
-
-    <!-- Particle constellation canvas -->
-    <canvas id="science-canvas" aria-hidden="true"></canvas>
 
     <main>
 
@@ -1187,19 +795,19 @@
 
                         <!-- Domain pills (decorative, aria-hidden) -->
                         <div class="hero-domains" aria-hidden="true">
-                            <span class="hero-domain-pill cs">
+                            <span class="hero-domain-pill physics">
                                 <span class="hero-domain-icon">CS</span>
                                 Computer Science
                             </span>
-                            <span class="hero-domain-pill ds">
+                            <span class="hero-domain-pill chemistry">
                                 <span class="hero-domain-icon">DS</span>
                                 Data Science
                             </span>
-                            <span class="hero-domain-pill algo">
+                            <span class="hero-domain-pill biology">
                                 <span class="hero-domain-icon">AL</span>
                                 Algorithms
                             </span>
-                            <span class="hero-domain-pill ml">
+                            <span class="hero-domain-pill enviro">
                                 <span class="hero-domain-icon">ML</span>
                                 Machine Learning
                             </span>
@@ -1241,172 +849,17 @@
                     </div>
                     <!-- END HERO LEFT -->
 
-                    <!-- HERO RIGHT — CS Visualization (decorative, aria-hidden) -->
-                    <div class="hero-right" aria-hidden="true">
-                        <div class="sci-vis-container">
-
-                            <!-- Glass panel background -->
-                            <div class="sci-vis-glass">
-                                <div class="sci-glow-1"></div>
-                                <div class="sci-glow-2"></div>
-                                <div class="sci-glow-3"></div>
-                                <!-- HUD corners -->
-                                <div class="sci-corner tl"></div>
-                                <div class="sci-corner tr"></div>
-                                <div class="sci-corner bl"></div>
-                                <div class="sci-corner br"></div>
-                            </div>
-
-                            <!-- SVG constellation network -->
-                            <svg class="sci-network-svg" viewBox="0 0 460 370" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                <defs>
-                                    <radialGradient id="rg-cs" cx="50%" cy="50%" r="50%">
-                                        <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.55"/>
-                                        <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
-                                    </radialGradient>
-                                    <radialGradient id="rg-ds" cx="50%" cy="50%" r="50%">
-                                        <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.55"/>
-                                        <stop offset="100%" stop-color="#06b6d4" stop-opacity="0"/>
-                                    </radialGradient>
-                                    <radialGradient id="rg-algo" cx="50%" cy="50%" r="50%">
-                                        <stop offset="0%" stop-color="#10b981" stop-opacity="0.55"/>
-                                        <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
-                                    </radialGradient>
-                                    <radialGradient id="rg-ml" cx="50%" cy="50%" r="50%">
-                                        <stop offset="0%" stop-color="#84cc16" stop-opacity="0.5"/>
-                                        <stop offset="100%" stop-color="#84cc16" stop-opacity="0"/>
-                                    </radialGradient>
-                                    <filter id="sf-glow" x="-50%" y="-50%" width="200%" height="200%">
-                                        <feGaussianBlur stdDeviation="3.5" result="blur"/>
-                                        <feMerge>
-                                            <feMergeNode in="blur"/>
-                                            <feMergeNode in="SourceGraphic"/>
-                                        </feMerge>
-                                    </filter>
-                                </defs>
-
-                                <!-- Connection lines -->
-                                <path d="M 92 92 Q 220 68 368 170" stroke="#3b82f6" stroke-width="1.2" fill="none" opacity="0.22" stroke-dasharray="5 7">
-                                    <animate attributeName="stroke-dashoffset" values="0;-24" dur="4s" repeatCount="indefinite"/>
-                                </path>
-                                <path d="M 90 100 Q 105 195 125 282" stroke="#3b82f6" stroke-width="1.2" fill="none" opacity="0.22" stroke-dasharray="5 7">
-                                    <animate attributeName="stroke-dashoffset" values="0;-24" dur="5.2s" repeatCount="indefinite"/>
-                                </path>
-                                <path d="M 362 180 Q 250 310 138 287" stroke="#06b6d4" stroke-width="1.2" fill="none" opacity="0.22" stroke-dasharray="5 7">
-                                    <animate attributeName="stroke-dashoffset" values="0;-24" dur="3.8s" repeatCount="indefinite"/>
-                                </path>
-                                <path d="M 98 88 Q 240 55 378 82" stroke="#84cc16" stroke-width="1" fill="none" opacity="0.18" stroke-dasharray="4 7">
-                                    <animate attributeName="stroke-dashoffset" values="0;-22" dur="6s" repeatCount="indefinite"/>
-                                </path>
-                                <path d="M 382 94 Q 390 134 374 166" stroke="#06b6d4" stroke-width="1" fill="none" opacity="0.18" stroke-dasharray="4 7">
-                                    <animate attributeName="stroke-dashoffset" values="0;-22" dur="4.5s" repeatCount="indefinite"/>
-                                </path>
-                                <line x1="88" y1="90" x2="230" y2="188" stroke="#3b82f6" stroke-width="0.8" opacity="0.1"/>
-                                <line x1="372" y1="175" x2="230" y2="188" stroke="#06b6d4" stroke-width="0.8" opacity="0.1"/>
-                                <line x1="125" y1="290" x2="230" y2="188" stroke="#10b981" stroke-width="0.8" opacity="0.1"/>
-                                <line x1="385" y1="82" x2="230" y2="188" stroke="#84cc16" stroke-width="0.8" opacity="0.1"/>
-
-                                <!-- Central node -->
-                                <circle cx="230" cy="188" r="16" fill="#3b82f6" opacity="0.05"/>
-                                <circle cx="230" cy="188" r="8"  fill="#3b82f6" opacity="0.08"/>
-                                <circle cx="230" cy="188" r="3"  fill="#3b82f6" opacity="0.3"/>
-
-                                <!-- Node: CS -->
-                                <circle cx="88" cy="90" r="30" fill="url(#rg-cs)" opacity="0.7"/>
-                                <circle cx="88" cy="90" r="14" fill="#3b82f6" opacity="0.1" filter="url(#sf-glow)"/>
-                                <circle cx="88" cy="90" r="8"  fill="#3b82f6" opacity="0.45" filter="url(#sf-glow)"/>
-                                <circle cx="88" cy="90" r="3.5" fill="#93c5fd"/>
-
-                                <!-- Node: Data Science -->
-                                <circle cx="372" cy="175" r="26" fill="url(#rg-ds)" opacity="0.7"/>
-                                <circle cx="372" cy="175" r="12" fill="#06b6d4" opacity="0.1" filter="url(#sf-glow)"/>
-                                <circle cx="372" cy="175" r="7"  fill="#06b6d4" opacity="0.45" filter="url(#sf-glow)"/>
-                                <circle cx="372" cy="175" r="3"  fill="#67e8f9"/>
-
-                                <!-- Node: Algorithms -->
-                                <circle cx="125" cy="290" r="22" fill="url(#rg-algo)" opacity="0.7"/>
-                                <circle cx="125" cy="290" r="11" fill="#10b981" opacity="0.1" filter="url(#sf-glow)"/>
-                                <circle cx="125" cy="290" r="6.5" fill="#10b981" opacity="0.45" filter="url(#sf-glow)"/>
-                                <circle cx="125" cy="290" r="2.8" fill="#6ee7b7"/>
-
-                                <!-- Node: ML -->
-                                <circle cx="385" cy="82" r="18" fill="url(#rg-ml)" opacity="0.65"/>
-                                <circle cx="385" cy="82" r="9"  fill="#84cc16" opacity="0.08" filter="url(#sf-glow)"/>
-                                <circle cx="385" cy="82" r="5"  fill="#84cc16" opacity="0.4" filter="url(#sf-glow)"/>
-                                <circle cx="385" cy="82" r="2.2" fill="#bef264"/>
-
-                                <!-- Floating micro particles -->
-                                <circle cx="195" cy="142" r="1.8" fill="#3b82f6" opacity="0.38">
-                                    <animate attributeName="opacity" values="0.38;0.75;0.38" dur="3.2s" repeatCount="indefinite"/>
-                                    <animate attributeName="cy" values="142;136;142" dur="4.1s" repeatCount="indefinite"/>
-                                </circle>
-                                <circle cx="285" cy="215" r="1.8" fill="#06b6d4" opacity="0.38">
-                                    <animate attributeName="opacity" values="0.38;0.75;0.38" dur="4.5s" repeatCount="indefinite"/>
-                                    <animate attributeName="cy" values="215;209;215" dur="5.2s" repeatCount="indefinite"/>
-                                </circle>
-                                <circle cx="175" cy="235" r="1.8" fill="#10b981" opacity="0.35">
-                                    <animate attributeName="opacity" values="0.35;0.7;0.35" dur="3.8s" repeatCount="indefinite"/>
-                                    <animate attributeName="cy" values="235;229;235" dur="4.8s" repeatCount="indefinite"/>
-                                </circle>
-                                <circle cx="320" cy="118" r="1.8" fill="#84cc16" opacity="0.32">
-                                    <animate attributeName="opacity" values="0.32;0.65;0.32" dur="5.1s" repeatCount="indefinite"/>
-                                    <animate attributeName="cy" values="118;112;118" dur="6.2s" repeatCount="indefinite"/>
-                                </circle>
-                                <circle cx="218" cy="318" r="1.8" fill="#3b82f6" opacity="0.28">
-                                    <animate attributeName="opacity" values="0.28;0.58;0.28" dur="4.2s" repeatCount="indefinite"/>
-                                    <animate attributeName="cy" values="318;311;318" dur="5.4s" repeatCount="indefinite"/>
-                                </circle>
-                                <circle cx="340" cy="280" r="1.5" fill="#06b6d4" opacity="0.28">
-                                    <animate attributeName="opacity" values="0.28;0.55;0.28" dur="3.5s" repeatCount="indefinite"/>
-                                    <animate attributeName="cy" values="280;274;280" dur="4.5s" repeatCount="indefinite"/>
-                                </circle>
-                            </svg>
-
-                            <!-- Subject module card overlays -->
-                            <div class="sci-modules-overlay">
-                                <div class="sci-mod cs">💻 Comp. Science</div>
-                                <div class="sci-mod ds">📊 Data Science</div>
-                                <div class="sci-mod algo">⚙ Algorithms</div>
-                                <div class="sci-mod ml">🤖 Machine Learning</div>
-                                <!-- Stat chips -->
-                                <div class="sci-chip c1">Beginner → Advanced</div>
-                                <div class="sci-chip c2">First Principles</div>
-                            </div>
-
+                    <!-- HERO RIGHT — Profile image -->
+                    <div class="hero-right">
+                        <div class="hero-profile-motion">
+                            <figure class="hero-profile">
+                                <img src="/Raushan_Hero_Image.webp"
+                                     width="1200"
+                                     height="1200"
+                                     loading="lazy"
+                                     alt="Portrait of Raushan, founder of RaushanSYNC Science">
+                            </figure>
                         </div>
-                    </div>
-                    <!-- END HERO RIGHT -->
-
-                </div>
-                <!-- ═══ END HERO SPLIT ════════════════════════════ -->
-
-                <!-- ═══ CINEMATIC QUOTE SECTION ══════════════════ -->
-                <div class="quote-display-section">
-                    <div class="quote-hud" role="region" aria-label="Rotating CS quote">
-                        <!-- Accent lines -->
-                        <div class="qhud-line top" aria-hidden="true"></div>
-
-                        <!-- Decorative oversized quotation mark -->
-                        <span class="quote-deco-mark" aria-hidden="true">"</span>
-
-                        <!-- Label -->
-                        <div class="quote-label" aria-hidden="true">
-                            <span class="quote-label-dot"></span>
-                            Computing Wisdom
-                        </div>
-
-                        <!-- Rotating quote text — injected by JS -->
-                        <blockquote id="quote-text">
-                            Any sufficiently advanced technology is indistinguishable from magic.
-                        </blockquote>
-
-                        <!-- Author attribution -->
-                        <cite id="quote-author">— Arthur C. Clarke</cite>
-
-                        <!-- Progress indicator dots (rendered by JS) -->
-                        <div class="quote-indicators" id="quote-indicators" aria-hidden="true"></div>
-
-                        <div class="qhud-line bottom" aria-hidden="true"></div>
                     </div>
                 </div>
                 <!-- ═══ END QUOTE SECTION ══════════════════════ -->
@@ -1564,184 +1017,6 @@
     <script src="/assets/js/homepage-hero.js"></script>
 
     <script src="assets/js/script.js"></script>
-
-    <!-- ══════════════════════════════════════════════════════════
-         Particle Constellation + CS Quote Rotation
-         Self-contained — no external deps, no conflict with existing JS
-         ══════════════════════════════════════════════════════════ -->
-    <script>
-        /* ── Particle Constellation Canvas ───────────────────────── */
-        (function () {
-            var canvas = document.getElementById('science-canvas');
-            if (!canvas || !canvas.getContext) return;
-
-            var ctx = canvas.getContext('2d');
-            var W, H, pts, raf;
-            var COUNT = 55;
-            var LINK  = 130;
-
-            function resize() {
-                W = canvas.width  = window.innerWidth;
-                H = canvas.height = window.innerHeight;
-            }
-
-            function spawn() {
-                pts = [];
-                for (var i = 0; i < COUNT; i++) {
-                    pts.push({
-                        x:  Math.random() * W,
-                        y:  Math.random() * H,
-                        vx: (Math.random() - 0.5) * 0.28,
-                        vy: (Math.random() - 0.5) * 0.28,
-                        r:  Math.random() * 1.6 + 0.7
-                    });
-                }
-            }
-
-            function step() {
-                ctx.clearRect(0, 0, W, H);
-                var dark  = document.documentElement.classList.contains('dark-mode');
-                var rgb   = dark ? '96,165,250' : '59,130,246';
-                var maxA  = dark ? 0.18 : 0.2;
-                var dotA  = dark ? 0.45 : 0.48;
-
-                for (var i = 0; i < COUNT; i++) {
-                    var a = pts[i];
-                    for (var j = i + 1; j < COUNT; j++) {
-                        var b  = pts[j];
-                        var dx = a.x - b.x;
-                        var dy = a.y - b.y;
-                        var d  = Math.sqrt(dx * dx + dy * dy);
-                        if (d < LINK) {
-                            var alpha = (1 - d / LINK) * maxA;
-                            ctx.beginPath();
-                            ctx.strokeStyle = 'rgba(' + rgb + ',' + alpha + ')';
-                            ctx.lineWidth   = 0.8;
-                            ctx.moveTo(a.x, a.y);
-                            ctx.lineTo(b.x, b.y);
-                            ctx.stroke();
-                        }
-                    }
-                    ctx.beginPath();
-                    ctx.fillStyle = 'rgba(' + rgb + ',' + dotA + ')';
-                    ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
-                    ctx.fill();
-                    a.x += a.vx;
-                    a.y += a.vy;
-                    if (a.x < 0 || a.x > W) a.vx *= -1;
-                    if (a.y < 0 || a.y > H) a.vy *= -1;
-                }
-                raf = requestAnimationFrame(step);
-            }
-
-            var prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            if (prefersReduced) return;
-
-            resize();
-            spawn();
-            step();
-
-            var resizeTimer;
-            window.addEventListener('resize', function () {
-                clearTimeout(resizeTimer);
-                resizeTimer = setTimeout(function () { resize(); spawn(); }, 220);
-            });
-        })();
-
-        /* ── CS Quote Rotation System ───────────────────── */
-        (function () {
-            var QUOTES = [
-                {
-                    text:   'Any sufficiently advanced technology is indistinguishable from magic.',
-                    author: 'Arthur C. Clarke'
-                },
-                {
-                    text:   'First, solve the problem. Then, write the code.',
-                    author: 'John Johnson'
-                },
-                {
-                    text:   'The computer was born to solve problems that did not exist before.',
-                    author: 'Bill Gates'
-                },
-                {
-                    text:   'Data is the new oil. It\'s valuable, but if unrefined it cannot really be used.',
-                    author: 'Clive Humby'
-                },
-                {
-                    text:   'Programs must be written for people to read, and only incidentally for machines to execute.',
-                    author: 'Harold Abelson'
-                },
-                {
-                    text:   'In God we trust. All others must bring data.',
-                    author: 'W. Edwards Deming'
-                },
-                {
-                    text:   'The science of today is the technology of tomorrow.',
-                    author: 'Edward Teller'
-                },
-                {
-                    text:   'First principles: reduce things to their fundamental truths and reason up from there.',
-                    author: 'Elon Musk'
-                }
-            ];
-
-            var textEl   = document.getElementById('quote-text');
-            var authEl   = document.getElementById('quote-author');
-            var dotsEl   = document.getElementById('quote-indicators');
-
-            if (!textEl || !authEl) return;
-
-            var current = 0;
-            var total   = QUOTES.length;
-
-            if (dotsEl) {
-                for (var k = 0; k < total; k++) {
-                    (function (idx) {
-                        var d = document.createElement('span');
-                        d.className = 'q-dot' + (idx === 0 ? ' active' : '');
-                        d.addEventListener('click', function () { goTo(idx); });
-                        dotsEl.appendChild(d);
-                    })(k);
-                }
-            }
-
-            function updateDots(idx) {
-                if (!dotsEl) return;
-                var dots = dotsEl.querySelectorAll('.q-dot');
-                dots.forEach(function (d, i) {
-                    d.classList.toggle('active', i === idx);
-                });
-            }
-
-            function goTo(idx) {
-                if (idx === current) return;
-                current = idx;
-
-                textEl.style.opacity = '0';
-                authEl.style.opacity = '0';
-
-                setTimeout(function () {
-                    textEl.textContent = QUOTES[current].text;
-                    authEl.textContent = '— ' + QUOTES[current].author;
-                    updateDots(current);
-                    textEl.style.opacity = '1';
-                    authEl.style.opacity = '1';
-                }, 560);
-            }
-
-            function next() {
-                goTo((current + 1) % total);
-            }
-
-            var timer = setInterval(next, 10000);
-
-            var hudEl = textEl.closest ? textEl.closest('.quote-hud') : null;
-            if (hudEl) {
-                hudEl.addEventListener('mouseenter', function () { clearInterval(timer); });
-                hudEl.addEventListener('mouseleave', function () { timer = setInterval(next, 10000); });
-            }
-        })();
-    </script>
 
     <!-- ── PRESERVED: Service Worker — EXACT ─────────────────────── -->
     <script>

@@ -165,7 +165,7 @@
         }
 
         if (elements.title) {
-            elements.title.classList.remove('home-learning-title--typing');
+            elements.title.style.opacity = '';
         }
     }
 
@@ -213,8 +213,6 @@
             window.clearTimeout(state.quoteTypingTimerId);
             state.quoteTypingTimerId = null;
         }
-
-        elements.title.classList.add('home-learning-title--typing');
 
         if (shouldReduceMotion()) {
             elements.title.textContent = quoteText;
