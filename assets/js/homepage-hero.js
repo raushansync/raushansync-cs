@@ -298,7 +298,7 @@
             return {
                 badge: label,
                 title: getQuoteForTrack(trackType, state.currentQuote),
-                copy: 'Continue from your selected class, open your dashboard, or ask RaushanSYNC AI for guidance.'
+                copy: 'Continue from your selected class or open your dashboard to track your learning.'
             };
         }
 
@@ -307,14 +307,14 @@
             return {
                 badge: label,
                 title: getQuoteForTrack(trackType, state.currentQuote),
-                copy: 'Continue from your selected level, open your dashboard, or ask RaushanSYNC AI for guidance.'
+                copy: 'Continue from your selected level, open your dashboard to track your learning.'
             };
         }
 
         return {
             badge: 'Profile incomplete',
             title: getQuoteForTrack(trackType, state.currentQuote),
-            copy: 'Choose your class or study track in the dashboard first. That unlocks Start Learning, Dashboard access, and AI support.'
+            copy: 'Choose your class or study track in the dashboard first. That unlocks Start Learning, Dashboard access, and progress tracking.'
         };
     }
 
